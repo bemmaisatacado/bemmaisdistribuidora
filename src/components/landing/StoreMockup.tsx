@@ -1,6 +1,6 @@
-import calcados from "@/assets/cat-calcados.jpg";
-import vestuario from "@/assets/cat-vestuario.jpg";
-import acessorios from "@/assets/cat-acessorios.jpg";
+import calcados from "@/assets/shop-tenis.jpg";
+import vestuario from "@/assets/shop-overshirt.jpg";
+import acessorios from "@/assets/shop-bolsa.jpg";
 import { cn } from "@/lib/utils";
 
 export const MOCK_PRODUCTS = [

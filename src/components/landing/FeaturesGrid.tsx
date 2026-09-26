@@ -1,5 +1,5 @@
 import { Store, Users, Megaphone, MessageCircle, ClipboardList, Boxes, GraduationCap, Wallet } from "lucide-react";
-import lifePedidos from "@/assets/life-pedidos.jpg";
+import lifePedidos from "@/assets/life-ferramentas.jpg";
 import { Container, Eyebrow, Reveal, Section } from "./primitives";
 
 const FEATURES = [
@@ -25,8 +25,8 @@ export function FeaturesGrid() {
             </h2>
           </Reveal>
           <Reveal delay={100} className="relative overflow-hidden rounded-3xl">
-            <img src={lifePedidos} alt="Empreendedor embalando pedidos para envio" width={1280} height={960} loading="lazy" className="aspect-[16/9] w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
+            <img src={lifePedidos} alt="Empreendedores brasileiros comemorando um novo pedido na loja" width={1280} height={720} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
           </Reveal>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
