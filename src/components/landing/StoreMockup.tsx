@@ -49,7 +49,7 @@ export function BrowserStore({ className, eager }: { className?: string; eager?:
 }
 
 export function PhoneStore({ className }: { className?: string }) {
-  const p = MOCK_PRODUCTS[0];
+  const p = MOCK_PRODUCTS[0]!;
   return (
     <div className={cn("w-40 rounded-[1.75rem] border-[6px] border-ink bg-card p-2 shadow-lift sm:w-48", className)}>
       <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-foreground/10" />
