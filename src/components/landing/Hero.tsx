@@ -16,27 +16,28 @@ function MiniCard({ icon: Icon, label, value, className }: { icon: typeof Packag
   );
 }
 
-const TICKER = ["Drop sem estoque", "Atacado", "Grade fechada", "Loja white-label", "Estoque híbrido", "BemMais Academy", "Pedidos integrados"];
+const TICKER = ["São Paulo", "Recife", "Porto Alegre", "Manaus", "Belo Horizonte", "Drop sem estoque", "Atacado", "Grade fechada", "Loja white-label", "Estoque híbrido", "BemMais Academy", "Pedidos integrados"];
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 lg:pt-24">
+    <section className="relative overflow-hidden pt-8 pb-10 sm:pt-12 lg:pt-14">
       <div className="bg-grid absolute inset-0" aria-hidden />
       <div className="orb -left-32 top-10 h-96 w-96 bg-primary/25" aria-hidden />
-      <div className="orb right-0 top-40 h-80 w-80 bg-primary-soft" style={{ animationDelay: "-6s" }} aria-hidden />
+      <div className="orb right-0 top-20 h-80 w-80 bg-brasil-yellow/30" style={{ animationDelay: "-6s" }} aria-hidden />
+      <div className="orb bottom-0 left-1/3 h-72 w-72 bg-brasil-green/20" style={{ animationDelay: "-12s" }} aria-hidden />
 
       <Container className="relative grid items-center gap-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
         <div>
           <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em]">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Ecossistema BemMais · 2026
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Feito no Brasil · Para quem vende no Brasil
           </span>
-          <h1 className="mt-7 text-[clamp(2.4rem,6vw,4.75rem)] font-bold uppercase leading-[0.98]">
-            O futuro do seu negócio{" "}
-            <span className="text-gradient">começa aqui.</span>
+          <h1 className="mt-5 text-[clamp(2.4rem,6.4vw,5.25rem)] font-bold uppercase leading-[0.98]">
+            O futuro do varejo{" "}
+            <span className="text-gradient">é brasileiro.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             Produtos, tecnologia e estrutura em uma só plataforma. Revenda, venda sem estoque, compre no atacado
-            e lance sua própria loja em minutos.
+            e lance sua própria loja — de Norte a Sul, em minutos.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button to="/criar-conta" size="lg" className="shadow-glow">
@@ -44,8 +45,8 @@ export function Hero() {
             </Button>
             <Button href="#formas-de-vender" variant="outline" size="lg" className="glass">Explorar o ecossistema</Button>
           </div>
-          <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6">
-            {[["4", "Formas de vender"], ["1", "Painel único"], ["24/7", "Sua loja online"]].map(([v, l]) => (
+          <dl className="mt-8 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6">
+            {[["4", "Formas de vender"], ["1", "Painel único"], ["27", "Estados atendidos"]].map(([v, l]) => (
               <div key={l}>
                 <dt className="font-display text-2xl font-bold">{v}</dt>
                 <dd className="mt-1 text-xs text-muted-foreground">{l}</dd>
@@ -66,11 +67,11 @@ export function Hero() {
         </div>
       </Container>
 
-      <div className="relative mt-20 overflow-hidden border-y border-border py-4" aria-hidden>
+      <div className="relative mt-12 overflow-hidden border-y border-border bg-ink py-4" aria-hidden>
         <div className="marquee flex w-max gap-10 whitespace-nowrap">
           {[...TICKER, ...TICKER].map((t, i) => (
-            <span key={i} className="flex items-center gap-10 font-display text-sm font-bold uppercase tracking-[0.25em] text-muted-foreground">
-              {t} <span className="text-primary">✦</span>
+            <span key={i} className="flex items-center gap-10 font-display text-sm font-bold uppercase tracking-[0.25em] text-ink-foreground">
+              {t} <span className={["text-primary","text-brasil-yellow","text-brasil-green"][i%3]}>✦</span>
             </span>
           ))}
         </div>

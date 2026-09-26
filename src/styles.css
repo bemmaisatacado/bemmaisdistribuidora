@@ -38,6 +38,8 @@
   --color-ink-muted: var(--ink-muted);
   --color-ink-border: var(--ink-border);
   --color-surface: var(--surface);
+  --color-brasil-green: var(--brasil-green);
+  --color-brasil-yellow: var(--brasil-yellow);
 }
 
 :root {
@@ -67,6 +69,8 @@
   --ink-foreground: oklch(0.97 0.004 85);
   --ink-muted: oklch(0.7 0.008 70);
   --ink-border: oklch(1 0 0 / 0.1);
+  --brasil-green: oklch(0.62 0.16 150);
+  --brasil-yellow: oklch(0.86 0.17 95);
   --shadow-soft: 0 1px 2px oklch(0.2 0.01 60 / 0.04), 0 12px 32px -12px oklch(0.2 0.01 60 / 0.12);
   --shadow-lift: 0 2px 4px oklch(0.2 0.01 60 / 0.04), 0 30px 60px -24px oklch(0.2 0.01 60 / 0.22);
 }
@@ -97,7 +101,7 @@
 }
 
 @utility text-gradient {
-  background: linear-gradient(100deg, var(--primary), oklch(0.78 0.16 65), var(--primary));
+  background: linear-gradient(100deg, var(--primary), var(--brasil-yellow), var(--brasil-green), var(--primary));
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
