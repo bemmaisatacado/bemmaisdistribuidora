@@ -25,10 +25,10 @@ export function CatalogCategories() {
             <span className="text-primary">+</span> Catálogo em constante expansão.
           </p>
         </div>
-        <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+        <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
           {CATS.map((c, i) => (
             <Reveal key={c.t} delay={i * 80} className="group">
-              <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-surface">
+              <div className="aspect-[4/4] overflow-hidden rounded-2xl bg-surface">
                 <img src={c.img} alt={c.t} width={896} height={1120} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
               </div>
               <h3 className="mt-4 text-sm font-bold uppercase tracking-wider sm:text-base">{c.t}</h3>
