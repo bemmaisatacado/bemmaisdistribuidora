@@ -1,55 +1,53 @@
-import { Check } from "lucide-react";
-import { Container, Reveal, Section, SectionHeader } from "./primitives";
+import { ArrowRight, Boxes, PackageOpen, Rocket } from "lucide-react";
+import lifeLoja from "@/assets/life-loja.jpg";
+import { Button, Container, Eyebrow, Reveal, Section } from "./primitives";
 
-const MODES = [
-  {
-    n: "01", tag: "Drop", title: "Venda sem precisar ter estoque.",
-    text: "Escolha produtos do catálogo BemMais, defina sua margem e comece a vender.",
-    items: ["Comece a partir de 1 produto", "Estoque integrado", "Envio direto ao cliente"],
-  },
-  {
-    n: "02", tag: "Atacado variado", title: "Mais liberdade para montar seu estoque.",
-    text: "Escolha diferentes modelos, tamanhos e produtos conforme as condições disponíveis.",
-    items: ["Mix de produtos", "Condições de atacado", "Mais flexibilidade"],
-  },
-  {
-    n: "03", tag: "Grade fechada", title: "Mais volume. Melhor condição de compra.",
-    text: "Compre grades fechadas e aumente sua margem conforme sua operação cresce.",
-    items: ["Compra em volume", "Condições diferenciadas", "Ideal para lojistas"],
-  },
+const PATHS = [
+  { icon: Rocket, kicker: "Começar sem estoque", tag: "Drop", text: "Escolha produtos do catálogo, defina sua margem e venda. A BemMais envia para o seu cliente." },
+  { icon: PackageOpen, kicker: "Começar com poucos produtos", tag: "Atacado variado", text: "Monte seu mix com modelos e tamanhos diferentes e teste o que vende mais." },
+  { icon: Boxes, kicker: "Abastecer minha loja", tag: "Grade fechada", text: "Compre em volume, com melhores condições, e fortaleça sua margem." },
 ];
 
 export function SellingModes() {
   return (
-    <Section id="formas-de-vender" className="bg-card">
+    <Section id="formas-de-vender" className="bg-background">
       <Container>
-        <SectionHeader
-          eyebrow="Formas de vender"
-          title="Uma estrutura. Várias formas de vender."
-          subtitle="Comece da forma que fizer sentido para você e evolua sua operação dentro da BemMais."
-        />
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {MODES.map((m, i) => (
-            <Reveal key={m.n} delay={i * 90} className="group flex flex-col rounded-2xl border border-border bg-background p-7 transition-all duration-300 hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lift sm:p-8">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary">{m.tag}</span>
-                <span className="font-display text-sm font-semibold text-muted-foreground">{m.n}</span>
-              </div>
-              <h3 className="mt-8 text-2xl font-bold leading-tight">{m.title}</h3>
-              <p className="mt-4 leading-relaxed text-muted-foreground">{m.text}</p>
-              <ul className="mt-8 space-y-3 border-t border-border pt-6">
-                {m.items.map((it) => (
-                  <li key={it} className="flex items-center gap-3 text-sm font-medium">
-                    <Check className="h-4 w-4 shrink-0 text-primary" /> {it}
-                  </li>
-                ))}
-              </ul>
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <Reveal>
+            <Eyebrow>Por onde começar</Eyebrow>
+            <h2 className="mt-5 text-[clamp(2rem,4.6vw,3.5rem)] font-bold uppercase leading-[1.02]">
+              E se a sua próxima venda <span className="text-primary">começasse hoje?</span>
+            </h2>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Você não precisa começar com uma grande estrutura. Na BemMais, você encontra diferentes caminhos para
+              entrar no mercado, testar produtos e desenvolver sua operação.
+            </p>
+            <Button to="/criar-conta" size="lg" className="mt-8">
+              Escolher como começar <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Reveal>
+          <Reveal delay={100} className="relative">
+            <img src={lifeLoja} alt="Empreendedora gerenciando vendas pelo celular em sua loja" width={1280} height={960} loading="lazy" className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lift" />
+            <div className="absolute -bottom-5 left-5 flex items-center gap-3 rounded-2xl bg-ink px-4 py-3 text-ink-foreground shadow-lift">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+              <span className="text-xs font-bold uppercase tracking-wider">Sua loja, seu ritmo</span>
+            </div>
+          </Reveal>
+        </div>
+
+        <div className="mt-16 grid gap-4 md:grid-cols-3">
+          {PATHS.map((p, i) => (
+            <Reveal key={p.tag} delay={i * 90} className="group relative overflow-hidden rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift">
+              <span className="absolute right-6 top-6 font-display text-5xl font-bold text-foreground/5">0{i + 1}</span>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-ink text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <p.icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-6 text-xl font-bold uppercase leading-tight">{p.kicker}</h3>
+              <p className="mt-1 text-sm font-bold uppercase tracking-[0.18em] text-primary">{p.tag}</p>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.text}</p>
             </Reveal>
           ))}
         </div>
-        <p className="mt-8 text-center text-sm text-muted-foreground">
-          Uma única conta. Use Drop, Variado e Grade ao mesmo tempo.
-        </p>
       </Container>
     </Section>
   );
