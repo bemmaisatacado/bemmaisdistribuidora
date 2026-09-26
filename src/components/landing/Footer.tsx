@@ -11,7 +11,7 @@ export function Footer() {
     <footer id="contato" className="border-t border-border bg-card">
       <Container className="grid gap-12 py-16 lg:grid-cols-[1.4fr_2fr]">
         <div>
-          <Logo className="h-11" />
+          <Logo className="-ml-2 h-20" />
           <p className="mt-6 text-sm font-bold">BemMais Distribuidora</p>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">O ecossistema que ajuda sua loja a vender mais.</p>
         </div>

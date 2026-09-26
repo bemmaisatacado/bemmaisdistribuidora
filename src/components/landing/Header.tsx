@@ -36,7 +36,7 @@ export function Header() {
     >
       <Container className="flex h-18 items-center justify-between gap-6 py-3">
         <Link to="/" aria-label="BemMais Distribuidora — início">
-          <Logo className="h-9 sm:h-10" />
+          <Logo className="-my-3 h-14 sm:h-16" />
         </Link>
 
         <nav aria-label="Principal" className="hidden lg:block">

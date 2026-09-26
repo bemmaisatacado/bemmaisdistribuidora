@@ -46,12 +46,12 @@ export function Hero() {
         <div className="relative mx-auto w-full max-w-xl pb-10 lg:max-w-none">
           <BrowserStore eager />
           <PhoneStore className="absolute -bottom-2 -right-1 sm:-right-6" />
-          <MiniCard icon={ShoppingBag} label="Pedidos hoje" value="12" className="absolute -left-3 top-24 hidden sm:flex lg:-left-10" />
+          <MiniCard icon={ShoppingBag} label="Pedidos hoje" value="12" className="absolute -left-3 top-[58%] hidden sm:flex lg:-left-10" />
           <MiniCard icon={TrendingUp} label="Vendas" value="+18%" className="absolute -top-5 right-10 hidden sm:flex" />
           <div className="mt-4 flex gap-3 sm:hidden">
             <MiniCard icon={Boxes} label="Estoque" value="Integrado" />
           </div>
-          <MiniCard icon={Package} label="Produtos" value="Drop + Próprio" className="absolute bottom-6 left-6 hidden sm:flex" />
+          <MiniCard icon={Package} label="Produtos" value="Drop + Próprio" className="absolute -bottom-2 left-10 hidden sm:flex" />
         </div>
       </Container>
     </section>
