@@ -19,7 +19,7 @@ function Toast({ icon: Icon, title, sub, className, delay = 0 }: { icon: typeof 
   );
 }
 
-const STRIP = ["Sem estoque no Drop", "Atacado", "Loja própria", "Academy", "Ferramentas de venda"];
+const STRIP = ["Tênis", "Roupas", "Bolsas", "Acessórios", "Importação da China"];
 
 export function Hero() {
   return (
@@ -64,7 +64,7 @@ export function Hero() {
             <BrowserStore eager />
           </div>
           <PhoneStore className="float-y absolute -bottom-2 -right-1 sm:-right-6" />
-          <Toast icon={Bell} title="Novo pedido" sub="Tênis Couro · R$ 389,90" className="absolute -left-2 top-[8%] sm:-left-8" />
+          <Toast icon={Bell} title="Novo pedido" sub="Tênis Street Hi · R$ 349,90" className="absolute -left-2 top-[8%] sm:-left-8" />
           <Toast icon={BadgeCheck} title="Venda aprovada" sub="Pagamento confirmado" className="absolute -left-2 top-[62%] hidden sm:flex lg:-left-12" delay={-2} />
           <Toast icon={Package} title="Estoque atualizado" sub="Drop + estoque próprio" className="absolute -top-5 right-10 hidden md:flex" delay={-4} />
           <Toast icon={Truck} title="Pedido enviado" sub="A caminho do cliente" className="absolute -bottom-3 left-6 hidden sm:flex" delay={-3} />

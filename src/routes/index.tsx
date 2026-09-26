@@ -8,6 +8,7 @@ import { StickyCTA } from "@/components/landing/StickyCTA";
 import { WhiteLabelStore } from "@/components/landing/WhiteLabelStore";
 import { CatalogCategories } from "@/components/landing/CatalogCategories";
 import { HybridInventory } from "@/components/landing/HybridInventory";
+import { ChinaImport } from "@/components/landing/ChinaImport";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { AcademySection } from "@/components/landing/AcademySection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
@@ -45,6 +46,7 @@ function Index() {
         <WhiteLabelStore />
         <CatalogCategories />
         <HybridInventory />
+        <ChinaImport />
         <FeaturesGrid />
         <AcademySection />
         <HowItWorks />
