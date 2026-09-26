@@ -16,7 +16,7 @@ export function HowItWorks() {
         <SectionHeader align="center" eyebrow="Como funciona" title="Da ideia à primeira venda." />
         <ol className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {STEPS.map(({ i: Icon, t }, idx) => (
-            <Reveal as="li" key={t} delay={idx * 80} className="flex flex-col rounded-2xl border border-border bg-background p-6 sm:p-7">
+            <Reveal as="li" key={t} delay={idx * 80} className="glass flex flex-col rounded-2xl p-6 transition-transform duration-500 hover:-translate-y-1 sm:p-7">
               <span className="font-display text-4xl font-bold text-foreground/10">0{idx + 1}</span>
               <Icon className={`mt-6 h-6 w-6 ${idx === STEPS.length - 1 ? "text-primary" : "text-foreground"}`} />
               <h3 className="mt-4 text-base font-bold uppercase leading-snug">{t}</h3>

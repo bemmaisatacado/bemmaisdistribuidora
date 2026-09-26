@@ -87,10 +87,50 @@
 
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
 @utility shadow-lift { box-shadow: var(--shadow-lift); }
+@utility shadow-glow { box-shadow: 0 0 0 1px oklch(0.67 0.2 42 / 0.25), 0 20px 60px -15px oklch(0.67 0.2 42 / 0.45); }
 
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
-.reveal.is-visible { opacity: 1; transform: none; }
+@utility glass {
+  background: oklch(1 0 0 / 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid oklch(1 0 0 / 0.7);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.8), var(--shadow-soft);
+}
+
+@utility text-gradient {
+  background: linear-gradient(100deg, var(--primary), oklch(0.78 0.16 65), var(--primary));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(oklch(0.2 0.006 60 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.2 0.006 60 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%);
+}
+
+.orb { position: absolute; border-radius: 9999px; filter: blur(70px); pointer-events: none; animation: drift 18s ease-in-out infinite alternate; }
+.float-y { animation: floaty 6s ease-in-out infinite; }
+.tilt-3d { transform: perspective(1400px) rotateY(-10deg) rotateX(6deg); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.tilt-3d:hover { transform: perspective(1400px) rotateY(-3deg) rotateX(2deg); }
+.scanline { position: relative; overflow: hidden; }
+.scanline::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, oklch(0.67 0.2 42 / 0.12), transparent); height: 40%; animation: scan 4.5s ease-in-out infinite; pointer-events: none; }
+.marquee { animation: marquee 30s linear infinite; }
+
+@keyframes shimmer { to { background-position: 200% center; } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(60px,-40px) scale(1.15); } }
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(250%); } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+.reveal { opacity: 0; transform: translateY(24px); filter: blur(6px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1), filter .9s; }
+.reveal.is-visible { opacity: 1; transform: none; filter: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .orb, .float-y, .text-gradient, .scanline::after, .marquee { animation: none; }
 }
