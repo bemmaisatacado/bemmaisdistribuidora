@@ -101,7 +101,7 @@
 }
 
 @utility text-gradient {
-  background: linear-gradient(100deg, var(--primary), var(--brasil-yellow), var(--brasil-green), var(--primary));
+  background: linear-gradient(100deg, var(--primary), oklch(0.8 0.16 65), var(--primary));
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -117,6 +117,18 @@
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%);
 }
 
+@utility bg-grid-dark {
+  background-image:
+    linear-gradient(oklch(1 0 0 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, black 20%, transparent 85%);
+}
+@utility glass-dark {
+  background: oklch(0.24 0.006 60 / 0.72);
+  backdrop-filter: blur(16px);
+  border: 1px solid oklch(1 0 0 / 0.1);
+}
 .orb { position: absolute; border-radius: 9999px; filter: blur(70px); pointer-events: none; animation: drift 18s ease-in-out infinite alternate; }
 .float-y { animation: floaty 6s ease-in-out infinite; }
 .tilt-3d { transform: perspective(1400px) rotateY(-10deg) rotateX(6deg); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
