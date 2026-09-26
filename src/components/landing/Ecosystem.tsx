@@ -1,23 +1,26 @@
 import { Container, Eyebrow, Reveal, Section } from "./primitives";
 
-const NODES = ["Produtos", "Drop", "Atacado", "Loja", "Estoque", "Clientes", "Marketing", "Academy", "Pedidos"];
+const NODES = ["Produtos", "Drop", "Atacado", "Loja", "Estoque", "Clientes", "Marketing", "Academy"];
 
 export function Ecosystem() {
   return (
-    <Section className="bg-ink text-ink-foreground">
-      <Container>
+    <Section id="ecossistema" className="relative overflow-hidden bg-ink text-ink-foreground">
+      <div className="bg-grid-dark absolute inset-0" aria-hidden />
+      <div className="orb left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 bg-primary/20" aria-hidden />
+      <Container className="relative">
         <Reveal className="mx-auto max-w-3xl text-center">
           <Eyebrow className="text-ink-muted">Ecossistema</Eyebrow>
           <h2 className="mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)] font-bold uppercase leading-[1.05]">
-            Tudo conectado.<br />Em um único ecossistema.
+            Não é só produto.<br /><span className="text-gradient">É estrutura para vender.</span>
           </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">Da escolha do produto ao relacionamento com o cliente, a BemMais reúne diferentes ferramentas para acompanhar a evolução da sua operação.</p>
         </Reveal>
 
         {/* Desktop orbit */}
         <Reveal className="relative mx-auto mt-16 hidden aspect-square w-full max-w-[560px] md:block">
           <div className="absolute inset-[12%] rounded-full border border-ink-border" />
           <div className="absolute inset-[30%] rounded-full border border-ink-border" />
-          <div className="absolute left-1/2 top-1/2 flex h-32 w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-ink-foreground text-ink">
+          <div className="absolute left-1/2 top-1/2 flex h-32 w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-ink-foreground text-ink shadow-glow">
             <span className="font-display text-lg font-bold tracking-tight">BEM<span className="text-primary">MAIS</span></span>
             <span className="text-[9px] font-bold tracking-[0.3em] text-muted-foreground">ECOSSISTEMA</span>
           </div>
@@ -38,7 +41,7 @@ export function Ecosystem() {
 
         {/* Mobile grid */}
         <div className="mt-12 md:hidden">
-          <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center rounded-full bg-ink-foreground text-ink">
+          <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center rounded-full bg-ink-foreground text-ink shadow-glow">
             <span className="font-display text-base font-bold">BEM<span className="text-primary">MAIS</span></span>
           </div>
           <ul className="mt-8 grid grid-cols-3 gap-2">

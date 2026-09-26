@@ -1,68 +1,49 @@
-import { Check } from "lucide-react";
-import { Container, Reveal, Section, SectionHeader } from "./primitives";
-import { BrowserStore } from "./StoreMockup";
+import { ArrowRight, Plus } from "lucide-react";
+import { Button, Container, Eyebrow, Reveal, Section } from "./primitives";
+import { BrowserStore, PhoneStore } from "./StoreMockup";
 
-const CAN = [
-  "Colocar sua própria logo", "Escolher suas cores", "Escolher produtos do catálogo",
-  "Definir sua margem e seus preços", "Trabalhar com Drop e estoque próprio",
-  "Cadastrar produtos próprios", "Vender no varejo e no atacado",
-];
-
-const SWATCHES = ["bg-ink", "bg-primary", "bg-muted-foreground", "bg-border"];
+const YOURS = ["Sua logo", "Suas cores", "Seus preços", "Sua margem", "Seus clientes"];
+const SOURCES = ["Produtos BemMais", "Seu próprio estoque", "Seus próprios produtos"];
 
 export function WhiteLabelStore() {
   return (
-    <Section id="sua-loja" className="bg-surface">
-      <Container className="grid items-center gap-16 lg:grid-cols-2">
-        <div>
-          <SectionHeader
-            eyebrow="Sua loja"
-            title={<>Sua marca.<br />Sua loja.<br />Seus preços.</>}
-            subtitle="Tenha sua própria loja virtual conectada ao ecossistema BemMais — com catálogo, estoque e pedidos no mesmo lugar."
-          />
-          <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-            {CAN.map((c) => (
-              <li key={c} className="flex items-start gap-3 text-sm font-medium">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {c}
+    <Section id="sua-loja" className="relative overflow-hidden bg-ink text-ink-foreground">
+      <div className="bg-grid-dark absolute inset-0" aria-hidden />
+      <div className="orb -left-20 top-1/3 h-96 w-96 bg-primary/25" aria-hidden />
+      <Container className="relative grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+        <Reveal>
+          <Eyebrow className="text-ink-muted">Sua loja</Eyebrow>
+          <h2 className="mt-5 text-[clamp(2.4rem,6vw,4.75rem)] font-bold uppercase leading-[0.96]">
+            Uma loja com<br /><span className="text-gradient">a sua cara.</span>
+          </h2>
+          <p className="mt-5 max-w-md text-base leading-relaxed text-ink-muted sm:text-lg">
+            Sua marca na frente. A estrutura BemMais trabalhando por trás.
+          </p>
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {YOURS.map((y) => (
+              <li key={y} className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-ink-foreground">
+                {y}
               </li>
             ))}
           </ul>
-          <div className="mt-10 flex flex-wrap gap-2">
-            {["Varejo", "Atacado", "Híbrido"].map((b) => (
-              <span key={b} className="rounded-full border border-foreground/15 bg-card px-4 py-2 text-xs font-bold uppercase tracking-widest">
-                {b}
+          <div className="mt-8 flex flex-wrap items-center gap-2 text-sm font-semibold">
+            {SOURCES.map((s, i) => (
+              <span key={s} className="flex items-center gap-2">
+                {i > 0 && <Plus className="h-4 w-4 text-primary" />}
+                <span className="rounded-xl border border-ink-border px-3 py-2">{s}</span>
               </span>
             ))}
           </div>
-        </div>
+          <p className="mt-3 text-xs uppercase tracking-[0.2em] text-ink-muted">Tudo na mesma vitrine · Varejo · Atacado · Híbrido</p>
+          <Button to="/criar-conta" size="lg" className="mt-9 shadow-glow">
+            Quero minha loja <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Reveal>
 
-        <Reveal className="relative">
-          <BrowserStore />
-          <div className="relative mt-5 grid gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft sm:absolute sm:-bottom-10 sm:-left-8 sm:mt-0 sm:w-72">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Personalizar</p>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Logo</span>
-              <span className="font-display text-xs font-bold tracking-[0.2em]">ATELIER NOVE</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Cor da marca</span>
-              <span className="flex gap-1.5">
-                {SWATCHES.map((s, i) => (
-                  <span key={s} className={`h-5 w-5 rounded-full ${s} ${i === 0 ? "ring-2 ring-primary ring-offset-2 ring-offset-card" : ""}`} />
-                ))}
-              </span>
-            </div>
-            <div className="flex items-center justify-between border-t border-border pt-4 text-sm">
-              <span className="text-muted-foreground">Custo</span><span className="font-semibold">R$ 239,90</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Margem</span>
-              <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-bold text-primary">+62%</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Preço final</span><span className="font-display font-bold">R$ 389,90</span>
-            </div>
-          </div>
+        <Reveal delay={120} className="relative pb-10">
+          <div className="absolute -inset-6 rounded-[2rem] bg-primary/15 blur-3xl" aria-hidden />
+          <BrowserStore className="relative" />
+          <PhoneStore className="float-y absolute -bottom-2 -left-2 sm:-left-8" />
         </Reveal>
       </Container>
     </Section>
