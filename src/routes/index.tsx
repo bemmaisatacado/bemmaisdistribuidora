@@ -3,6 +3,8 @@ import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
 import { SellingModes } from "@/components/landing/SellingModes";
 import { GrowthJourney } from "@/components/landing/GrowthJourney";
+import { Opportunity } from "@/components/landing/Opportunity";
+import { StickyCTA } from "@/components/landing/StickyCTA";
 import { WhiteLabelStore } from "@/components/landing/WhiteLabelStore";
 import { CatalogCategories } from "@/components/landing/CatalogCategories";
 import { HybridInventory } from "@/components/landing/HybridInventory";
@@ -13,9 +15,9 @@ import { Ecosystem } from "@/components/landing/Ecosystem";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
 
-const TITLE = "BemMais Distribuidora — O ecossistema que ajuda sua loja a vender mais";
+const TITLE = "BemMais — Comece a vender. Construa sua marca.";
 const DESC =
-  "Produtos, tecnologia e estrutura para você vender mais: Drop, atacado, grade fechada e sua própria loja white-label.";
+  "Produtos, loja virtual, fornecedores e ferramentas em um só ecossistema: Drop, atacado, loja própria e Academy.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +41,7 @@ function Index() {
         <Hero />
         <SellingModes />
         <GrowthJourney />
+        <Opportunity />
         <WhiteLabelStore />
         <CatalogCategories />
         <HybridInventory />
@@ -49,6 +52,7 @@ function Index() {
         <FinalCTA />
       </main>
       <Footer />
+      <StickyCTA />
     </>
   );
 }
