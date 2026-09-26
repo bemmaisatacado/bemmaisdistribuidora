@@ -10,15 +10,15 @@ const LESSONS = [
 
 export function AcademySection() {
   return (
-    <Section id="academy" className="bg-surface py-16 sm:py-20 lg:py-24">
+    <Section id="academy" className="bg-background">
       <Container className="grid items-center gap-12 lg:grid-cols-2">
         <Reveal>
           <Eyebrow>BemMais Academy</Eyebrow>
           <h2 className="mt-5 text-[clamp(1.7rem,3.4vw,2.5rem)] font-bold uppercase leading-[1.08]">
-            Produto é importante.<br />Saber vender também.
+            Você vende.<br /><span className="text-primary">A BemMais também te ajuda a evoluir.</span>
           </h2>
           <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">
-            Tenha acesso a vídeos e materiais de estudo para desenvolver suas estratégias e melhorar sua operação.
+            Acesse vídeos e materiais sobre vendas, divulgação, precificação, atendimento, WhatsApp, Instagram e gestão.
           </p>
           <ul className="mt-8 flex flex-wrap gap-2">
             {TOPICS.map((t) => (
