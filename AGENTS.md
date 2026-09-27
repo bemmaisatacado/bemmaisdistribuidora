@@ -22,3 +22,4 @@
 - AI calls go through src/lib/ai/gateway.server.ts with provider adapters; keys only in server secrets, usage logs hold metadata only.
 - Super Admin lives under src/routes/_authenticated/admin/*; future modules route to the admin splat page — no invented data.
 - Architecture reference: docs/ARCHITECTURE.md.
+- Super Admin design system: tokens (canvas, surface-elevated/dark, success/warning/danger/info) in src/styles.css + shared components in src/components/admin/ui.tsx — every admin module must reuse them, never hand-roll white/bordered cards.
