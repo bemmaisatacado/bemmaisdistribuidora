@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/landing/ComingSoon";
+import { AuthForm } from "@/components/auth/AuthForm";
 
 export const Route = createFileRoute("/criar-conta")({
   head: () => ({
     meta: [
-      { title: "Criar minha conta — BemMais Distribuidora" },
-      { name: "description", content: "Cadastre-se e entre para o ecossistema BemMais." },
-      { property: "og:title", content: "Criar minha conta — BemMais Distribuidora" },
-      { property: "og:description", content: "Cadastre-se e entre para o ecossistema BemMais." },
+      { title: "Criar conta — BemMais Distribuidora" },
+      { name: "description", content: "Crie sua conta e acesse o ecossistema BemMais." },
+      { property: "og:title", content: "Criar conta — BemMais Distribuidora" },
+      { property: "og:description", content: "Crie sua conta e acesse o ecossistema BemMais." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <ComingSoon title="Criar minha conta" text="O cadastro no ecossistema BemMais estará disponível em breve." />,
+  component: () => <AuthForm mode="signup" />,
 });

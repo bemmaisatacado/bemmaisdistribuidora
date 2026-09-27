@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/landing/ComingSoon";
+import { AuthForm } from "@/components/auth/AuthForm";
 
 export const Route = createFileRoute("/entrar")({
   head: () => ({
@@ -8,7 +8,9 @@ export const Route = createFileRoute("/entrar")({
       { name: "description", content: "Acesse sua conta no ecossistema BemMais." },
       { property: "og:title", content: "Entrar — BemMais Distribuidora" },
       { property: "og:description", content: "Acesse sua conta no ecossistema BemMais." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <ComingSoon title="Entrar" text="O acesso à sua conta BemMais estará disponível em breve." />,
+  component: () => <AuthForm mode="signin" />,
 });
