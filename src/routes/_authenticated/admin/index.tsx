@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, type LinkProps } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +42,7 @@ function Dashboard() {
   const m = metrics.data;
   const v = (k: string) => (m ? m[k] : undefined);
   const ticket = m && m.paid_count ? m.gmv / m.paid_count : 0;
-  const alerts = ops.data ? [
+  const alerts: { n: number; label: string; to: LinkProps["to"] }[] = ops.data ? [
     { n: ops.data.offers_pending, label: "ofertas aguardando aprovação", to: "/admin/ofertas" },
     { n: ops.data.payouts_pending, label: "repasses pendentes", to: "/admin/financeiro/repasses" },
     { n: ops.data.accounts_pending, label: "contas recebedoras pendentes", to: "/admin/financeiro/contas" },
@@ -94,7 +94,7 @@ function Dashboard() {
           </Panel>
           <Panel title="Atalhos">
             <div className="grid grid-cols-2 gap-2 p-3 text-sm">
-              {[["Nova empresa", "/admin/empresas"], ["Nova loja", "/admin/lojas"], ["Novo produto", "/admin/produtos"], ["Nova oferta", "/admin/ofertas"]].map(([l, to]) => (
+              {([["Nova empresa", "/admin/empresas"], ["Nova loja", "/admin/lojas"], ["Novo produto", "/admin/produtos"], ["Nova oferta", "/admin/ofertas"]] as const).map(([l, to]) => (
                 <Link key={to} to={to} className="rounded-lg border border-border px-3 py-2 font-semibold hover:border-primary hover:text-primary">{l}</Link>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, type LinkProps } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,10 +6,10 @@ import { PageHeader, Panel } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/_authenticated/admin/operacional")({ component: Ops });
 
-type Item = { label: string; key?: string; to: string; soon?: boolean };
+type Item = { label: string; key?: string; to?: LinkProps["to"]; soon?: string };
 const ITEMS: Item[] = [
-  { label: "Pedidos aguardando ação", to: "/admin/pedidos", soon: true },
-  { label: "Pedidos atrasados", to: "/admin/pedidos", soon: true },
+  { label: "Pedidos aguardando ação", soon: "pedidos" },
+  { label: "Pedidos atrasados", soon: "pedidos" },
   { label: "Estoque crítico", key: "stock_critical", to: "/admin/estoque" },
   { label: "Ofertas aguardando aprovação", key: "offers_pending", to: "/admin/ofertas" },
   { label: "Produtos aguardando aprovação", key: "products_pending", to: "/admin/produtos" },
@@ -18,9 +18,9 @@ const ITEMS: Item[] = [
   { label: "Pagamentos com problema", key: "payments_problem", to: "/admin/financeiro/transacoes" },
   { label: "Repasses pendentes", key: "payouts_pending", to: "/admin/financeiro/repasses" },
   { label: "Contas recebedoras pendentes", key: "accounts_pending", to: "/admin/financeiro/contas" },
-  { label: "Fulfillments atrasados", to: "/admin/fulfillments", soon: true },
-  { label: "Integrações com falha", to: "/admin/integracoes", soon: true },
-  { label: "Ocorrências", to: "/admin/ocorrencias", soon: true },
+  { label: "Fulfillments atrasados", soon: "fulfillments" },
+  { label: "Integrações com falha", soon: "integracoes" },
+  { label: "Ocorrências", soon: "ocorrencias" },
 ];
 
 function Ops() {
@@ -41,7 +41,7 @@ function Ops() {
             const n = it.key ? data?.[it.key] : undefined;
             return (
               <li key={it.label}>
-                <Link to={it.to} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-secondary/50">
+                <Link {...(it.soon ? { to: "/admin/$", params: { _splat: it.soon } } : { to: it.to })} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-secondary/50">
                   <span className="font-medium">{it.label}</span>
                   <span className="flex items-center gap-2">
                     {it.soon ? <span className="text-xs text-muted-foreground">Próxima fase</span>
