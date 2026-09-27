@@ -13,7 +13,33 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminSplatRouteImport } from './routes/_authenticated/admin/$'
+import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin/categorias'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin/clientes'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminEstoqueRouteImport } from './routes/_authenticated/admin/estoque'
+import { Route as AuthenticatedAdminFornecedoresRouteImport } from './routes/_authenticated/admin/fornecedores'
+import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticated/admin/ia'
+import { Route as AuthenticatedAdminLojasRouteImport } from './routes/_authenticated/admin/lojas'
+import { Route as AuthenticatedAdminMarcasRouteImport } from './routes/_authenticated/admin/marcas'
+import { Route as AuthenticatedAdminModalidadesRouteImport } from './routes/_authenticated/admin/modalidades'
+import { Route as AuthenticatedAdminOfertasRouteImport } from './routes/_authenticated/admin/ofertas'
+import { Route as AuthenticatedAdminOperacionalRouteImport } from './routes/_authenticated/admin/operacional'
+import { Route as AuthenticatedAdminPermissoesRouteImport } from './routes/_authenticated/admin/permissoes'
+import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenticated/admin/precos'
+import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminFinanceiroIndexRouteImport } from './routes/_authenticated/admin/financeiro/index'
+import { Route as AuthenticatedAdminFinanceiroAllocationsRouteImport } from './routes/_authenticated/admin/financeiro/allocations'
+import { Route as AuthenticatedAdminFinanceiroContasRouteImport } from './routes/_authenticated/admin/financeiro/contas'
+import { Route as AuthenticatedAdminFinanceiroLedgerRouteImport } from './routes/_authenticated/admin/financeiro/ledger'
+import { Route as AuthenticatedAdminFinanceiroRecebiveisRouteImport } from './routes/_authenticated/admin/financeiro/recebiveis'
+import { Route as AuthenticatedAdminFinanceiroRepassesRouteImport } from './routes/_authenticated/admin/financeiro/repasses'
+import { Route as AuthenticatedAdminFinanceiroTransacoesRouteImport } from './routes/_authenticated/admin/financeiro/transacoes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,23 +60,226 @@ const EntrarRoute = EntrarRouteImport.update({
   path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSplatRoute = AuthenticatedAdminSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminAuditoriaRoute =
+  AuthenticatedAdminAuditoriaRouteImport.update({
+    id: '/auditoria',
+    path: '/auditoria',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCategoriasRoute =
+  AuthenticatedAdminCategoriasRouteImport.update({
+    id: '/categorias',
+    path: '/categorias',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/empresas',
+    path: '/empresas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEstoqueRoute =
+  AuthenticatedAdminEstoqueRouteImport.update({
+    id: '/estoque',
+    path: '/estoque',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFornecedoresRoute =
+  AuthenticatedAdminFornecedoresRouteImport.update({
+    id: '/fornecedores',
+    path: '/fornecedores',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminIaRoute = AuthenticatedAdminIaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminLojasRoute = AuthenticatedAdminLojasRouteImport.update({
+  id: '/lojas',
+  path: '/lojas',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminMarcasRoute =
+  AuthenticatedAdminMarcasRouteImport.update({
+    id: '/marcas',
+    path: '/marcas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminModalidadesRoute =
+  AuthenticatedAdminModalidadesRouteImport.update({
+    id: '/modalidades',
+    path: '/modalidades',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOfertasRoute =
+  AuthenticatedAdminOfertasRouteImport.update({
+    id: '/ofertas',
+    path: '/ofertas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOperacionalRoute =
+  AuthenticatedAdminOperacionalRouteImport.update({
+    id: '/operacional',
+    path: '/operacional',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPermissoesRoute =
+  AuthenticatedAdminPermissoesRouteImport.update({
+    id: '/permissoes',
+    path: '/permissoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPrecosRoute =
+  AuthenticatedAdminPrecosRouteImport.update({
+    id: '/precos',
+    path: '/precos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminProdutosRoute =
+  AuthenticatedAdminProdutosRouteImport.update({
+    id: '/produtos',
+    path: '/produtos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroIndexRoute =
+  AuthenticatedAdminFinanceiroIndexRouteImport.update({
+    id: '/financeiro/',
+    path: '/financeiro/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroAllocationsRoute =
+  AuthenticatedAdminFinanceiroAllocationsRouteImport.update({
+    id: '/financeiro/allocations',
+    path: '/financeiro/allocations',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroContasRoute =
+  AuthenticatedAdminFinanceiroContasRouteImport.update({
+    id: '/financeiro/contas',
+    path: '/financeiro/contas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroLedgerRoute =
+  AuthenticatedAdminFinanceiroLedgerRouteImport.update({
+    id: '/financeiro/ledger',
+    path: '/financeiro/ledger',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroRecebiveisRoute =
+  AuthenticatedAdminFinanceiroRecebiveisRouteImport.update({
+    id: '/financeiro/recebiveis',
+    path: '/financeiro/recebiveis',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroRepassesRoute =
+  AuthenticatedAdminFinanceiroRepassesRouteImport.update({
+    id: '/financeiro/repasses',
+    path: '/financeiro/repasses',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroTransacoesRoute =
+  AuthenticatedAdminFinanceiroTransacoesRouteImport.update({
+    id: '/financeiro/transacoes',
+    path: '/financeiro/transacoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/admin/lojas': typeof AuthenticatedAdminLojasRoute
+  '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
+  '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
+  '/admin/precos': typeof AuthenticatedAdminPrecosRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
+  '/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/admin/lojas': typeof AuthenticatedAdminLojasRoute
+  '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
+  '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
+  '/admin/precos': typeof AuthenticatedAdminPrecosRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
+  '/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/financeiro': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,13 +287,98 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
+  '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/_authenticated/admin/lojas': typeof AuthenticatedAdminLojasRoute
+  '/_authenticated/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/_authenticated/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/_authenticated/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
+  '/_authenticated/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/_authenticated/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
+  '/_authenticated/admin/precos': typeof AuthenticatedAdminPrecosRoute
+  '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/_authenticated/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
+  '/_authenticated/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/_authenticated/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/_authenticated/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/_authenticated/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/_authenticated/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/criar-conta' | '/entrar' | '/admin'
+  fullPaths:
+    | '/'
+    | '/criar-conta'
+    | '/entrar'
+    | '/admin'
+    | '/admin/$'
+    | '/admin/auditoria'
+    | '/admin/categorias'
+    | '/admin/clientes'
+    | '/admin/configuracoes'
+    | '/admin/empresas'
+    | '/admin/estoque'
+    | '/admin/fornecedores'
+    | '/admin/ia'
+    | '/admin/lojas'
+    | '/admin/marcas'
+    | '/admin/modalidades'
+    | '/admin/ofertas'
+    | '/admin/operacional'
+    | '/admin/permissoes'
+    | '/admin/precos'
+    | '/admin/produtos'
+    | '/admin/usuarios'
+    | '/admin/'
+    | '/admin/financeiro/allocations'
+    | '/admin/financeiro/contas'
+    | '/admin/financeiro/ledger'
+    | '/admin/financeiro/recebiveis'
+    | '/admin/financeiro/repasses'
+    | '/admin/financeiro/transacoes'
+    | '/admin/financeiro/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/criar-conta' | '/entrar' | '/admin'
+  to:
+    | '/'
+    | '/criar-conta'
+    | '/entrar'
+    | '/admin/$'
+    | '/admin/auditoria'
+    | '/admin/categorias'
+    | '/admin/clientes'
+    | '/admin/configuracoes'
+    | '/admin/empresas'
+    | '/admin/estoque'
+    | '/admin/fornecedores'
+    | '/admin/ia'
+    | '/admin/lojas'
+    | '/admin/marcas'
+    | '/admin/modalidades'
+    | '/admin/ofertas'
+    | '/admin/operacional'
+    | '/admin/permissoes'
+    | '/admin/precos'
+    | '/admin/produtos'
+    | '/admin/usuarios'
+    | '/admin'
+    | '/admin/financeiro/allocations'
+    | '/admin/financeiro/contas'
+    | '/admin/financeiro/ledger'
+    | '/admin/financeiro/recebiveis'
+    | '/admin/financeiro/repasses'
+    | '/admin/financeiro/transacoes'
+    | '/admin/financeiro'
   id:
     | '__root__'
     | '/'
@@ -72,6 +386,32 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/_authenticated/admin'
+    | '/_authenticated/admin/$'
+    | '/_authenticated/admin/auditoria'
+    | '/_authenticated/admin/categorias'
+    | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/estoque'
+    | '/_authenticated/admin/fornecedores'
+    | '/_authenticated/admin/ia'
+    | '/_authenticated/admin/lojas'
+    | '/_authenticated/admin/marcas'
+    | '/_authenticated/admin/modalidades'
+    | '/_authenticated/admin/ofertas'
+    | '/_authenticated/admin/operacional'
+    | '/_authenticated/admin/permissoes'
+    | '/_authenticated/admin/precos'
+    | '/_authenticated/admin/produtos'
+    | '/_authenticated/admin/usuarios'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/financeiro/allocations'
+    | '/_authenticated/admin/financeiro/contas'
+    | '/_authenticated/admin/financeiro/ledger'
+    | '/_authenticated/admin/financeiro/recebiveis'
+    | '/_authenticated/admin/financeiro/repasses'
+    | '/_authenticated/admin/financeiro/transacoes'
+    | '/_authenticated/admin/financeiro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -115,18 +455,271 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/$': {
+      id: '/_authenticated/admin/$'
+      path: '/$'
+      fullPath: '/admin/$'
+      preLoaderRoute: typeof AuthenticatedAdminSplatRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/auditoria': {
+      id: '/_authenticated/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/estoque': {
+      id: '/_authenticated/admin/estoque'
+      path: '/estoque'
+      fullPath: '/admin/estoque'
+      preLoaderRoute: typeof AuthenticatedAdminEstoqueRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/fornecedores': {
+      id: '/_authenticated/admin/fornecedores'
+      path: '/fornecedores'
+      fullPath: '/admin/fornecedores'
+      preLoaderRoute: typeof AuthenticatedAdminFornecedoresRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/ia': {
+      id: '/_authenticated/admin/ia'
+      path: '/ia'
+      fullPath: '/admin/ia'
+      preLoaderRoute: typeof AuthenticatedAdminIaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/lojas': {
+      id: '/_authenticated/admin/lojas'
+      path: '/lojas'
+      fullPath: '/admin/lojas'
+      preLoaderRoute: typeof AuthenticatedAdminLojasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/marcas': {
+      id: '/_authenticated/admin/marcas'
+      path: '/marcas'
+      fullPath: '/admin/marcas'
+      preLoaderRoute: typeof AuthenticatedAdminMarcasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/modalidades': {
+      id: '/_authenticated/admin/modalidades'
+      path: '/modalidades'
+      fullPath: '/admin/modalidades'
+      preLoaderRoute: typeof AuthenticatedAdminModalidadesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/ofertas': {
+      id: '/_authenticated/admin/ofertas'
+      path: '/ofertas'
+      fullPath: '/admin/ofertas'
+      preLoaderRoute: typeof AuthenticatedAdminOfertasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/operacional': {
+      id: '/_authenticated/admin/operacional'
+      path: '/operacional'
+      fullPath: '/admin/operacional'
+      preLoaderRoute: typeof AuthenticatedAdminOperacionalRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/permissoes': {
+      id: '/_authenticated/admin/permissoes'
+      path: '/permissoes'
+      fullPath: '/admin/permissoes'
+      preLoaderRoute: typeof AuthenticatedAdminPermissoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/precos': {
+      id: '/_authenticated/admin/precos'
+      path: '/precos'
+      fullPath: '/admin/precos'
+      preLoaderRoute: typeof AuthenticatedAdminPrecosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/produtos': {
+      id: '/_authenticated/admin/produtos'
+      path: '/produtos'
+      fullPath: '/admin/produtos'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/': {
+      id: '/_authenticated/admin/financeiro/'
+      path: '/financeiro'
+      fullPath: '/admin/financeiro/'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/allocations': {
+      id: '/_authenticated/admin/financeiro/allocations'
+      path: '/financeiro/allocations'
+      fullPath: '/admin/financeiro/allocations'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroAllocationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/contas': {
+      id: '/_authenticated/admin/financeiro/contas'
+      path: '/financeiro/contas'
+      fullPath: '/admin/financeiro/contas'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroContasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/ledger': {
+      id: '/_authenticated/admin/financeiro/ledger'
+      path: '/financeiro/ledger'
+      fullPath: '/admin/financeiro/ledger'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroLedgerRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/recebiveis': {
+      id: '/_authenticated/admin/financeiro/recebiveis'
+      path: '/financeiro/recebiveis'
+      fullPath: '/admin/financeiro/recebiveis'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroRecebiveisRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/repasses': {
+      id: '/_authenticated/admin/financeiro/repasses'
+      path: '/financeiro/repasses'
+      fullPath: '/admin/financeiro/repasses'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroRepassesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/transacoes': {
+      id: '/_authenticated/admin/financeiro/transacoes'
+      path: '/financeiro/transacoes'
+      fullPath: '/admin/financeiro/transacoes'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroTransacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminSplatRoute: typeof AuthenticatedAdminSplatRoute
+  AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
+  AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminEstoqueRoute: typeof AuthenticatedAdminEstoqueRoute
+  AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
+  AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
+  AuthenticatedAdminLojasRoute: typeof AuthenticatedAdminLojasRoute
+  AuthenticatedAdminMarcasRoute: typeof AuthenticatedAdminMarcasRoute
+  AuthenticatedAdminModalidadesRoute: typeof AuthenticatedAdminModalidadesRoute
+  AuthenticatedAdminOfertasRoute: typeof AuthenticatedAdminOfertasRoute
+  AuthenticatedAdminOperacionalRoute: typeof AuthenticatedAdminOperacionalRoute
+  AuthenticatedAdminPermissoesRoute: typeof AuthenticatedAdminPermissoesRoute
+  AuthenticatedAdminPrecosRoute: typeof AuthenticatedAdminPrecosRoute
+  AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminFinanceiroAllocationsRoute: typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  AuthenticatedAdminFinanceiroContasRoute: typeof AuthenticatedAdminFinanceiroContasRoute
+  AuthenticatedAdminFinanceiroLedgerRoute: typeof AuthenticatedAdminFinanceiroLedgerRoute
+  AuthenticatedAdminFinanceiroRecebiveisRoute: typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  AuthenticatedAdminFinanceiroRepassesRoute: typeof AuthenticatedAdminFinanceiroRepassesRoute
+  AuthenticatedAdminFinanceiroTransacoesRoute: typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  AuthenticatedAdminFinanceiroIndexRoute: typeof AuthenticatedAdminFinanceiroIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminSplatRoute: AuthenticatedAdminSplatRoute,
+    AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
+    AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
+    AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+    AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+    AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+    AuthenticatedAdminEstoqueRoute: AuthenticatedAdminEstoqueRoute,
+    AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
+    AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
+    AuthenticatedAdminLojasRoute: AuthenticatedAdminLojasRoute,
+    AuthenticatedAdminMarcasRoute: AuthenticatedAdminMarcasRoute,
+    AuthenticatedAdminModalidadesRoute: AuthenticatedAdminModalidadesRoute,
+    AuthenticatedAdminOfertasRoute: AuthenticatedAdminOfertasRoute,
+    AuthenticatedAdminOperacionalRoute: AuthenticatedAdminOperacionalRoute,
+    AuthenticatedAdminPermissoesRoute: AuthenticatedAdminPermissoesRoute,
+    AuthenticatedAdminPrecosRoute: AuthenticatedAdminPrecosRoute,
+    AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRoute,
+    AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminFinanceiroAllocationsRoute:
+      AuthenticatedAdminFinanceiroAllocationsRoute,
+    AuthenticatedAdminFinanceiroContasRoute:
+      AuthenticatedAdminFinanceiroContasRoute,
+    AuthenticatedAdminFinanceiroLedgerRoute:
+      AuthenticatedAdminFinanceiroLedgerRoute,
+    AuthenticatedAdminFinanceiroRecebiveisRoute:
+      AuthenticatedAdminFinanceiroRecebiveisRoute,
+    AuthenticatedAdminFinanceiroRepassesRoute:
+      AuthenticatedAdminFinanceiroRepassesRoute,
+    AuthenticatedAdminFinanceiroTransacoesRoute:
+      AuthenticatedAdminFinanceiroTransacoesRoute,
+    AuthenticatedAdminFinanceiroIndexRoute:
+      AuthenticatedAdminFinanceiroIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
