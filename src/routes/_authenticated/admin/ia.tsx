@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { getAiSecretStatus } from "@/lib/ai/status.functions";
-import { PageHeader, Panel, DataTable, Badge, Btn } from "@/components/admin/ui";
+import { Cpu, Sparkles, Activity, KeyRound } from "lucide-react";
+import { PageHeader, Panel, DarkPanel, DataTable, Badge, Btn } from "@/components/admin/ui";
 import { dateTime } from "@/lib/admin/format";
 
 export const Route = createFileRoute("/_authenticated/admin/ia")({ component: AiCenter });
@@ -30,11 +31,29 @@ function AiCenter() {
   return (
     <>
       <PageHeader eyebrow="Inteligência" title="Central de IA" description="Todas as chamadas passam pelo gateway interno da BemMais. As chaves ficam somente no servidor; registramos apenas metadados de uso." />
+      <DarkPanel className="mb-6 p-6">
+        <p className="relative text-[10px] font-bold uppercase tracking-[0.24em] text-primary">AI Control Center</p>
+        <div className="relative mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+          {([
+            [Cpu, "Provedores ativos", providers.data ? `${providers.data.filter((p) => p.enabled).length} / ${providers.data.length}` : "…"],
+            [KeyRound, "Chaves no servidor", secrets.data ? `${Object.values(secrets.data).filter(Boolean).length}` : "…"],
+            [Sparkles, "Recursos ativos", features.data ? `${features.data.filter((f) => f.enabled).length} / ${features.data.length}` : "…"],
+            [Activity, "Chamadas recentes", usage.data ? `${usage.data.length}` : "…"],
+          ] as const).map(([Icon, l, v]) => (
+            <div key={l} className="rounded-xl bg-surface-dark-2/80 p-4 ring-1 ring-ink-border">
+              <Icon className="h-4 w-4 text-primary" />
+              <p className="metric mt-3 text-2xl font-bold">{v}</p>
+              <p className="mt-0.5 text-[11px] text-ink-muted">{l}</p>
+            </div>
+          ))}
+        </div>
+        <p className="relative mt-4 text-[11px] text-ink-muted">Custo estimado aparece quando houver chamadas registradas. Chaves nunca são enviadas ao navegador.</p>
+      </DarkPanel>
       <Panel title="Provedores">
         <DataTable<P> rowKey={(r) => r.key} rows={providers.data} loading={providers.isLoading} columns={[
           { key: "n", label: "Provedor", render: (r) => <span className="font-semibold">{r.name}</span> },
           { key: "m", label: "Modelo padrão", render: (r) => r.default_model ?? "—" },
-          { key: "k", label: "Chave no servidor", render: (r) => (secrets.data?.[r.key as "openai"] ? <Badge value="active" /> : <span className="text-xs text-destructive">Não configurada ({r.secret_name})</span>) },
+          { key: "k", label: "Chave no servidor", render: (r) => (secrets.data?.[r.key as "openai"] ? <Badge value="active" /> : <span className="text-xs text-danger">Não configurada ({r.secret_name})</span>) },
           { key: "e", label: "Status", render: (r) => <Badge value={r.enabled ? "active" : "disabled"} /> },
           { key: "a", label: "", className: "text-right", render: (r) => <Btn variant="outline" className="h-8 text-xs" onClick={() => toggle.mutate({ table: "ai_providers", key: r.key, enabled: !r.enabled })}>{r.enabled ? "Desativar" : "Ativar"}</Btn> },
         ]} />

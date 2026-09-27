@@ -44,7 +44,7 @@ function Products() {
       <PageHeader eyebrow="Catálogo" title="Produtos" description="Catálogo mestre: a identidade do item. Custos e condições ficam nas ofertas dos fornecedores."
         actions={<Btn onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Novo produto</Btn>} />
       <Panel>
-        <div className="flex flex-wrap gap-2 border-b border-border p-3">
+        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4">
           <SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} />
           <SelectInput value={status} onChange={(e) => { setStatusF(e.target.value as CStatus); setPage(0); }} className="w-44">
             <option value="">Todos os status</option>

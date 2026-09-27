@@ -54,7 +54,7 @@ export function OrgsPage({ kind }: { kind: Kind }) {
     { key: "name", label: "Empresa", render: (r) => <div><p className="font-semibold">{r.name}</p><p className="text-xs text-muted-foreground">{r.document || r.email || r.slug}</p></div> },
     { key: "caps", label: "Capacidades", render: (r) => (
       <div className="flex flex-wrap gap-1">{r.organization_capabilities.filter((c) => c.enabled).map((c) => (
-        <span key={c.capability} className="rounded bg-secondary px-1.5 py-0.5 text-[11px]">{CAPABILITY_LABEL[c.capability]}</span>))}</div>) },
+        <span key={c.capability} className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium">{CAPABILITY_LABEL[c.capability]}</span>))}</div>) },
     { key: "status", label: "Status", render: (r) => <Badge value={r.status} /> },
     { key: "created", label: "Criada em", render: (r) => <span className="text-xs text-muted-foreground">{dateTime(r.created_at)}</span> },
     { key: "act", label: "", className: "text-right", render: (r) => (
@@ -68,7 +68,7 @@ export function OrgsPage({ kind }: { kind: Kind }) {
       <PageHeader eyebrow="Ecossistema" title={copy.title} description={copy.desc}
         actions={<Btn onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Nova empresa</Btn>} />
       <Panel>
-        <div className="border-b border-border p-3"><SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} placeholder="Buscar por nome..." /></div>
+        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4"><SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} placeholder="Buscar por nome..." /></div>
         <DataTable columns={cols} rows={list.data?.rows} loading={list.isLoading} rowKey={(r) => r.id} empty="Nenhuma empresa cadastrada." />
         <Pager page={page} setPage={setPage} total={list.data?.count} />
       </Panel>

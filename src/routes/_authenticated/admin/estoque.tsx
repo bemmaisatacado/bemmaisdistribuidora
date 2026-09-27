@@ -52,7 +52,7 @@ function Stock() {
           { key: "o", label: "Dono do estoque", render: (r) => r.org },
           { key: "h", label: "Em mãos", render: (r) => num(r.on_hand) },
           { key: "r", label: "Reservado", render: (r) => num(r.reserved) },
-          { key: "a", label: "Disponível", render: (r) => { const a = (r.on_hand ?? 0) - (r.reserved ?? 0); return <b className={a <= 0 ? "text-destructive" : ""}>{num(a)}</b>; } },
+          { key: "a", label: "Disponível", render: (r) => { const a = (r.on_hand ?? 0) - (r.reserved ?? 0); return <b className={a <= 0 ? "text-danger" : ""}>{num(a)}</b>; } },
         ]} />
         <Pager page={page} setPage={setPage} total={balances.data?.count} />
       </Panel>

@@ -44,7 +44,7 @@ function Offers() {
       <PageHeader eyebrow="Catálogo" title="Ofertas de fornecedores" description="Relação comercial fornecedor × produto: custo por SKU, modalidades e pedido mínimo. Publicação exige aprovação BemMais."
         actions={<Btn onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Nova oferta</Btn>} />
       <Panel>
-        <div className="border-b border-border p-3">
+        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4">
           <SelectInput value={status} onChange={(e) => { setStatusF(e.target.value as CStatus); setPage(0); }} className="w-48">
             <option value="">Todos os status</option>
             {Constants.public.Enums.catalog_status.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
@@ -53,7 +53,7 @@ function Offers() {
         <DataTable<Row> rowKey={(r) => r.id} rows={list.data?.rows} loading={list.isLoading} empty="Nenhuma oferta cadastrada." columns={[
           { key: "p", label: "Produto", render: (r) => <span className="font-semibold">{r.products?.name}</span> },
           { key: "f", label: "Fornecedor", render: (r) => r.organizations?.name },
-          { key: "m", label: "Modalidades", render: (r) => <div className="flex flex-wrap gap-1">{r.modalities.map((x) => <span key={x} className="rounded bg-secondary px-1.5 py-0.5 text-[11px]">{MODALITY_LABEL[x]}</span>)}</div> },
+          { key: "m", label: "Modalidades", render: (r) => <div className="flex flex-wrap gap-1">{r.modalities.map((x) => <span key={x} className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium">{MODALITY_LABEL[x]}</span>)}</div> },
           { key: "q", label: "Mín.", render: (r) => r.moq },
           { key: "c", label: "Custo", render: (r) => {
             const c = r.supplier_offer_variants.map((v) => Number(v.supply_cost));
