@@ -38,12 +38,12 @@ export function BrowserStore({ className, eager }: { className?: string; eager?:
         </div>
       </div>
       <div className="p-4 sm:p-5">
-        <div className="flex items-center justify-between rounded-xl bg-primary px-4 py-3 text-primary-foreground">
-          <div>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl bg-primary px-3 py-3 text-primary-foreground sm:px-4">
+          <div className="min-w-0">
             <p className="text-[9px] font-bold uppercase tracking-widest opacity-90">Semana do tênis</p>
-            <p className="font-display text-sm font-extrabold sm:text-base">Até 30% OFF + 10x sem juros</p>
+            <p className="truncate font-display text-xs font-extrabold sm:text-base">Até 30% OFF + 10x sem juros</p>
           </div>
-          <span className="rounded-full bg-card px-3 py-1 text-[9px] font-bold uppercase text-foreground">Ver ofertas</span>
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-card px-2.5 py-1 text-[9px] font-bold uppercase text-foreground sm:px-3">Ver ofertas</span>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-3">
           {MOCK_PRODUCTS.map((p) => (
