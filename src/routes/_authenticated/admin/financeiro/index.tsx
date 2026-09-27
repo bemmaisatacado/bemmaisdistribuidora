@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, Panel, Stat } from "@/components/admin/ui";
 import { brl, num } from "@/lib/admin/format";
+import type { Metrics } from "@/lib/admin/metrics";
 
 export const Route = createFileRoute("/_authenticated/admin/financeiro/")({ component: FinanceOverview });
 
@@ -13,7 +14,7 @@ function FinanceOverview() {
       const to = new Date();
       const { data, error } = await supabase.rpc("admin_dashboard_metrics", { _from: new Date(to.getTime() - 30 * 864e5).toISOString(), _to: to.toISOString() });
       if (error) throw error;
-      return data as unknown as Record<string, number>;
+      return data as unknown as Metrics;
     },
   });
   return (

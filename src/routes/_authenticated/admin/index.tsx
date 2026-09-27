@@ -4,11 +4,11 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, Panel, Stat, SelectInput, Empty } from "@/components/admin/ui";
 import { brl, num, dateTime } from "@/lib/admin/format";
+import type { Metrics, Ops } from "@/lib/admin/metrics";
 
 export const Route = createFileRoute("/_authenticated/admin/")({ component: Dashboard });
 
 const PERIODS = { "7": "Últimos 7 dias", "30": "Últimos 30 dias", "90": "Últimos 90 dias", "365": "Últimos 12 meses" } as const;
-type Metrics = Record<string, number>;
 
 function Dashboard() {
   const [days, setDays] = useState<keyof typeof PERIODS>("30");
@@ -27,7 +27,7 @@ function Dashboard() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_ops_queue");
       if (error) throw error;
-      return data as unknown as Metrics;
+      return data as unknown as Ops;
     },
   });
   const activity = useQuery({
@@ -40,9 +40,9 @@ function Dashboard() {
   });
 
   const m = metrics.data;
-  const v = (k: string) => (m ? m[k] : undefined);
+  const v = (k: keyof Metrics) => (m ? m[k] : undefined);
   const ticket = m && m.paid_count ? m.gmv / m.paid_count : 0;
-  const alerts: { n: number; label: string; to: LinkProps["to"] }[] = ops.data ? [
+  const alerts: { n: number; label: string; to: NonNullable<LinkProps["to"]> }[] = ops.data ? [
     { n: ops.data.offers_pending, label: "ofertas aguardando aprovação", to: "/admin/ofertas" },
     { n: ops.data.payouts_pending, label: "repasses pendentes", to: "/admin/financeiro/repasses" },
     { n: ops.data.accounts_pending, label: "contas recebedoras pendentes", to: "/admin/financeiro/contas" },

@@ -3,7 +3,7 @@
  * Add a provider by implementing AiProvider and registering it in PROVIDERS.
  */
 export type AiMessage = { role: "system" | "user" | "assistant"; content: string };
-export type AiResult = { text: string; inputTokens?: number; outputTokens?: number };
+export type AiResult = { text: string; inputTokens?: number | undefined; outputTokens?: number | undefined };
 
 export interface AiProvider {
   key: string;

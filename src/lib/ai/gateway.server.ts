@@ -10,8 +10,9 @@ export async function runAiFeature(opts: { featureKey: string; organizationId: s
   const { data: feature } = await supabaseAdmin.from("ai_features").select("key,enabled,model,provider_key,monthly_quota_per_org").eq("key", opts.featureKey).maybeSingle();
   if (!feature?.enabled || !feature.provider_key) throw new Error("Recurso de IA desativado.");
   const { data: prov } = await supabaseAdmin.from("ai_providers").select("key,enabled,default_model").eq("key", feature.provider_key).maybeSingle();
-  const provider = PROVIDERS[feature.provider_key];
-  if (!prov?.enabled || !provider) throw new Error("Provedor de IA indisponível.");
+  const found = PROVIDERS[feature.provider_key];
+  if (!prov?.enabled || !found) throw new Error("Provedor de IA indisponível.");
+  const provider = found;
   const apiKey = process.env[provider.secretName];
   if (!apiKey) throw new Error("Provedor de IA não configurado.");
 

@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, Panel } from "@/components/admin/ui";
+import type { Ops } from "@/lib/admin/metrics";
 
 export const Route = createFileRoute("/_authenticated/admin/operacional")({ component: Ops });
 
-type Item = { label: string; key?: string; to?: LinkProps["to"]; soon?: string };
+type Item = { label: string; key?: keyof Ops; to?: LinkProps["to"]; soon?: string };
 const ITEMS: Item[] = [
   { label: "Pedidos aguardando ação", soon: "pedidos" },
   { label: "Pedidos atrasados", soon: "pedidos" },
@@ -29,7 +30,7 @@ function Ops() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_ops_queue");
       if (error) throw error;
-      return data as unknown as Record<string, number>;
+      return data as unknown as Ops;
     },
   });
   return (

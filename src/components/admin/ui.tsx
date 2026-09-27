@@ -30,7 +30,7 @@ export function Panel({ title, children, className, actions }: { title?: string;
   );
 }
 
-export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
+export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string | undefined }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <p className="text-xs font-semibold text-muted-foreground">{label}</p>

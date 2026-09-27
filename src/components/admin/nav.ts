@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 /** `to` = built screen; `soon` = future module (splat route, no invented data). */
-export type NavItem = { label: string; icon: LucideIcon } & ({ to: LinkProps["to"] } | { soon: string });
+export type NavItem = { label: string; icon: LucideIcon } & ({ to: NonNullable<LinkProps["to"]> } | { soon: string });
 export type NavSection = { title: string; items: NavItem[] };
 
 export const ADMIN_NAV: NavSection[] = [

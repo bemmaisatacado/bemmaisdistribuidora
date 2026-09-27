@@ -65,10 +65,12 @@ function CreateAccount({ onClose }: { onClose: () => void }) {
       if (!f.organization_id) throw new Error("Selecione a empresa.");
       if (f.kind === "pix" && (!f.pix_key.trim() || !f.holder_name.trim())) throw new Error("Informe chave Pix e titular.");
       if (f.kind === "gateway_recipient" && !f.provider_account_id.trim()) throw new Error("Informe o ID do recebedor no gateway.");
-      const base = { organization_id: f.organization_id, kind: f.kind, holder_name: f.holder_name || null, holder_document: f.holder_document || null };
-      const row = f.kind === "pix"
-        ? { ...base, pix_key_type: f.pix_key_type, pix_key: f.pix_key.trim() }
-        : { ...base, provider: f.provider || null, provider_account_id: f.provider_account_id.trim() };
+      const pix = f.kind === "pix";
+      const row = {
+        organization_id: f.organization_id, kind: f.kind, holder_name: f.holder_name || null, holder_document: f.holder_document || null,
+        pix_key_type: pix ? f.pix_key_type : null, pix_key: pix ? f.pix_key.trim() : null,
+        provider: pix ? null : f.provider || null, provider_account_id: pix ? null : f.provider_account_id.trim(),
+      };
       const { error } = await supabase.from("payment_accounts").insert(row);
       if (error) throw error;
     },
