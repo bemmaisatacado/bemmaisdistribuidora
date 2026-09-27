@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { LinkProps } from "@tanstack/react-router";
 import {
   LayoutDashboard, Radar, Building2, Users, Factory, Store, UserCog, Package, FolderTree, Tag, Handshake,
   Layers, Percent, Boxes, BadgePercent, ShoppingCart, Truck, MapPin, AlertTriangle, Wallet, ArrowLeftRight,
@@ -7,7 +8,7 @@ import {
 } from "lucide-react";
 
 /** `to` = built screen; `soon` = future module (splat route, no invented data). */
-export type NavItem = { label: string; icon: LucideIcon } & ({ to: string } | { soon: string });
+export type NavItem = { label: string; icon: LucideIcon } & ({ to: LinkProps["to"] } | { soon: string });
 export type NavSection = { title: string; items: NavItem[] };
 
 export const ADMIN_NAV: NavSection[] = [
