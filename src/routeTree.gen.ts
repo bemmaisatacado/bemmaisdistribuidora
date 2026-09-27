@@ -16,6 +16,9 @@ import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminSplatRouteImport } from './routes/_authenticated/admin/$'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin/clientes'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminFornecedoresRouteImport } from './routes/_authenticated/admin/fornecedores'
 import { Route as AuthenticatedAdminOperacionalRouteImport } from './routes/_authenticated/admin/operacional'
 
 const IndexRoute = IndexRouteImport.update({
@@ -52,6 +55,24 @@ const AuthenticatedAdminSplatRoute = AuthenticatedAdminSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/empresas',
+    path: '/empresas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFornecedoresRoute =
+  AuthenticatedAdminFornecedoresRouteImport.update({
+    id: '/fornecedores',
+    path: '/fornecedores',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOperacionalRoute =
   AuthenticatedAdminOperacionalRouteImport.update({
     id: '/operacional',
@@ -65,6 +86,9 @@ export interface FileRoutesByFullPath {
   '/entrar': typeof EntrarRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -73,6 +97,9 @@ export interface FileRoutesByTo {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -84,6 +111,9 @@ export interface FileRoutesById {
   '/entrar': typeof EntrarRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/admin/$': typeof AuthenticatedAdminSplatRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/_authenticated/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -95,6 +125,9 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/admin'
     | '/admin/$'
+    | '/admin/clientes'
+    | '/admin/empresas'
+    | '/admin/fornecedores'
     | '/admin/operacional'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -103,6 +136,9 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/admin/$'
+    | '/admin/clientes'
+    | '/admin/empresas'
+    | '/admin/fornecedores'
     | '/admin/operacional'
     | '/admin'
   id:
@@ -113,6 +149,9 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/_authenticated/admin'
     | '/_authenticated/admin/$'
+    | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/fornecedores'
     | '/_authenticated/admin/operacional'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -175,6 +214,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSplatRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/fornecedores': {
+      id: '/_authenticated/admin/fornecedores'
+      path: '/fornecedores'
+      fullPath: '/admin/fornecedores'
+      preLoaderRoute: typeof AuthenticatedAdminFornecedoresRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/operacional': {
       id: '/_authenticated/admin/operacional'
       path: '/operacional'
@@ -187,6 +247,9 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSplatRoute: typeof AuthenticatedAdminSplatRoute
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
   AuthenticatedAdminOperacionalRoute: typeof AuthenticatedAdminOperacionalRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -194,6 +257,9 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminSplatRoute: AuthenticatedAdminSplatRoute,
+    AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+    AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+    AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
     AuthenticatedAdminOperacionalRoute: AuthenticatedAdminOperacionalRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
