@@ -42,12 +42,13 @@ function Dashboard() {
   const m = metrics.data;
   const v = (k: keyof Metrics) => (m ? m[k] : undefined);
   const ticket = m && m.paid_count ? m.gmv / m.paid_count : 0;
-  const alerts: { n: number; label: string; to: NonNullable<LinkProps["to"]> }[] = ops.data ? [
+  type Alert = { n: number; label: string; to: NonNullable<LinkProps["to"]> };
+  const alerts: Alert[] = ops.data ? ([
     { n: ops.data.offers_pending, label: "ofertas aguardando aprovação", to: "/admin/ofertas" },
     { n: ops.data.payouts_pending, label: "repasses pendentes", to: "/admin/financeiro/repasses" },
     { n: ops.data.accounts_pending, label: "contas recebedoras pendentes", to: "/admin/financeiro/contas" },
     { n: ops.data.stock_critical, label: "SKUs com estoque crítico", to: "/admin/estoque" },
-  ].filter((a) => a.n > 0) : [];
+  ] satisfies Alert[]).filter((a) => a.n > 0) : [];
 
   return (
     <>

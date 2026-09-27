@@ -110,8 +110,8 @@ function CreateSku({ product, onClose }: { product: { id: string; name: string }
     mutationFn: async () => {
       if (!f.sku.trim()) throw new Error("Informe o código SKU.");
       const attributes: Record<string, string> = {};
-      if (f.color) attributes.cor = f.color;
-      if (f.size) attributes.tamanho = f.size;
+      if (f.color) attributes["cor"] = f.color;
+      if (f.size) attributes["tamanho"] = f.size;
       const { error } = await supabase.from("product_variants").insert({ product_id: product.id, sku: f.sku.trim(), barcode: f.barcode || null, attributes });
       if (error) throw error.code === "23505" ? new Error("SKU já existe.") : error;
     },

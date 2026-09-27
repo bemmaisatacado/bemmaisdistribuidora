@@ -7,7 +7,7 @@ import type { Ops } from "@/lib/admin/metrics";
 
 export const Route = createFileRoute("/_authenticated/admin/operacional")({ component: Ops });
 
-type Item = { label: string; key?: keyof Ops; to?: LinkProps["to"]; soon?: string };
+type Item = { label: string; key?: keyof Ops; to?: NonNullable<LinkProps["to"]>; soon?: string };
 const ITEMS: Item[] = [
   { label: "Pedidos aguardando ação", soon: "pedidos" },
   { label: "Pedidos atrasados", soon: "pedidos" },
@@ -42,7 +42,7 @@ function Ops() {
             const n = it.key ? data?.[it.key] : undefined;
             return (
               <li key={it.label}>
-                <Link {...(it.soon ? { to: "/admin/$", params: { _splat: it.soon } } : { to: it.to })} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-secondary/50">
+                <Link to={it.soon ? "/admin/$" : (it.to ?? "/admin")} params={{ _splat: it.soon ?? "" }} className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-secondary/50">
                   <span className="font-medium">{it.label}</span>
                   <span className="flex items-center gap-2">
                     {it.soon ? <span className="text-xs text-muted-foreground">Próxima fase</span>
