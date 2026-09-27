@@ -33,38 +33,38 @@ export function Hero() {
           <p className="inline-flex items-center gap-2 rounded-full border border-ink-border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-muted">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" /> Seu negócio pode começar aqui.
           </p>
-          <h1 className="mt-5 text-[clamp(2.3rem,6.2vw,5rem)] font-bold uppercase leading-[0.98]">
+          <h1 className="mt-5 text-[clamp(1.9rem,4.6vw,3.65rem)] font-bold uppercase leading-[1.05] tracking-tight">
             Comece a vender.<br />
             Construa sua marca.<br />
             <span className="text-gradient">Cresça do seu jeito.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
+          <p className="mt-5 max-w-lg text-[0.95rem] leading-relaxed text-ink-muted sm:text-base">
             Produtos, loja virtual, fornecedores e ferramentas reunidos em um único ecossistema para quem quer
             começar a vender ou levar sua operação para o próximo nível.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button to="/criar-conta" size="lg" className="shadow-glow">
               Quero começar a vender <ArrowRight className="h-4 w-4" />
             </Button>
             <Button href="#ecossistema" variant="light" size="lg">Conhecer o ecossistema</Button>
           </div>
-          <ul className="mt-8 flex flex-wrap gap-x-4 gap-y-2 border-t border-ink-border pt-6 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-muted">
+          <ul className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink-border pt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-muted sm:text-[11px]">
             {STRIP.map((s, i) => (
-              <li key={s} className="flex items-center gap-4">
+              <li key={s} className="flex items-center gap-3">
                 {i > 0 && <span className="text-primary" aria-hidden>•</span>}
-                {s}
+                <span>{s}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="relative mx-auto w-full max-w-xl pb-12 lg:max-w-none">
+        <div className="relative mx-auto w-full max-w-md pb-10 sm:max-w-xl lg:max-w-none lg:pr-6">
           <div className="absolute -inset-4 rounded-[2rem] bg-primary/20 blur-3xl" aria-hidden />
           <div className="tilt-3d scanline relative rounded-2xl">
             <BrowserStore eager />
           </div>
-          <PhoneStore className="float-y absolute -bottom-2 -right-1 sm:-right-6" />
-          <Toast icon={Bell} title="Novo pedido" sub="Tênis Street Hi · R$ 349,90" className="absolute -left-2 top-[8%] sm:-left-8" />
+          <PhoneStore className="float-y absolute -bottom-2 -right-1 sm:-right-4" />
+          <Toast icon={Bell} title="Novo pedido" sub="Tênis Street Hi · R$ 349,90" className="absolute -left-2 top-[8%] hidden sm:flex lg:-left-8" />
           <Toast icon={BadgeCheck} title="Venda aprovada" sub="Pagamento confirmado" className="absolute -left-2 top-[62%] hidden sm:flex lg:-left-12" delay={-2} />
           <Toast icon={Package} title="Estoque atualizado" sub="Drop + estoque próprio" className="absolute -top-5 right-10 hidden md:flex" delay={-4} />
           <Toast icon={Truck} title="Pedido enviado" sub="A caminho do cliente" className="absolute -bottom-3 left-6 hidden sm:flex" delay={-3} />
