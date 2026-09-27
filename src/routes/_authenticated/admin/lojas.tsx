@@ -44,7 +44,7 @@ function Stores() {
       <PageHeader eyebrow="Ecossistema" title="Lojas" description="Lojas white-label das empresas clientes. A BemMais pode criar e configurar a loja pelo cliente."
         actions={<Btn onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Criar loja para cliente</Btn>} />
       <Panel>
-        <div className="border-b border-border p-3"><SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} /></div>
+        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4"><SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} /></div>
         <DataTable<Row> rowKey={(r) => r.id} rows={list.data?.rows} loading={list.isLoading} empty="Nenhuma loja criada." columns={[
           { key: "n", label: "Loja", render: (r) => <div><p className="font-semibold">{r.name}</p><p className="text-xs text-muted-foreground">/{r.slug}</p></div> },
           { key: "o", label: "Empresa", render: (r) => r.organizations?.name ?? "—" },

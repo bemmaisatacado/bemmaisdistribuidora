@@ -29,7 +29,7 @@ function Audit() {
     <>
       <PageHeader eyebrow="Plataforma" title="Auditoria" description="Registro imutável de mudanças críticas, gravado automaticamente pelo banco. Não pode ser editado nem apagado." />
       <Panel>
-        <div className="border-b border-border p-3">
+        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4">
           <SelectInput value={entity} onChange={(e) => { setEntity(e.target.value); setPage(0); }} className="w-64">
             <option value="">Todas as entidades</option>{ENTITIES.map((e) => <option key={e} value={e}>{e}</option>)}
           </SelectInput>
@@ -44,9 +44,9 @@ function Audit() {
             <button className="text-xs font-semibold text-primary" onClick={() => setOpen(open === r.id ? null : r.id)}>{open === r.id ? "Fechar" : "Detalhes"}</button>) },
         ]} />
         {open !== null && (() => { const r = q.data?.rows.find((x) => x.id === open); return r ? (
-          <div className="grid gap-3 border-t border-border p-4 text-xs md:grid-cols-2">
-            <div><p className="mb-1 font-semibold">Antes</p><pre className="max-h-72 overflow-auto rounded bg-secondary p-2">{JSON.stringify(r.before_data, null, 2)}</pre></div>
-            <div><p className="mb-1 font-semibold">Depois</p><pre className="max-h-72 overflow-auto rounded bg-secondary p-2">{JSON.stringify(r.after_data, null, 2)}</pre></div>
+          <div className="grid gap-3 border-t border-border-subtle p-4 text-xs md:grid-cols-2">
+            <div><p className="mb-1 font-semibold">Antes</p><pre className="max-h-72 overflow-auto rounded-lg bg-secondary p-3">{JSON.stringify(r.before_data, null, 2)}</pre></div>
+            <div><p className="mb-1 font-semibold">Depois</p><pre className="max-h-72 overflow-auto rounded-lg bg-secondary p-3">{JSON.stringify(r.after_data, null, 2)}</pre></div>
           </div>) : null; })()}
         <Pager page={page} setPage={setPage} total={q.data?.count} />
       </Panel>

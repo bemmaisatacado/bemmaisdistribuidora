@@ -25,13 +25,13 @@ function Perms() {
       <Panel>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
-            <thead><tr className="border-b border-border bg-secondary/60 text-xs">
+            <thead><tr className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
               <th className="px-4 py-2.5 text-left">Permissão</th>
               {q.data?.roles.map((r) => <th key={r.key} className="px-2 py-2.5 text-center font-semibold">{r.name}</th>)}
             </tr></thead>
             <tbody>
               {q.data?.perms.map((p) => (
-                <tr key={p.key} className="border-b border-border last:border-0">
+                <tr key={p.key} className="border-t border-border-subtle transition-colors hover:bg-secondary/60">
                   <td className="px-4 py-2"><p className="font-medium">{p.description}</p><code className="text-[11px] text-muted-foreground">{p.key}</code></td>
                   {q.data.roles.map((r) => (
                     <td key={r.key} className="text-center">
