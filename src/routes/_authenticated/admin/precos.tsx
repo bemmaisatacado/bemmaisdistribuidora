@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Constants, type Database } from "@/integrations/supabase/types";
-import { PageHeader, Panel, DataTable, Badge, Btn, Field, TextInput, SelectInput, ErrorNote } from "@/components/admin/ui";
+import { PageHeader, Panel, DarkPanel, DataTable, Badge, Btn, Field, TextInput, SelectInput, ErrorNote } from "@/components/admin/ui";
 import { FormModal } from "@/components/admin/Modal";
 import { brl, MODALITY_LABEL } from "@/lib/admin/format";
 
@@ -118,19 +118,45 @@ function Simulator() {
       return data?.[0];
     },
   });
+  const d = r.data;
+  const cell = (label: string, v: number | null | undefined, cls = "") => (
+    <div className={`rounded-xl bg-surface-dark-2/80 p-4 ring-1 ring-ink-border ${cls}`}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">{label}</p>
+      <p className="metric mt-2 text-xl font-bold sm:text-2xl">{d ? brl(v) : "—"}</p>
+    </div>
+  );
+  const op = (c: string) => <span className="grid place-items-center font-display text-2xl font-bold text-ink-muted" aria-hidden>{c}</span>;
   return (
-    <Panel title="Simulador de preço" className="mt-6">
-      <div className="grid gap-3 p-4 sm:grid-cols-3">
-        <Field label="SKU da oferta"><SelectInput value={ov} onChange={(e) => setOv(e.target.value)}><option value="">Selecione...</option>
-          {options.data?.map((o) => <option key={o.id} value={o.id}>{o.product_variants?.sku} · {o.organizations?.name}</option>)}</SelectInput></Field>
-        <Field label="Modalidade"><SelectInput value={mod} onChange={(e) => setMod(e.target.value as Modality)}>{Constants.public.Enums.commercial_modality.map((s) => <option key={s} value={s}>{MODALITY_LABEL[s]}</option>)}</SelectInput></Field>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <div><p className="text-xs text-muted-foreground">Fornecedor</p><b>{r.data ? brl(r.data.supply_cost) : "—"}</b></div>
-          <div><p className="text-xs text-muted-foreground">BemMais</p><b className="text-primary">{r.data ? brl(r.data.platform_amount) : "—"}</b></div>
-          <div><p className="text-xs text-muted-foreground">Custo revendedor</p><b>{r.data ? brl(r.data.reseller_cost) : "—"}</b></div>
+    <DarkPanel className="mt-6 p-6">
+      <div className="relative flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">Pricing Engine</p>
+          <h2 className="mt-2 font-display text-xl font-bold">Composição de preço</h2>
+          <p className="mt-1 text-sm text-ink-muted">Calculado no servidor pelas regras ativas. Nada é calculado na tela.</p>
+        </div>
+        <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+          <label className="grid gap-1 text-xs font-semibold text-ink-muted">SKU da oferta
+            <select value={ov} onChange={(e) => setOv(e.target.value)} className="h-10 rounded-lg border border-ink-border bg-surface-dark-2 px-3 text-sm text-ink-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:w-64">
+              <option value="">Selecione...</option>
+              {options.data?.map((o) => <option key={o.id} value={o.id}>{o.product_variants?.sku} · {o.organizations?.name}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-semibold text-ink-muted">Modalidade
+            <select value={mod} onChange={(e) => setMod(e.target.value as Modality)} className="h-10 rounded-lg border border-ink-border bg-surface-dark-2 px-3 text-sm text-ink-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+              {Constants.public.Enums.commercial_modality.map((s) => <option key={s} value={s}>{MODALITY_LABEL[s]}</option>)}
+            </select>
+          </label>
         </div>
       </div>
-      <div className="px-4 pb-4"><ErrorNote error={r.error} /></div>
-    </Panel>
+      <div className="relative mt-6 grid items-stretch gap-2 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
+        {cell("Custo fornecedor", d?.supply_cost)}
+        {op("+")}
+        {cell("Margem BemMais", d?.platform_amount, "!ring-primary/40 [&_p:last-child]:text-primary")}
+        {op("=")}
+        {cell("Preço BemMais", d?.reseller_cost)}
+      </div>
+      <p className="relative mt-3 text-[11px] text-ink-muted">Margem do lojista e preço final entram quando a loja definir seus preços de venda.</p>
+      {r.error ? <div className="relative mt-3"><ErrorNote error={r.error} /></div> : null}
+    </DarkPanel>
   );
 }
