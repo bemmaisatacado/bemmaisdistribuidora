@@ -22,7 +22,10 @@ import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFornecedoresRouteImport } from './routes/_authenticated/admin/fornecedores'
 import { Route as AuthenticatedAdminLojasRouteImport } from './routes/_authenticated/admin/lojas'
 import { Route as AuthenticatedAdminMarcasRouteImport } from './routes/_authenticated/admin/marcas'
+import { Route as AuthenticatedAdminModalidadesRouteImport } from './routes/_authenticated/admin/modalidades'
+import { Route as AuthenticatedAdminOfertasRouteImport } from './routes/_authenticated/admin/ofertas'
 import { Route as AuthenticatedAdminOperacionalRouteImport } from './routes/_authenticated/admin/operacional'
+import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -93,10 +96,28 @@ const AuthenticatedAdminMarcasRoute =
     path: '/marcas',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminModalidadesRoute =
+  AuthenticatedAdminModalidadesRouteImport.update({
+    id: '/modalidades',
+    path: '/modalidades',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOfertasRoute =
+  AuthenticatedAdminOfertasRouteImport.update({
+    id: '/ofertas',
+    path: '/ofertas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOperacionalRoute =
   AuthenticatedAdminOperacionalRouteImport.update({
     id: '/operacional',
     path: '/operacional',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminProdutosRoute =
+  AuthenticatedAdminProdutosRouteImport.update({
+    id: '/produtos',
+    path: '/produtos',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
@@ -112,7 +133,10 @@ export interface FileRoutesByFullPath {
   '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -126,7 +150,10 @@ export interface FileRoutesByTo {
   '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -143,7 +170,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/_authenticated/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/_authenticated/admin/marcas': typeof AuthenticatedAdminMarcasRoute
+  '/_authenticated/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
+  '/_authenticated/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/_authenticated/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -160,7 +190,10 @@ export interface FileRouteTypes {
     | '/admin/fornecedores'
     | '/admin/lojas'
     | '/admin/marcas'
+    | '/admin/modalidades'
+    | '/admin/ofertas'
     | '/admin/operacional'
+    | '/admin/produtos'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,7 +207,10 @@ export interface FileRouteTypes {
     | '/admin/fornecedores'
     | '/admin/lojas'
     | '/admin/marcas'
+    | '/admin/modalidades'
+    | '/admin/ofertas'
     | '/admin/operacional'
+    | '/admin/produtos'
     | '/admin'
   id:
     | '__root__'
@@ -190,7 +226,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/fornecedores'
     | '/_authenticated/admin/lojas'
     | '/_authenticated/admin/marcas'
+    | '/_authenticated/admin/modalidades'
+    | '/_authenticated/admin/ofertas'
     | '/_authenticated/admin/operacional'
+    | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -294,11 +333,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMarcasRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/modalidades': {
+      id: '/_authenticated/admin/modalidades'
+      path: '/modalidades'
+      fullPath: '/admin/modalidades'
+      preLoaderRoute: typeof AuthenticatedAdminModalidadesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/ofertas': {
+      id: '/_authenticated/admin/ofertas'
+      path: '/ofertas'
+      fullPath: '/admin/ofertas'
+      preLoaderRoute: typeof AuthenticatedAdminOfertasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/operacional': {
       id: '/_authenticated/admin/operacional'
       path: '/operacional'
       fullPath: '/admin/operacional'
       preLoaderRoute: typeof AuthenticatedAdminOperacionalRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/produtos': {
+      id: '/_authenticated/admin/produtos'
+      path: '/produtos'
+      fullPath: '/admin/produtos'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
   }
@@ -312,7 +372,10 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
   AuthenticatedAdminLojasRoute: typeof AuthenticatedAdminLojasRoute
   AuthenticatedAdminMarcasRoute: typeof AuthenticatedAdminMarcasRoute
+  AuthenticatedAdminModalidadesRoute: typeof AuthenticatedAdminModalidadesRoute
+  AuthenticatedAdminOfertasRoute: typeof AuthenticatedAdminOfertasRoute
   AuthenticatedAdminOperacionalRoute: typeof AuthenticatedAdminOperacionalRoute
+  AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -325,7 +388,10 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
     AuthenticatedAdminLojasRoute: AuthenticatedAdminLojasRoute,
     AuthenticatedAdminMarcasRoute: AuthenticatedAdminMarcasRoute,
+    AuthenticatedAdminModalidadesRoute: AuthenticatedAdminModalidadesRoute,
+    AuthenticatedAdminOfertasRoute: AuthenticatedAdminOfertasRoute,
     AuthenticatedAdminOperacionalRoute: AuthenticatedAdminOperacionalRoute,
+    AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
