@@ -28,6 +28,12 @@ import { Route as AuthenticatedAdminOfertasRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminOperacionalRouteImport } from './routes/_authenticated/admin/operacional'
 import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenticated/admin/precos'
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
+import { Route as AuthenticatedAdminFinanceiroIndexRouteImport } from './routes/_authenticated/admin/financeiro/index'
+import { Route as AuthenticatedAdminFinanceiroAllocationsRouteImport } from './routes/_authenticated/admin/financeiro/allocations'
+import { Route as AuthenticatedAdminFinanceiroLedgerRouteImport } from './routes/_authenticated/admin/financeiro/ledger'
+import { Route as AuthenticatedAdminFinanceiroRecebiveisRouteImport } from './routes/_authenticated/admin/financeiro/recebiveis'
+import { Route as AuthenticatedAdminFinanceiroRepassesRouteImport } from './routes/_authenticated/admin/financeiro/repasses'
+import { Route as AuthenticatedAdminFinanceiroTransacoesRouteImport } from './routes/_authenticated/admin/financeiro/transacoes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -134,6 +140,42 @@ const AuthenticatedAdminProdutosRoute =
     path: '/produtos',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminFinanceiroIndexRoute =
+  AuthenticatedAdminFinanceiroIndexRouteImport.update({
+    id: '/financeiro/',
+    path: '/financeiro/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroAllocationsRoute =
+  AuthenticatedAdminFinanceiroAllocationsRouteImport.update({
+    id: '/financeiro/allocations',
+    path: '/financeiro/allocations',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroLedgerRoute =
+  AuthenticatedAdminFinanceiroLedgerRouteImport.update({
+    id: '/financeiro/ledger',
+    path: '/financeiro/ledger',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroRecebiveisRoute =
+  AuthenticatedAdminFinanceiroRecebiveisRouteImport.update({
+    id: '/financeiro/recebiveis',
+    path: '/financeiro/recebiveis',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroRepassesRoute =
+  AuthenticatedAdminFinanceiroRepassesRouteImport.update({
+    id: '/financeiro/repasses',
+    path: '/financeiro/repasses',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroTransacoesRoute =
+  AuthenticatedAdminFinanceiroTransacoesRouteImport.update({
+    id: '/financeiro/transacoes',
+    path: '/financeiro/transacoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -154,6 +196,12 @@ export interface FileRoutesByFullPath {
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,6 +221,12 @@ export interface FileRoutesByTo {
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/financeiro': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -195,6 +249,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  '/_authenticated/admin/financeiro/ledger': typeof AuthenticatedAdminFinanceiroLedgerRoute
+  '/_authenticated/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  '/_authenticated/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
+  '/_authenticated/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/_authenticated/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -217,6 +277,12 @@ export interface FileRouteTypes {
     | '/admin/precos'
     | '/admin/produtos'
     | '/admin/'
+    | '/admin/financeiro/allocations'
+    | '/admin/financeiro/ledger'
+    | '/admin/financeiro/recebiveis'
+    | '/admin/financeiro/repasses'
+    | '/admin/financeiro/transacoes'
+    | '/admin/financeiro/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -236,6 +302,12 @@ export interface FileRouteTypes {
     | '/admin/precos'
     | '/admin/produtos'
     | '/admin'
+    | '/admin/financeiro/allocations'
+    | '/admin/financeiro/ledger'
+    | '/admin/financeiro/recebiveis'
+    | '/admin/financeiro/repasses'
+    | '/admin/financeiro/transacoes'
+    | '/admin/financeiro'
   id:
     | '__root__'
     | '/'
@@ -257,6 +329,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/precos'
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/financeiro/allocations'
+    | '/_authenticated/admin/financeiro/ledger'
+    | '/_authenticated/admin/financeiro/recebiveis'
+    | '/_authenticated/admin/financeiro/repasses'
+    | '/_authenticated/admin/financeiro/transacoes'
+    | '/_authenticated/admin/financeiro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -401,6 +479,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/financeiro/': {
+      id: '/_authenticated/admin/financeiro/'
+      path: '/financeiro'
+      fullPath: '/admin/financeiro/'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/allocations': {
+      id: '/_authenticated/admin/financeiro/allocations'
+      path: '/financeiro/allocations'
+      fullPath: '/admin/financeiro/allocations'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroAllocationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/ledger': {
+      id: '/_authenticated/admin/financeiro/ledger'
+      path: '/financeiro/ledger'
+      fullPath: '/admin/financeiro/ledger'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroLedgerRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/recebiveis': {
+      id: '/_authenticated/admin/financeiro/recebiveis'
+      path: '/financeiro/recebiveis'
+      fullPath: '/admin/financeiro/recebiveis'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroRecebiveisRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/repasses': {
+      id: '/_authenticated/admin/financeiro/repasses'
+      path: '/financeiro/repasses'
+      fullPath: '/admin/financeiro/repasses'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroRepassesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/financeiro/transacoes': {
+      id: '/_authenticated/admin/financeiro/transacoes'
+      path: '/financeiro/transacoes'
+      fullPath: '/admin/financeiro/transacoes'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroTransacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
@@ -419,6 +539,12 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminPrecosRoute: typeof AuthenticatedAdminPrecosRoute
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminFinanceiroAllocationsRoute: typeof AuthenticatedAdminFinanceiroAllocationsRoute
+  AuthenticatedAdminFinanceiroLedgerRoute: typeof AuthenticatedAdminFinanceiroLedgerRoute
+  AuthenticatedAdminFinanceiroRecebiveisRoute: typeof AuthenticatedAdminFinanceiroRecebiveisRoute
+  AuthenticatedAdminFinanceiroRepassesRoute: typeof AuthenticatedAdminFinanceiroRepassesRoute
+  AuthenticatedAdminFinanceiroTransacoesRoute: typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  AuthenticatedAdminFinanceiroIndexRoute: typeof AuthenticatedAdminFinanceiroIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
@@ -437,6 +563,18 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminPrecosRoute: AuthenticatedAdminPrecosRoute,
     AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminFinanceiroAllocationsRoute:
+      AuthenticatedAdminFinanceiroAllocationsRoute,
+    AuthenticatedAdminFinanceiroLedgerRoute:
+      AuthenticatedAdminFinanceiroLedgerRoute,
+    AuthenticatedAdminFinanceiroRecebiveisRoute:
+      AuthenticatedAdminFinanceiroRecebiveisRoute,
+    AuthenticatedAdminFinanceiroRepassesRoute:
+      AuthenticatedAdminFinanceiroRepassesRoute,
+    AuthenticatedAdminFinanceiroTransacoesRoute:
+      AuthenticatedAdminFinanceiroTransacoesRoute,
+    AuthenticatedAdminFinanceiroIndexRoute:
+      AuthenticatedAdminFinanceiroIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
