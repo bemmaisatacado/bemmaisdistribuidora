@@ -13,7 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminSplatRouteImport } from './routes/_authenticated/admin/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,23 +35,30 @@ const EntrarRoute = EntrarRouteImport.update({
   path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminSplatRoute = AuthenticatedAdminSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/admin/$': typeof AuthenticatedAdminSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/admin/$': typeof AuthenticatedAdminSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,13 +66,14 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/admin/$': typeof AuthenticatedAdminSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/criar-conta' | '/entrar' | '/admin'
+  fullPaths: '/' | '/criar-conta' | '/entrar' | '/admin' | '/admin/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/criar-conta' | '/entrar' | '/admin'
+  to: '/' | '/criar-conta' | '/entrar' | '/admin' | '/admin/$'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/_authenticated/admin'
+    | '/_authenticated/admin/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -115,18 +125,39 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/$': {
+      id: '/_authenticated/admin/$'
+      path: '/$'
+      fullPath: '/admin/$'
+      preLoaderRoute: typeof AuthenticatedAdminSplatRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminSplatRoute: typeof AuthenticatedAdminSplatRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminSplatRoute: AuthenticatedAdminSplatRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

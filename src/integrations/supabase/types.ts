@@ -1356,6 +1356,11 @@ export type Database = {
       }
     }
     Functions: {
+      admin_dashboard_metrics: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      admin_ops_queue: { Args: never; Returns: Json }
       has_org_permission: {
         Args: { _org: string; _perm: string; _uid: string }
         Returns: boolean
