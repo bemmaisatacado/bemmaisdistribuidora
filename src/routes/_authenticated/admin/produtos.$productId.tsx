@@ -3,7 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
-import { ProductRichContent } from "@/components/storefront/ProductRichContent";
+import {
+  ProductRichContent,
+  visibleContentBlocks,
+} from "@/components/storefront/ProductRichContent";
 import { uploadProductMedia } from "@/lib/catalog/media";
 
 type ContentBlockType =
@@ -605,7 +608,7 @@ function ContentManager({
       )}
       <Panel title="Preview">
         <div className="p-5">
-          <ProductRichContent blocks={blocks.filter((b: ProductContentBlock) => b.is_visible)} />
+          <ProductRichContent blocks={visibleContentBlocks(blocks)} />
         </div>
       </Panel>
     </div>

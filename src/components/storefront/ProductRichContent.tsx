@@ -1,6 +1,9 @@
 type ContentValue =
   string | boolean | string[] | Record<string, unknown> | Record<string, unknown>[];
 type Block = { id: string; type: string; config: Record<string, ContentValue> };
+export type VisibleContentBlock = Block & { is_visible?: boolean };
+export const visibleContentBlocks = <T extends VisibleContentBlock>(blocks: T[]) =>
+  blocks.filter((block) => block.is_visible !== false);
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
 export function ProductRichContent({ blocks }: { blocks?: Block[] }) {

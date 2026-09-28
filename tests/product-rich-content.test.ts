@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { visibleContentBlocks } from "../src/components/storefront/ProductRichContent.tsx";
 
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
@@ -64,4 +65,15 @@ test("size guide column operations keep rows consistent", () => {
     ["Tamanho", ""],
     ["M", ""],
   ]);
+});
+test("visible rich-content blocks preserve order and omit hidden blocks", () => {
+  const blocks = [
+    { id: "a", type: "text", config: {}, is_visible: true },
+    { id: "b", type: "text", config: {}, is_visible: false },
+    { id: "c", type: "text", config: {}, is_visible: true },
+  ];
+  assert.deepEqual(
+    visibleContentBlocks(blocks).map((block) => block.id),
+    ["a", "c"],
+  );
 });
