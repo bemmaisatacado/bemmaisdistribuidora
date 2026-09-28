@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
+import { ProductRichContent } from "@/components/storefront/ProductRichContent";
+import { uploadProductMedia } from "@/lib/catalog/media";
 
 const db: any = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos/$productId")({
@@ -16,7 +18,7 @@ function Product360() {
   const q = useQuery({
     queryKey: ["product-360", productId],
     queryFn: async () => {
-      const [product, variants, media, offers, listings, activity] = await Promise.all([
+      const [product, variants, media, offers, listings, activity, blocks] = await Promise.all([
         db
           .from("products")
           .select("*,categories(name,slug),brands(name,logo_url)")
@@ -43,6 +45,7 @@ function Product360() {
           .eq("entity_id", productId)
           .order("occurred_at", { ascending: false })
           .limit(30),
+        db.from("product_content_blocks").select("*").eq("product_id", productId).order("position"),
       ]);
       if (product.error) throw product.error;
       return {
@@ -52,6 +55,7 @@ function Product360() {
         offers: offers.data ?? [],
         listings: listings.data ?? [],
         activity: activity.data ?? [],
+        blocks: blocks.data ?? [],
       };
     },
   });
@@ -86,13 +90,20 @@ function Product360() {
         }
       />
       <div className="flex gap-2 overflow-x-auto border-b pb-2">
-        {["Resumo", "Variantes/SKUs", "Mídia", "Ofertas", "Lojas", "Estoque", "Atividade"].map(
-          (x) => (
-            <Btn key={x} variant={tab === x ? "default" : "outline"} onClick={() => setTab(x)}>
-              {x}
-            </Btn>
-          ),
-        )}
+        {[
+          "Resumo",
+          "Variantes/SKUs",
+          "Mídia",
+          "Conteúdo da Página",
+          "Ofertas",
+          "Lojas",
+          "Estoque",
+          "Atividade",
+        ].map((x) => (
+          <Btn key={x} variant={tab === x ? "default" : "outline"} onClick={() => setTab(x)}>
+            {x}
+          </Btn>
+        ))}
       </div>
       {tab === "Resumo" ? (
         <div className="grid gap-5 lg:grid-cols-2">
@@ -156,26 +167,20 @@ function Product360() {
         </Panel>
       ) : null}
       {tab === "Mídia" ? (
-        <Panel title="Galeria">
-          <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-4">
-            {d.media.length ? (
-              d.media.map((m: any) => (
-                <figure key={m.id}>
-                  <img
-                    src={m.storage_path}
-                    alt={m.alt_text || ""}
-                    className="aspect-square w-full rounded-xl object-cover"
-                  />
-                  <figcaption className="mt-1 text-xs">
-                    {m.is_primary ? "Principal" : m.alt_text || "Imagem"}
-                  </figcaption>
-                </figure>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground">Nenhuma imagem cadastrada.</p>
-            )}
-          </div>
-        </Panel>
+        <MediaManager
+          productId={productId}
+          media={d.media}
+          variants={d.variants}
+          reload={q.refetch}
+        />
+      ) : null}
+      {tab === "Conteúdo da Página" ? (
+        <ContentManager
+          productId={productId}
+          blocks={d.blocks}
+          media={d.media}
+          reload={q.refetch}
+        />
       ) : null}
       {tab === "Ofertas" ? (
         <Panel title="Ofertas de fornecedores">
@@ -224,5 +229,214 @@ function Product360() {
         </Panel>
       ) : null}
     </main>
+  );
+}
+
+function MediaManager({ productId, media, variants, reload }: any) {
+  const [busy, setBusy] = useState(false);
+  const upload = async (files: FileList | null) => {
+    if (!files) return;
+    setBusy(true);
+    for (const file of Array.from(files)) {
+      try {
+        const path = await uploadProductMedia(productId, file);
+        await db
+          .from("product_media")
+          .insert({
+            product_id: productId,
+            storage_path: path,
+            sort_order: media.length,
+            is_primary: !media.length,
+          });
+      } catch {}
+    }
+    setBusy(false);
+    reload();
+  };
+  const update = (id: string, v: any) =>
+    db.from("product_media").update(v).eq("id", id).then(reload);
+  const remove = async (m: any) => {
+    if (!confirm("Remover esta imagem?")) return;
+    await db.storage.from("product-media").remove([m.storage_path]);
+    await db.from("product_media").delete().eq("id", m.id);
+    reload();
+  };
+  return (
+    <Panel
+      title="Galeria"
+      actions={
+        <label>
+          <Btn disabled={busy}>{busy ? "Enviando…" : "Adicionar imagens"}</Btn>
+          <input
+            className="hidden"
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => upload(e.target.files)}
+          />
+        </label>
+      }
+    >
+      <div className="grid gap-3 p-5 sm:grid-cols-3">
+        {media.map((m: any, i: number) => (
+          <div key={m.id} className="rounded-xl border p-3">
+            <img
+              src={m.storage_path}
+              alt=""
+              className="aspect-square w-full rounded-lg object-cover"
+            />
+            <input
+              className="mt-2 w-full"
+              value={m.alt_text || ""}
+              placeholder="Texto alternativo"
+              onBlur={(e) => update(m.id, { alt_text: e.target.value })}
+              onChange={() => {}}
+            />
+            <select
+              className="mt-2 w-full"
+              value={m.variant_id || ""}
+              onChange={(e) => update(m.id, { variant_id: e.target.value || null })}
+            >
+              <option value="">Sem variante</option>
+              {variants.map((v: any) => (
+                <option key={v.id} value={v.id}>
+                  {v.sku}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 flex gap-1">
+              <Btn variant="outline" onClick={() => update(m.id, { is_primary: true })}>
+                Principal
+              </Btn>
+              <Btn
+                variant="ghost"
+                disabled={!i}
+                onClick={() =>
+                  update(m.id, { sort_order: media[i - 1].sort_order }).then(() =>
+                    update(media[i - 1].id, { sort_order: m.sort_order }),
+                  )
+                }
+              >
+                ↑
+              </Btn>
+              <Btn variant="ghost" onClick={() => remove(m)}>
+                Remover
+              </Btn>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+function ContentManager({ productId, blocks, media, reload }: any) {
+  const [type, setType] = useState("text");
+  const add = async () => {
+    await db
+      .from("product_content_blocks")
+      .insert({
+        product_id: productId,
+        type,
+        position: blocks.length,
+        config: type === "faq" ? { items: [] } : type === "benefits" ? { items: [] } : {},
+      });
+    reload();
+  };
+  const upd = (id: string, v: any) =>
+    db.from("product_content_blocks").update(v).eq("id", id).then(reload);
+  return (
+    <div className="space-y-4">
+      <Panel
+        title="Conteúdo da Página"
+        description="Blocos aparecem abaixo da área comercial após a próxima publicação da Store."
+        actions={
+          <>
+            <select value={type} onChange={(e) => setType(e.target.value)}>
+              {[
+                "text",
+                "image",
+                "banner",
+                "image_text",
+                "two_images",
+                "benefits",
+                "size_guide",
+                "faq",
+                "spacer",
+              ].map((x) => (
+                <option key={x}>{x}</option>
+              ))}
+            </select>
+            <Btn onClick={add}>+ Adicionar bloco</Btn>
+          </>
+        }
+      >
+        <div className="space-y-2 p-5">
+          {blocks.length ? (
+            blocks.map((b: any, i: number) => (
+              <div key={b.id} className="rounded-xl border p-3">
+                <div className="flex justify-between">
+                  <b>{b.type}</b>
+                  <div>
+                    <Btn
+                      variant="ghost"
+                      disabled={!i}
+                      onClick={() =>
+                        upd(b.id, { position: b.position - 1 }).then(() =>
+                          upd(blocks[i - 1].id, { position: b.position }),
+                        )
+                      }
+                    >
+                      ↑
+                    </Btn>
+                    <Btn variant="ghost" onClick={() => upd(b.id, { is_visible: !b.is_visible })}>
+                      {b.is_visible ? "Ocultar" : "Mostrar"}
+                    </Btn>
+                    <Btn variant="ghost" onClick={() => upd(b.id, { position: blocks.length })}>
+                      Duplicar
+                    </Btn>
+                    <Btn
+                      variant="ghost"
+                      onClick={() =>
+                        confirm("Excluir bloco?") &&
+                        db.from("product_content_blocks").delete().eq("id", b.id).then(reload)
+                      }
+                    >
+                      Excluir
+                    </Btn>
+                  </div>
+                </div>
+                <textarea
+                  className="mt-2 w-full"
+                  placeholder="Conteúdo do bloco"
+                  value={b.config.text || ""}
+                  onChange={(e) => upd(b.id, { config: { ...b.config, text: e.target.value } })}
+                />
+                {["image", "banner", "image_text"].includes(b.type) && (
+                  <select
+                    className="mt-2 w-full"
+                    value={b.config.image || ""}
+                    onChange={(e) => upd(b.id, { config: { ...b.config, image: e.target.value } })}
+                  >
+                    <option value="">Selecionar mídia</option>
+                    {media.map((m: any) => (
+                      <option key={m.id} value={m.storage_path}>
+                        {m.alt_text || m.storage_path}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>Enriqueça a página deste produto com blocos visuais.</p>
+          )}
+        </div>
+      </Panel>
+      <Panel title="Preview">
+        <div className="p-5">
+          <ProductRichContent blocks={blocks.filter((b: any) => b.is_visible)} />
+        </div>
+      </Panel>
+    </div>
   );
 }
