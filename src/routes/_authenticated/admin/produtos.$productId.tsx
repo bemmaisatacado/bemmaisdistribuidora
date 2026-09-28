@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -7,7 +6,47 @@ import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
 import { ProductRichContent } from "@/components/storefront/ProductRichContent";
 import { uploadProductMedia } from "@/lib/catalog/media";
 
-const db: any = supabase;
+type ContentBlockType =
+  | "text"
+  | "image"
+  | "banner"
+  | "image_text"
+  | "two_images"
+  | "benefits"
+  | "size_guide"
+  | "faq"
+  | "spacer";
+type ContentConfig = Record<
+  string,
+  string | boolean | number | string[] | Record<string, string>[] | string[][]
+>;
+type ProductContentBlock = {
+  id: string;
+  product_id: string;
+  type: ContentBlockType;
+  position: number;
+  is_visible: boolean;
+  config: ContentConfig;
+};
+type ProductMedia = {
+  id: string;
+  storage_path: string;
+  alt_text: string | null;
+  variant_id: string | null;
+  sort_order: number;
+  is_primary: boolean;
+};
+type ProductVariant = {
+  id: string;
+  sku: string;
+  internal_code?: string | null;
+  gtin?: string | null;
+  barcode?: string | null;
+  attributes: Record<string, string>;
+  is_active: boolean;
+};
+type Update = Record<string, string | boolean | number | null | ContentConfig>;
+const db = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos/$productId")({
   component: Product360,
 });
@@ -66,7 +105,7 @@ function Product360() {
     primary = d.media[0]?.storage_path || p.images?.[0];
   const health = [
     !d.media.length && "Sem imagem",
-    !d.variants.some((v: any) => v.is_active) && "Sem SKU ativo",
+    !d.variants.some((v: ProductVariant) => v.is_active) && "Sem SKU ativo",
     !d.offers.length && "Sem oferta",
     !p.description && "Descrição incompleta",
   ].filter(Boolean);
@@ -120,7 +159,7 @@ function Product360() {
           <Panel title="Saúde do cadastro">
             <div className="flex flex-wrap gap-2 p-5">
               {health.length ? (
-                health.map((x: any) => (
+                health.map((x: ProductMedia) => (
                   <Badge key={x} value="warning">
                     {x}
                   </Badge>
@@ -146,7 +185,7 @@ function Product360() {
                 </tr>
               </thead>
               <tbody>
-                {d.variants.map((v: any) => (
+                {d.variants.map((v: ProductVariant) => (
                   <tr key={v.id} className="border-t">
                     <td className="py-3 font-mono">{v.sku}</td>
                     <td className="font-mono">{v.internal_code || "—"}</td>
@@ -185,28 +224,42 @@ function Product360() {
       {tab === "Ofertas" ? (
         <Panel title="Ofertas de fornecedores">
           <div className="space-y-2 p-5">
-            {d.offers.map((o: any) => (
-              <div key={o.id} className="flex justify-between rounded-lg border p-3">
-                <span>
-                  {o.organizations?.name || "Fornecedor"} · MOQ {o.moq}
-                </span>
-                <Badge value={o.status} />
-              </div>
-            )) || <p>Sem ofertas.</p>}
+            {d.offers.map(
+              (o: {
+                id: string;
+                status: string;
+                moq: number;
+                organizations?: { name?: string } | null;
+              }) => (
+                <div key={o.id} className="flex justify-between rounded-lg border p-3">
+                  <span>
+                    {o.organizations?.name || "Fornecedor"} · MOQ {o.moq}
+                  </span>
+                  <Badge value={o.status} />
+                </div>
+              ),
+            ) || <p>Sem ofertas.</p>}
           </div>
         </Panel>
       ) : null}
       {tab === "Lojas" ? (
         <Panel title="Lojas que usam este produto">
           <div className="space-y-2 p-5">
-            {d.listings.map((l: any) => (
-              <div key={l.id} className="flex justify-between rounded-lg border p-3">
-                <span>
-                  {l.stores?.name || "Loja"} · {l.visibility}
-                </span>
-                <Badge value={l.status} />
-              </div>
-            )) || <p>Sem listings.</p>}
+            {d.listings.map(
+              (l: {
+                id: string;
+                status: string;
+                visibility: string;
+                stores?: { name?: string } | null;
+              }) => (
+                <div key={l.id} className="flex justify-between rounded-lg border p-3">
+                  <span>
+                    {l.stores?.name || "Loja"} · {l.visibility}
+                  </span>
+                  <Badge value={l.status} />
+                </div>
+              ),
+            ) || <p>Sem listings.</p>}
           </div>
         </Panel>
       ) : null}
@@ -220,7 +273,7 @@ function Product360() {
       {tab === "Atividade" ? (
         <Panel title="Atividade">
           <div className="space-y-2 p-5">
-            {d.activity.map((a: any) => (
+            {d.activity.map((a: { id: string; action: string; occurred_at: string }) => (
               <p key={a.id} className="rounded-lg border p-3 text-sm">
                 {a.action} · {new Date(a.occurred_at).toLocaleString("pt-BR")}
               </p>
@@ -232,7 +285,17 @@ function Product360() {
   );
 }
 
-function MediaManager({ productId, media, variants, reload }: any) {
+function MediaManager({
+  productId,
+  media,
+  variants,
+  reload,
+}: {
+  productId: string;
+  media: ProductMedia[];
+  variants: ProductVariant[];
+  reload: () => unknown;
+}) {
   const [busy, setBusy] = useState(false);
   const upload = async (files: FileList | null) => {
     if (!files) return;
@@ -253,12 +316,12 @@ function MediaManager({ productId, media, variants, reload }: any) {
     setBusy(false);
     reload();
   };
-  const update = (id: string, v: any) =>
+  const update = (id: string, v: Update) =>
     db.from("product_media").update(v).eq("id", id).then(reload);
-  const remove = async (m: any) => {
+  const remove = async (m: ProductMedia) => {
     if (!confirm("Remover esta imagem?")) return;
     if (m.is_primary) {
-      const next = media.find((x: any) => x.id !== m.id);
+      const next = media.find((x: ProductMedia) => x.id !== m.id);
       if (next) await db.from("product_media").update({ is_primary: true }).eq("id", next.id);
     }
     await db.from("product_media").delete().eq("id", m.id);
@@ -282,7 +345,7 @@ function MediaManager({ productId, media, variants, reload }: any) {
       }
     >
       <div className="grid gap-3 p-5 sm:grid-cols-3">
-        {media.map((m: any, i: number) => (
+        {media.map((m: ProductMedia, i: number) => (
           <div key={m.id} className="rounded-xl border p-3">
             <img
               src={m.storage_path}
@@ -302,7 +365,7 @@ function MediaManager({ productId, media, variants, reload }: any) {
               onChange={(e) => update(m.id, { variant_id: e.target.value || null })}
             >
               <option value="">Sem variante</option>
-              {variants.map((v: any) => (
+              {variants.map((v: ProductVariant) => (
                 <option key={v.id} value={v.id}>
                   {v.sku}
                 </option>
@@ -344,7 +407,17 @@ function MediaManager({ productId, media, variants, reload }: any) {
     </Panel>
   );
 }
-function ContentManager({ productId, blocks, media, reload }: any) {
+function ContentManager({
+  productId,
+  blocks,
+  media,
+  reload,
+}: {
+  productId: string;
+  blocks: ProductContentBlock[];
+  media: ProductMedia[];
+  reload: () => unknown;
+}) {
   const [type, setType] = useState("text");
   const add = async () => {
     await db.from("product_content_blocks").insert({
@@ -355,9 +428,9 @@ function ContentManager({ productId, blocks, media, reload }: any) {
     });
     reload();
   };
-  const upd = (id: string, v: any) =>
+  const upd = (id: string, v: Update) =>
     db.from("product_content_blocks").update(v).eq("id", id).then(reload);
-  const duplicate = async (b: any) => {
+  const duplicate = async (b: ProductContentBlock) => {
     await db.from("product_content_blocks").insert({
       product_id: productId,
       type: b.type,
@@ -395,7 +468,7 @@ function ContentManager({ productId, blocks, media, reload }: any) {
       >
         <div className="space-y-2 p-5">
           {blocks.length ? (
-            blocks.map((b: any, i: number) => (
+            blocks.map((b: ProductContentBlock, i: number) => (
               <div key={b.id} className="rounded-xl border p-3">
                 <div className="flex justify-between">
                   <b>{b.type}</b>
@@ -441,7 +514,7 @@ function ContentManager({ productId, blocks, media, reload }: any) {
                     onChange={(e) => upd(b.id, { config: { ...b.config, image: e.target.value } })}
                   >
                     <option value="">Selecionar mídia</option>
-                    {media.map((m: any) => (
+                    {media.map((m: ProductMedia) => (
                       <option key={m.id} value={m.storage_path}>
                         {m.alt_text || m.storage_path}
                       </option>
@@ -457,7 +530,7 @@ function ContentManager({ productId, blocks, media, reload }: any) {
       </Panel>
       <Panel title="Preview">
         <div className="p-5">
-          <ProductRichContent blocks={blocks.filter((b: any) => b.is_visible)} />
+          <ProductRichContent blocks={blocks.filter((b: ProductContentBlock) => b.is_visible)} />
         </div>
       </Panel>
     </div>
