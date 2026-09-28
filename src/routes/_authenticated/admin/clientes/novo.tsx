@@ -159,6 +159,7 @@ function NewCustomer() {
       return { id, name: f.name.trim(), inviteError };
     },
     onSuccess: (r) => {
+      if (r.inviteError) window.alert(`Cliente cadastrado, mas o convite não foi enviado: ${r.inviteError}. Reenvie pela aba Usuários.`);
       qc.invalidateQueries({ queryKey: ["customers"] });
       qc.invalidateQueries({ queryKey: ["customer-stats"] });
       if (f.createStore) setCreated(r);
