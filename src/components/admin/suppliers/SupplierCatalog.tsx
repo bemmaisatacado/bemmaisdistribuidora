@@ -132,7 +132,7 @@ export function SupplierProductsTab({ orgId, onEditOffer }: { orgId: string; onE
     {
       key: "st", label: "Status", render: (r) => {
         const best = r.offers.find((o) => o.status === "active") ?? r.offers[0];
-        return best ? <Badge value={best.status} label={STATUS_LABEL[best.status]} /> : "—";
+        return best ? <Badge value={best.status} label={STATUS_LABEL[best.status] ?? best.status} /> : "—";
       },
     },
     {
@@ -297,7 +297,7 @@ export function SupplierOffersTab({ orgId, onEditOffer }: { orgId: string; onEdi
     {
       key: "s", label: "Status", render: (o) => (
         <div className="grid gap-0.5">
-          <Badge value={o.status} label={STATUS_LABEL[o.status]} />
+          <Badge value={o.status} label={STATUS_LABEL[o.status] ?? o.status} />
           {o.status === "rejected" && o.rejection_reason && <span className="max-w-[14rem] truncate text-[11px] text-danger" title={o.rejection_reason}>{o.rejection_reason}</span>}
           {o.status === "pending_review" && o.submitted_at && <span className="text-[11px] text-muted-foreground">Enviada {dateTime(o.submitted_at)}</span>}
           {o.reviewed_at && (o.status === "approved" || o.status === "active") && <span className="text-[11px] text-muted-foreground">Revisada {dateTime(o.reviewed_at)}</span>}
@@ -446,7 +446,7 @@ function OfferForm({ offer, variants, onClose, onSaved }: {
         <DialogHeader>
           <DialogTitle className="flex flex-wrap items-center gap-2">
             Oferta · {offer.products?.name}
-            <Badge value={offer.status} label={STATUS_LABEL[offer.status]} />
+            <Badge value={offer.status} label={STATUS_LABEL[offer.status] ?? offer.status} />
           </DialogTitle>
         </DialogHeader>
         <div className="flex gap-1 border-b border-border-subtle">
@@ -640,7 +640,7 @@ export function SupplierStockTab({ orgId }: { orgId: string }) {
   const cols: Column<R>[] = [
     { key: "p", label: "Produto", render: (r) => <span className="font-semibold">{r.product}</span> },
     { key: "s", label: "SKU", render: (r) => <span className="font-mono text-xs">{r.sku}</span> },
-    { key: "o", label: "Oferta", render: (r) => <Badge value={r.offerStatus} label={STATUS_LABEL[r.offerStatus]} /> },
+    { key: "o", label: "Oferta", render: (r) => <Badge value={r.offerStatus} label={STATUS_LABEL[r.offerStatus] ?? r.offerStatus} /> },
     { key: "h", label: "Em mãos", className: "metric", render: (r) => num(r.on_hand) },
     { key: "r", label: "Reservado", className: "metric", render: (r) => num(r.reserved) },
     { key: "d", label: "Disponível", className: "metric", render: (r) => { const d = r.on_hand - r.reserved; return <span className={cn("font-bold", d < 0 ? "text-danger" : d === 0 ? "text-muted-foreground" : "")}>{num(d)}</span>; } },
@@ -666,7 +666,7 @@ export function SupplierStockTab({ orgId }: { orgId: string }) {
           <ul className="divide-y divide-border-subtle">
             {moves.data.map((mv) => (
               <li key={mv.id} className="flex items-center gap-3 py-2 text-sm">
-                <Badge value={mv.movement_type} label={MOVE_LABEL[mv.movement_type]} tone={mv.movement_type === "in" || mv.movement_type === "return" ? "ok" : mv.movement_type === "out" ? "bad" : "info"} />
+                <Badge value={mv.movement_type} label={MOVE_LABEL[mv.movement_type] ?? mv.movement_type} tone={mv.movement_type === "in" || mv.movement_type === "return" ? "ok" : mv.movement_type === "out" ? "bad" : "info"} />
                 <span className="font-mono text-xs">{mv.product_variants?.sku}</span>
                 <span className="metric font-bold">{mv.quantity > 0 && mv.movement_type === "adjust" ? "+" : ""}{mv.quantity}</span>
                 <span className="min-w-0 flex-1 truncate text-muted-foreground">{mv.reason}</span>
