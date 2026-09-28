@@ -45,7 +45,7 @@ function Dashboard() {
   const control: Alert[] = [
     { n: ops.data?.offers_pending, label: "Ofertas pendentes", to: "/admin/ofertas" },
     { n: ops.data?.payouts_pending, label: "Repasses pendentes", to: "/admin/financeiro/repasses" },
-    { n: ops.data?.stock_critical, label: "Estoque crítico", to: "/admin/estoque" },
+    { n: ops.data?.stock_critical, label: "Estoque zerado / ajuste", to: "/admin/estoque" },
     { n: ops.data?.accounts_pending, label: "Contas a validar", to: "/admin/financeiro/contas" },
   ];
   const totalAttention = control.reduce((a, c) => a + (c.n ?? 0), 0);

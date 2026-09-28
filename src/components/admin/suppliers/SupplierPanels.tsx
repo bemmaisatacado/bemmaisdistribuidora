@@ -54,7 +54,7 @@ export function Supplier360View({ s, go }: { s: Supplier360; go: (t: SupplierTab
   if (!p) alerts.push({ text: "Perfil de fornecimento não configurado.", tab: "relacionamento" });
   if (o.offers_pending) alerts.push({ text: `${o.offers_pending} oferta(s) aguardando aprovação.`, tab: "ofertas" });
   if (o.offers_rejected) alerts.push({ text: `${o.offers_rejected} oferta(s) rejeitada(s) para correção.`, tab: "ofertas" });
-  if (o.negative_skus) alerts.push({ text: `${o.negative_skus} SKU(s) com saldo negativo.`, tab: "estoque" });
+  if (o.negative_skus) alerts.push({ text: `${o.negative_skus} SKU(s) legado(s) exigem ajuste administrativo.`, tab: "estoque" });
   if (!f.active_accounts) alerts.push({ text: "Nenhuma conta de recebimento ativa.", tab: "financeiro" });
   if (s.access.invites_pending) alerts.push({ text: `${s.access.invites_pending} convite(s) pendente(s).`, tab: "usuarios" });
 
@@ -320,14 +320,14 @@ export function SupplierDomainsTab({ orgId, onCreateStore }: { orgId: string; on
       const hasPrimary = q.data?.domains.some((d) => d.store_id === sid && d.is_primary);
       const { error } = await supabase.from("store_domains").insert({
         store_id: sid, organization_id: orgId, hostname, type: kind, is_primary: !hasPrimary,
-        verification_data: kind === "custom_domain" ? { record: "CNAME", name: hostname, target: `lojas.${PLATFORM_DOMAIN}` } : {},
+        verification_data: {},
       });
       if (error) throw new Error(error.message.includes("duplicate") ? "Este domínio já está em uso." : error.message);
     },
     onSuccess: () => { setValue(""); refresh(); },
   });
   const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: { verification_status?: string; is_primary?: boolean; last_error?: string | null } }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: { is_primary?: boolean } }) => {
       if (patch.is_primary) {
         const d = q.data?.domains.find((x) => x.id === id);
         await supabase.from("store_domains").update({ is_primary: false }).eq("store_id", d!.store_id).eq("is_primary", true);
@@ -352,7 +352,6 @@ export function SupplierDomainsTab({ orgId, onCreateStore }: { orgId: string; on
         {q.data?.domains.length ? (
           <ul className="divide-y divide-border-subtle">
             {q.data.domains.map((d) => {
-              const vd = (d.verification_data ?? {}) as { record?: string; target?: string };
               return (
                 <li key={d.id} className="grid gap-2 py-3 sm:flex sm:items-center sm:gap-3">
                   <Globe className="hidden h-4 w-4 text-muted-foreground sm:block" />
@@ -363,14 +362,11 @@ export function SupplierDomainsTab({ orgId, onCreateStore }: { orgId: string; on
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {storeName.get(d.store_id)} · {d.type === "custom_domain" ? "Domínio próprio" : "Subdomínio BemMais"}
-                      {d.type === "custom_domain" && vd.target && d.verification_status !== "active" && <> · DNS: {vd.record} → <span className="font-mono">{vd.target}</span></>}
                     </p>
                     {d.last_error && <p className="text-xs text-danger">{d.last_error}</p>}
                   </div>
                   <Badge value={d.verification_status} tone={DOMAIN_STATUS_TONE[d.verification_status]} label={DOMAIN_STATUS_LABEL[d.verification_status] ?? d.verification_status} />
                   <div className="flex gap-1">
-                    {d.verification_status !== "active" && <Btn variant="outline" className="h-8 text-xs" onClick={() => update.mutate({ id: d.id, patch: { verification_status: "active", last_error: null } })}>Ativar</Btn>}
-                    {d.verification_status === "pending" && <Btn variant="outline" className="h-8 text-xs" onClick={() => update.mutate({ id: d.id, patch: { verification_status: "verifying" } })}>Verificando</Btn>}
                     {!d.is_primary && <Btn variant="outline" className="h-8 w-8 p-0" aria-label="Tornar principal" title="Tornar principal" onClick={() => update.mutate({ id: d.id, patch: { is_primary: true } })}><Star className="h-3.5 w-3.5" /></Btn>}
                     <Btn variant="outline" className="h-8 w-8 p-0" aria-label="Remover" title="Remover" onClick={() => window.confirm(`Remover ${d.hostname}?`) && del.mutate(d.id)}><Trash2 className="h-3.5 w-3.5" /></Btn>
                   </div>
@@ -402,7 +398,7 @@ export function SupplierDomainsTab({ orgId, onCreateStore }: { orgId: string; on
         <ErrorNote error={add.error} />
         {kind === "custom_domain" && (
           <p className="mt-3 rounded-lg bg-info-soft px-3 py-2 text-xs text-info">
-            O fornecedor deve criar um registro CNAME apontando para <b className="font-mono">lojas.{PLATFORM_DOMAIN}</b>. O domínio fica “Aguardando configuração” até a BemMais confirmar.
+            O domínio fica aguardando configuração e verificação. As instruções de conexão serão disponibilizadas quando a infraestrutura de lojas estiver definida.
           </p>
         )}
       </Panel>

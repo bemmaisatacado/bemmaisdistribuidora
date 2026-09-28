@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarClock, Rocket, FileWarning, ChevronRight, ClipboardCheck, Wallet, PackageX } from "lucide-react";
+import { CalendarClock, Rocket, FileWarning, ChevronRight, ClipboardCheck, Wallet, PackageX, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { shortDate } from "@/lib/admin/customers";
 import { cn } from "@/lib/utils";
 
 type Item = { id: string; name: string; detail?: string | null; due_at?: string | null };
 type Queues = Record<
-  "followups_late" | "onboarding" | "offers_pending" | "no_payout" | "stock_issues" | "incomplete",
+  "followups_late" | "onboarding" | "offers_pending" | "no_payout" | "stock_zero" | "stock_adjustment_required" | "incomplete",
   Item[]
 >;
 
@@ -20,7 +20,8 @@ const QUEUES: {
 }[] = [
   { key: "offers_pending", title: "Ofertas aguardando aprovação", icon: ClipboardCheck, tab: "ofertas" },
   { key: "followups_late", title: "Ações vencidas", icon: CalendarClock, critical: true, tab: "relacionamento" },
-  { key: "stock_issues", title: "Estoque negativo", icon: PackageX, critical: true, tab: "estoque" },
+  { key: "stock_zero", title: "Estoque zerado", icon: PackageX, critical: true, tab: "estoque" },
+  { key: "stock_adjustment_required", title: "Divergência / ajuste necessário", icon: Wrench, critical: true, tab: "estoque" },
   { key: "no_payout", title: "Sem conta de recebimento", icon: Wallet, tab: "financeiro" },
   { key: "onboarding", title: "Fornecedores em onboarding", icon: Rocket, tab: "relacionamento" },
   { key: "incomplete", title: "Cadastros incompletos", icon: FileWarning, tab: "dados" },

@@ -44,7 +44,7 @@ const ITEMS: Item[] = [
     to: "/admin/financeiro/transacoes",
   },
   {
-    label: "Estoque crítico",
+    label: "Estoque zerado / ajuste",
     icon: Boxes,
     level: "critical",
     key: "stock_critical",
