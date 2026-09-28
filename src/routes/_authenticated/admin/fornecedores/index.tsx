@@ -310,7 +310,7 @@ function SuppliersPage() {
                   </p>
                 </div>
                 {r.relationship_status ? (
-                  <Badge value={r.relationship_status} tone={RELATIONSHIP_TONE[r.relationship_status]} label={RELATIONSHIP_LABEL[r.relationship_status]} />
+                  <Badge value={r.relationship_status} tone={RELATIONSHIP_TONE[r.relationship_status]} label={RELATIONSHIP_LABEL[r.relationship_status] ?? r.relationship_status} />
                 ) : (
                   <Badge value={r.status} />
                 )}

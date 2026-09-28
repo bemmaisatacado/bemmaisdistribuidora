@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminFinanceiroRecebiveisRouteImport } from './ro
 import { Route as AuthenticatedAdminFinanceiroRepassesRouteImport } from './routes/_authenticated/admin/financeiro/repasses'
 import { Route as AuthenticatedAdminFinanceiroTransacoesRouteImport } from './routes/_authenticated/admin/financeiro/transacoes'
 import { Route as AuthenticatedAdminFornecedoresIndexRouteImport } from './routes/_authenticated/admin/fornecedores/index'
+import { Route as AuthenticatedAdminFornecedoresOrgIdRouteImport } from './routes/_authenticated/admin/fornecedores/$orgId'
 import { Route as AuthenticatedAdminFornecedoresNovoRouteImport } from './routes/_authenticated/admin/fornecedores/novo'
 
 const IndexRoute = IndexRouteImport.update({
@@ -246,6 +247,12 @@ const AuthenticatedAdminFornecedoresIndexRoute =
     path: '/fornecedores/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminFornecedoresOrgIdRoute =
+  AuthenticatedAdminFornecedoresOrgIdRouteImport.update({
+    id: '/fornecedores/$orgId',
+    path: '/fornecedores/$orgId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminFornecedoresNovoRoute =
   AuthenticatedAdminFornecedoresNovoRouteImport.update({
     id: '/fornecedores/novo',
@@ -284,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
@@ -320,6 +328,7 @@ export interface FileRoutesByTo {
   '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasIndexRoute
@@ -359,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/_authenticated/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/_authenticated/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/_authenticated/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/_authenticated/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/_authenticated/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/admin/financeiro/recebiveis'
     | '/admin/financeiro/repasses'
     | '/admin/financeiro/transacoes'
+    | '/admin/fornecedores/$orgId'
     | '/admin/fornecedores/novo'
     | '/admin/clientes/'
     | '/admin/empresas/'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/admin/financeiro/recebiveis'
     | '/admin/financeiro/repasses'
     | '/admin/financeiro/transacoes'
+    | '/admin/fornecedores/$orgId'
     | '/admin/fornecedores/novo'
     | '/admin/clientes'
     | '/admin/empresas'
@@ -472,6 +484,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/financeiro/recebiveis'
     | '/_authenticated/admin/financeiro/repasses'
     | '/_authenticated/admin/financeiro/transacoes'
+    | '/_authenticated/admin/fornecedores/$orgId'
     | '/_authenticated/admin/fornecedores/novo'
     | '/_authenticated/admin/clientes/'
     | '/_authenticated/admin/empresas/'
@@ -733,6 +746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFornecedoresIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/fornecedores/$orgId': {
+      id: '/_authenticated/admin/fornecedores/$orgId'
+      path: '/fornecedores/$orgId'
+      fullPath: '/admin/fornecedores/$orgId'
+      preLoaderRoute: typeof AuthenticatedAdminFornecedoresOrgIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/fornecedores/novo': {
       id: '/_authenticated/admin/fornecedores/novo'
       path: '/fornecedores/novo'
@@ -770,6 +790,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFinanceiroRecebiveisRoute: typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   AuthenticatedAdminFinanceiroRepassesRoute: typeof AuthenticatedAdminFinanceiroRepassesRoute
   AuthenticatedAdminFinanceiroTransacoesRoute: typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  AuthenticatedAdminFornecedoresOrgIdRoute: typeof AuthenticatedAdminFornecedoresOrgIdRoute
   AuthenticatedAdminFornecedoresNovoRoute: typeof AuthenticatedAdminFornecedoresNovoRoute
   AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
   AuthenticatedAdminEmpresasIndexRoute: typeof AuthenticatedAdminEmpresasIndexRoute
@@ -811,6 +832,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
       AuthenticatedAdminFinanceiroRepassesRoute,
     AuthenticatedAdminFinanceiroTransacoesRoute:
       AuthenticatedAdminFinanceiroTransacoesRoute,
+    AuthenticatedAdminFornecedoresOrgIdRoute:
+      AuthenticatedAdminFornecedoresOrgIdRoute,
     AuthenticatedAdminFornecedoresNovoRoute:
       AuthenticatedAdminFornecedoresNovoRoute,
     AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
