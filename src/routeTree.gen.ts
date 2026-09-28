@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminFinanceiroLedgerRouteImport } from './routes
 import { Route as AuthenticatedAdminFinanceiroRecebiveisRouteImport } from './routes/_authenticated/admin/financeiro/recebiveis'
 import { Route as AuthenticatedAdminFinanceiroRepassesRouteImport } from './routes/_authenticated/admin/financeiro/repasses'
 import { Route as AuthenticatedAdminFinanceiroTransacoesRouteImport } from './routes/_authenticated/admin/financeiro/transacoes'
+import { Route as AuthenticatedAdminFornecedoresIndexRouteImport } from './routes/_authenticated/admin/fornecedores/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -245,6 +246,12 @@ const AuthenticatedAdminFinanceiroTransacoesRoute =
     path: '/financeiro/transacoes',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminFornecedoresIndexRoute =
+  AuthenticatedAdminFornecedoresIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminFornecedoresRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -256,7 +263,7 @@ export interface FileRoutesByFullPath {
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
-  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRouteWithChildren
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
+  '/admin/fornecedores/': typeof AuthenticatedAdminFornecedoresIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -291,7 +299,6 @@ export interface FileRoutesByTo {
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
-  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/admin/marcas': typeof AuthenticatedAdminMarcasRoute
@@ -316,6 +323,7 @@ export interface FileRoutesByTo {
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroIndexRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -329,7 +337,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
-  '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRouteWithChildren
   '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
   '/_authenticated/admin/lojas': typeof AuthenticatedAdminLojasRoute
   '/_authenticated/admin/marcas': typeof AuthenticatedAdminMarcasRoute
@@ -354,6 +362,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/_authenticated/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/_authenticated/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
+  '/_authenticated/admin/fornecedores/': typeof AuthenticatedAdminFornecedoresIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/admin/clientes/'
     | '/admin/empresas/'
     | '/admin/financeiro/'
+    | '/admin/fornecedores/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -402,7 +412,6 @@ export interface FileRouteTypes {
     | '/admin/categorias'
     | '/admin/configuracoes'
     | '/admin/estoque'
-    | '/admin/fornecedores'
     | '/admin/ia'
     | '/admin/lojas'
     | '/admin/marcas'
@@ -427,6 +436,7 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/empresas'
     | '/admin/financeiro'
+    | '/admin/fornecedores'
   id:
     | '__root__'
     | '/'
@@ -464,6 +474,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes/'
     | '/_authenticated/admin/empresas/'
     | '/_authenticated/admin/financeiro/'
+    | '/_authenticated/admin/fornecedores/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -720,8 +731,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFinanceiroTransacoesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/fornecedores/': {
+      id: '/_authenticated/admin/fornecedores/'
+      path: '/'
+      fullPath: '/admin/fornecedores/'
+      preLoaderRoute: typeof AuthenticatedAdminFornecedoresIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminFornecedoresRoute
+    }
   }
 }
+
+interface AuthenticatedAdminFornecedoresRouteChildren {
+  AuthenticatedAdminFornecedoresIndexRoute: typeof AuthenticatedAdminFornecedoresIndexRoute
+}
+
+const AuthenticatedAdminFornecedoresRouteChildren: AuthenticatedAdminFornecedoresRouteChildren =
+  {
+    AuthenticatedAdminFornecedoresIndexRoute:
+      AuthenticatedAdminFornecedoresIndexRoute,
+  }
+
+const AuthenticatedAdminFornecedoresRouteWithChildren =
+  AuthenticatedAdminFornecedoresRoute._addFileChildren(
+    AuthenticatedAdminFornecedoresRouteChildren,
+  )
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSplatRoute: typeof AuthenticatedAdminSplatRoute
@@ -729,7 +762,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
   AuthenticatedAdminEstoqueRoute: typeof AuthenticatedAdminEstoqueRoute
-  AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
+  AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRouteWithChildren
   AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
   AuthenticatedAdminLojasRoute: typeof AuthenticatedAdminLojasRoute
   AuthenticatedAdminMarcasRoute: typeof AuthenticatedAdminMarcasRoute
@@ -763,7 +796,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
     AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
     AuthenticatedAdminEstoqueRoute: AuthenticatedAdminEstoqueRoute,
-    AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
+    AuthenticatedAdminFornecedoresRoute:
+      AuthenticatedAdminFornecedoresRouteWithChildren,
     AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
     AuthenticatedAdminLojasRoute: AuthenticatedAdminLojasRoute,
     AuthenticatedAdminMarcasRoute: AuthenticatedAdminMarcasRoute,

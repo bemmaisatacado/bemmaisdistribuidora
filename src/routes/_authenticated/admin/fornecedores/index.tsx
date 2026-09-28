@@ -41,9 +41,9 @@ import {
   RELATIONSHIP_LABEL,
   RELATIONSHIP_TONE,
   SUPPLY_MODALITIES,
-  MODALITY_SHORT,
   type SupplierRow,
 } from "@/lib/admin/suppliers";
+import { ModChips } from "@/components/admin/suppliers/ModChips";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/fornecedores/")({
@@ -346,20 +346,6 @@ function Mini({ label, v }: { label: string; v: number }) {
     <div>
       <p className="metric text-base font-bold">{num(v)}</p>
       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
-export function ModChips({ mods }: { mods: string[] }) {
-  const shown = mods.filter((m) => MODALITY_SHORT[m]);
-  if (!shown.length) return <span className="text-xs text-muted-foreground">Sem modalidades</span>;
-  return (
-    <div className="flex flex-wrap gap-1">
-      {shown.map((m) => (
-        <span key={m} className="rounded-md bg-surface-dark px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink-foreground">
-          {MODALITY_SHORT[m]}
-        </span>
-      ))}
     </div>
   );
 }
