@@ -4,6 +4,12 @@ import { sanitizeTheme } from "../src/lib/storefront.ts";
 import { publishedSeo } from "../src/lib/store-seo.ts";
 import { publishedNavigation, storeNavigationHref } from "../src/lib/store-navigation.ts";
 import {
+  possibleDuplicate,
+  productSku,
+  variantKey,
+  variantMatrix,
+} from "../src/lib/product-master.ts";
+import {
   hasUnpublishedChanges,
   ordered,
   publicSnapshot,
@@ -84,4 +90,18 @@ test("menu publicado respeita ordem, visibilidade e rotas da própria Store", ()
     ),
     null,
   );
+});
+test("matriz de variantes não depende de uma categoria específica", () => {
+  const matrix = variantMatrix({ cor: ["Preto", "Branco"], tamanho: ["P", "M"] });
+  assert.equal(matrix.length, 4);
+  assert.equal(new Set(matrix.map(variantKey)).size, 4);
+  assert.equal(variantMatrix({}).length, 1);
+  assert.match(productSku("Camiseta Nova", matrix[0], 1), /^CAMISETA-/);
+});
+test("detecção de possível duplicidade considera nome e marca", () => {
+  const matches = possibleDuplicate("Tênis 9060", "Nike", [
+    { name: "Tênis 9060", brand: "NIKE" },
+    { name: "Tênis 9060", brand: "Outra" },
+  ]);
+  assert.equal(matches.length, 1);
 });
