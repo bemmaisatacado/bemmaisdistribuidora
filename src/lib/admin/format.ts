@@ -29,6 +29,7 @@ export const CAPABILITY_LABEL: Record<string, string> = {
   sell_retail: "Vende varejo",
   sell_wholesale: "Vende atacado",
   operate_store: "Opera loja",
+  own_inventory: "Estoque próprio",
 };
 
 export const MODALITY_LABEL: Record<string, string> = {
