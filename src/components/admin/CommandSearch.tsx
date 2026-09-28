@@ -55,7 +55,7 @@ export function CommandSearch() {
           {!!data?.orgs.length && (
             <CommandGroup heading="Empresas">
               {data.orgs.map((o) => (
-                <CommandItem key={o.id} value={`org-${o.id}-${o.name}`} onSelect={() => go(() => navigate({ to: "/admin/empresas" }))}>
+                <CommandItem key={o.id} value={`org-${o.id}-${o.name}`} onSelect={() => go(() => navigate({ to: "/admin/empresas/$orgId", params: { orgId: o.id }, search: { tab: "resumo" } }))}>
                   <Building2 className="h-4 w-4" /> {o.name}
                 </CommandItem>
               ))}
