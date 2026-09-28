@@ -2,7 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { sanitizeTheme } from "../src/lib/storefront.ts";
 import {
+  hasUnpublishedChanges,
   ordered,
+  publicSnapshot,
   sanitizePageContent,
   validateMediaMeta,
   visible,
@@ -35,4 +37,10 @@ test("bloqueia mídia inválida e conteúdo inseguro", () => {
     sanitizePageContent("<script>x</script>javascript:alert(1) Sobre"),
     "xalert(1) Sobre",
   );
+});
+test("identifica rascunho não publicado sem substituir o snapshot público", () => {
+  assert.equal(hasUnpublishedChanges(4, 3), true);
+  assert.equal(hasUnpublishedChanges(3, 3), false);
+  assert.deepEqual(publicSnapshot({ version: 3 }, { version: 4 }), { version: 3 });
+  assert.deepEqual(publicSnapshot(null, { version: 4 }), { version: 4 });
 });

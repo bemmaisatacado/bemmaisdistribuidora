@@ -16,3 +16,9 @@ export function validateMediaMeta(type: string, size: number) {
     size <= 5 * 1024 * 1024
   );
 }
+export function hasUnpublishedChanges(draftRevision: number, publishedRevision: number) {
+  return draftRevision !== publishedRevision;
+}
+export function publicSnapshot<T>(published: T | null, draft: T) {
+  return published ?? draft;
+}

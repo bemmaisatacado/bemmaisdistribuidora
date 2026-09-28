@@ -5,7 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { sanitizeTheme } from "@/lib/storefront";
 import { ProductCard, type PublicListing } from "@/components/storefront/ProductCard";
 
-export const Route = createFileRoute("/s/$slug")({ component: Storefront });
+export const Route = createFileRoute("/s/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    preview: typeof search.preview === "string" ? search.preview : undefined,
+  }),
+  component: Storefront,
+});
 type Section = { id: string; type: string; config: Record<string, unknown> };
 type StorefrontData = {
   store: {
@@ -23,10 +28,13 @@ const text = (v: unknown) => (typeof v === "string" ? v : "");
 
 function Storefront() {
   const { slug } = Route.useParams();
+  const { preview } = Route.useSearch();
   const q = useQuery({
-    queryKey: ["public-store", slug],
+    queryKey: ["public-store", slug, preview],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_storefront", { _slug: slug });
+      const { data, error } = preview
+        ? await supabase.rpc("preview_storefront", { _store_id: preview })
+        : await supabase.rpc("public_storefront", { _slug: slug });
       if (error) throw error;
       return data as unknown as StorefrontData | null;
     },
@@ -54,6 +62,11 @@ function Storefront() {
       style={{ background: t.background, color: t.text, fontFamily: t.fontBody }}
       className="min-h-screen"
     >
+      {preview ? (
+        <div className="bg-amber-400 px-4 py-2 text-center text-xs font-bold text-amber-950">
+          PREVIEW DE RASCUNHO — alterações ainda não estão públicas.
+        </div>
+      ) : null}
       <header className="sticky top-0 z-10 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Link to="/s/$slug" params={{ slug }} className="flex min-w-0 items-center gap-3">
