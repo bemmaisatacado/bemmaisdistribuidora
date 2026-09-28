@@ -48,6 +48,8 @@ type ProductVariant = {
   attributes: Record<string, string>;
   is_active: boolean;
 };
+type UploadStatus = "pending" | "uploading" | "success" | "error";
+type UploadItem = { id: string; file: File; status: UploadStatus; message?: string };
 type Update = Record<string, string | boolean | number | null | ContentConfig>;
 const db = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos/$productId")({
@@ -299,24 +301,48 @@ function MediaManager({
   variants: ProductVariant[];
   reload: () => unknown;
 }) {
-  const [busy, setBusy] = useState(false);
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
   const upload = async (files: FileList | null) => {
     if (!files) return;
-    setBusy(true);
-    for (const file of Array.from(files)) {
-      try {
-        const path = await uploadProductMedia(productId, file);
-        await db.from("product_media").insert({
-          product_id: productId,
-          storage_path: path,
-          sort_order: media.length,
-          is_primary: !media.length,
-        });
-      } catch {
-        // One rejected file must not interrupt the remaining uploads.
-      }
-    }
-    setBusy(false);
+    const batch = Array.from(files).map((file) => ({
+      id: crypto.randomUUID(),
+      file,
+      status: "pending" as const,
+    }));
+    setUploads((current) => [...current, ...batch]);
+    await Promise.all(
+      batch.map(async (item) => {
+        setUploads((current) =>
+          current.map((entry) =>
+            entry.id === item.id ? { ...entry, status: "uploading" } : entry,
+          ),
+        );
+        try {
+          const path = await uploadProductMedia(productId, item.file);
+          await db.from("product_media").insert({
+            product_id: productId,
+            storage_path: path,
+            sort_order: media.length,
+            is_primary: !media.length,
+          });
+          setUploads((current) =>
+            current.map((entry) =>
+              entry.id === item.id ? { ...entry, status: "success", message: "Concluído" } : entry,
+            ),
+          );
+        } catch (error) {
+          const message =
+            error instanceof Error && /10 MB|JPG|PNG|WebP/.test(error.message)
+              ? error.message
+              : "Não foi possível enviar este arquivo.";
+          setUploads((current) =>
+            current.map((entry) =>
+              entry.id === item.id ? { ...entry, status: "error", message } : entry,
+            ),
+          );
+        }
+      }),
+    );
     reload();
   };
   const update = (id: string, v: Update) =>
@@ -336,7 +362,7 @@ function MediaManager({
       title="Galeria"
       actions={
         <label>
-          <Btn disabled={busy}>{busy ? "Enviando…" : "Adicionar imagens"}</Btn>
+          <Btn>Adicionar imagens</Btn>
           <input
             className="hidden"
             type="file"
@@ -348,6 +374,18 @@ function MediaManager({
       }
     >
       <div className="grid gap-3 p-5 sm:grid-cols-3">
+        {uploads.map((item) => (
+          <p key={item.id} className="col-span-full text-sm">
+            {item.file.name} —{" "}
+            {item.status === "pending"
+              ? "Pendente"
+              : item.status === "uploading"
+                ? "Enviando"
+                : item.status === "success"
+                  ? "Concluído"
+                  : `Erro: ${item.message}`}
+          </p>
+        ))}
         {media.map((m: ProductMedia, i: number) => (
           <div key={m.id} className="rounded-xl border p-3">
             <img
