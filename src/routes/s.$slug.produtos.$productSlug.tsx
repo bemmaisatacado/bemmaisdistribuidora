@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { money } from "@/components/storefront/ProductCard";
+import { formatStorePrice } from "@/lib/storefront";
 import { readCart, writeCart } from "@/lib/store-cart";
 
 export const Route = createFileRoute("/s/$slug/produtos/$productSlug")({ component: ProductPage });
@@ -148,9 +148,9 @@ function ProductPage() {
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{product.name}</h1>
           <div className="mt-5 flex items-center gap-3">
-            <strong className="text-2xl">{money(listing.retail_price)}</strong>
+            <strong className="text-2xl">{formatStorePrice(listing.retail_price)}</strong>
             {listing.compare_at_price && listing.compare_at_price > listing.retail_price ? (
-              <s className="text-slate-400">{money(listing.compare_at_price)}</s>
+              <s className="text-slate-400">{formatStorePrice(listing.compare_at_price)}</s>
             ) : null}
           </div>
           {listing.modality === "wholesale" &&

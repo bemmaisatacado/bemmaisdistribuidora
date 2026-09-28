@@ -82,6 +82,9 @@ export type CartItem = {
 export function cartTotal(items: CartItem[]) {
   return items.reduce((n, x) => n + x.price * x.quantity, 0);
 }
+export function formatStorePrice(value: number) {
+  return `R$ ${Number(value).toFixed(2).replace(".", ",")}`;
+}
 export function changeCartQuantity(items: CartItem[], key: string, quantity: number) {
   return items.flatMap((x) =>
     x.key !== key

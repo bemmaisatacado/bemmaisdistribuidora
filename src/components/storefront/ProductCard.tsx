@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { formatStorePrice } from "@/lib/storefront";
 
 export type PublicListing = {
   id: string;
@@ -9,10 +10,6 @@ export type PublicListing = {
   compare_at_price?: number | null;
   category?: { name: string; slug: string } | null;
 };
-
-export function money(value: number) {
-  return `R$ ${Number(value).toFixed(2).replace(".", ",")}`;
-}
 
 export function ProductCard({ slug, listing }: { slug: string; listing: PublicListing }) {
   return (
@@ -43,9 +40,11 @@ export function ProductCard({ slug, listing }: { slug: string; listing: PublicLi
           {listing.name}
         </h3>
         <div className="mt-2 flex flex-wrap items-baseline gap-2">
-          <strong className="text-sm text-slate-950">{money(listing.retail_price)}</strong>
+          <strong className="text-sm text-slate-950">
+            {formatStorePrice(listing.retail_price)}
+          </strong>
           {listing.compare_at_price && listing.compare_at_price > listing.retail_price ? (
-            <s className="text-xs text-slate-400">{money(listing.compare_at_price)}</s>
+            <s className="text-xs text-slate-400">{formatStorePrice(listing.compare_at_price)}</s>
           ) : null}
         </div>
       </div>

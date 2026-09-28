@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   readCart,
@@ -8,7 +8,7 @@ import {
   cartTotal,
   type PersistedCart,
 } from "@/lib/store-cart";
-import { money } from "@/components/storefront/ProductCard";
+import { formatStorePrice } from "@/lib/storefront";
 export const Route = createFileRoute("/s/$slug/carrinho")({ component: Cart });
 type Validation = {
   items: {
@@ -28,54 +28,58 @@ function Cart() {
     setCart(c);
     writeCart(c);
   };
-  const validate = async (current: PersistedCart) => {
-    if (!current.items.length) return;
-    setChecking(true);
-    const { data, error } = await supabase.rpc("validate_storefront_cart", {
-      _slug: slug,
-      _items: current.items.map((i) => ({
-        listingId: i.listingId,
-        variantId: i.variantId,
-        quantity: i.quantity,
-      })),
-    });
-    setChecking(false);
-    if (error) {
-      setNotice("Não foi possível atualizar a disponibilidade agora.");
-      return;
-    }
-    const valid = (data as unknown as Validation).items;
-    const next = {
-      ...current,
-      items: current.items.flatMap((item) => {
-        const checked = valid.find(
-          (v) => v.listing_id === item.listingId && v.variant_id === item.variantId,
-        );
-        if (!checked || !checked.available || checked.accepted_quantity < 1) return [];
-        return [
-          {
-            ...item,
-            price: Number(checked.unit_price),
-            quantity: checked.accepted_quantity,
-            available: checked.accepted_quantity,
-          },
-        ];
-      }),
-    };
-    if (
-      next.items.length !== current.items.length ||
-      next.items.some(
-        (x, i) => x.price !== current.items[i]?.price || x.quantity !== current.items[i]?.quantity,
+  const validate = useCallback(
+    async (current: PersistedCart) => {
+      if (!current.items.length) return;
+      setChecking(true);
+      const { data, error } = await supabase.rpc("validate_storefront_cart", {
+        _slug: slug,
+        _items: current.items.map((i) => ({
+          listingId: i.listingId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+        })),
+      });
+      setChecking(false);
+      if (error) {
+        setNotice("Não foi possível atualizar a disponibilidade agora.");
+        return;
+      }
+      const valid = (data as unknown as Validation).items;
+      const next = {
+        ...current,
+        items: current.items.flatMap((item) => {
+          const checked = valid.find(
+            (v) => v.listing_id === item.listingId && v.variant_id === item.variantId,
+          );
+          if (!checked || !checked.available || checked.accepted_quantity < 1) return [];
+          return [
+            {
+              ...item,
+              price: Number(checked.unit_price),
+              quantity: checked.accepted_quantity,
+              available: checked.accepted_quantity,
+            },
+          ];
+        }),
+      };
+      if (
+        next.items.length !== current.items.length ||
+        next.items.some(
+          (x, i) =>
+            x.price !== current.items[i]?.price || x.quantity !== current.items[i]?.quantity,
+        )
       )
-    )
-      setNotice("Carrinho atualizado conforme preço e disponibilidade atuais.");
-    update(next);
-  };
+        setNotice("Carrinho atualizado conforme preço e disponibilidade atuais.");
+      update(next);
+    },
+    [slug],
+  );
   useEffect(() => {
     const initial = readCart(slug);
     setCart(initial);
     void validate(initial);
-  }, [slug]);
+  }, [slug, validate]);
   return (
     <main className="mx-auto min-h-screen max-w-3xl bg-white px-5 py-10">
       <Link to="/s/$slug/catalogo" params={{ slug }} className="text-sm text-slate-500">
@@ -102,7 +106,7 @@ function Cart() {
                 <div>
                   <b>{i.name}</b>
                   {i.sku ? <p className="text-xs text-slate-500">SKU {i.sku}</p> : null}
-                  <p>{money(i.price)}</p>
+                  <p>{formatStorePrice(i.price)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -144,7 +148,7 @@ function Cart() {
           </div>
           <div className="mt-6 flex justify-between border-t pt-5 text-xl font-bold">
             <span>Total</span>
-            <span>{money(cartTotal(cart.items))}</span>
+            <span>{formatStorePrice(cartTotal(cart.items))}</span>
           </div>
           <button
             onClick={() => void validate(cart)}
