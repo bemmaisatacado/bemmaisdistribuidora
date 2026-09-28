@@ -635,6 +635,107 @@ function BasicBlockForm({
             <option value="large">Grande</option>
           </select>
         )}
+        {block.type === "image_text" && (
+          <>
+            <label>
+              Imagem
+              <select
+                value={String(config.image || "")}
+                onChange={(e) => set("image", e.target.value)}
+              >
+                <option value="">
+                  {media.length
+                    ? "Selecionar imagem"
+                    : "Este produto ainda não possui imagens. Adicione imagens na aba Mídia."}
+                </option>
+                {media.map((m) => (
+                  <option key={m.id} value={m.storage_path}>
+                    {m.alt_text || "Imagem"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {config.image && (
+              <img src={String(config.image)} alt="" className="h-24 w-24 object-cover" />
+            )}
+            <label>
+              Posição
+              <select
+                value={config.reverse === true ? "right" : "left"}
+                onChange={(e) => setConfig({ ...config, reverse: e.target.value === "right" })}
+              >
+                <option value="left">Imagem à esquerda</option>
+                <option value="right">Imagem à direita</option>
+              </select>
+            </label>
+            <input
+              placeholder="Título"
+              value={String(config.title || "")}
+              onChange={(e) => set("title", e.target.value)}
+            />
+            <textarea
+              placeholder="Texto"
+              value={String(config.text || "")}
+              onChange={(e) => set("text", e.target.value)}
+            />
+          </>
+        )}
+        {block.type === "two_images" && (
+          <>
+            <label>
+              Imagem 1
+              <select
+                value={String(config.left_image || "")}
+                onChange={(e) => set("left_image", e.target.value)}
+              >
+                <option value="">
+                  {media.length
+                    ? "Selecionar imagem"
+                    : "Este produto ainda não possui imagens. Adicione imagens na aba Mídia."}
+                </option>
+                {media.map((m) => (
+                  <option key={m.id} value={m.storage_path}>
+                    {m.alt_text || "Imagem"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {config.left_image && (
+              <img src={String(config.left_image)} alt="" className="h-24 w-24 object-cover" />
+            )}
+            <input
+              placeholder="Alt da imagem 1"
+              value={String(config.left_alt || "")}
+              onChange={(e) => set("left_alt", e.target.value)}
+            />
+            <label>
+              Imagem 2
+              <select
+                value={String(config.right_image || "")}
+                onChange={(e) => set("right_image", e.target.value)}
+              >
+                <option value="">
+                  {media.length
+                    ? "Selecionar imagem"
+                    : "Este produto ainda não possui imagens. Adicione imagens na aba Mídia."}
+                </option>
+                {media.map((m) => (
+                  <option key={m.id} value={m.storage_path}>
+                    {m.alt_text || "Imagem"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {config.right_image && (
+              <img src={String(config.right_image)} alt="" className="h-24 w-24 object-cover" />
+            )}
+            <input
+              placeholder="Alt da imagem 2"
+              value={String(config.right_alt || "")}
+              onChange={(e) => set("right_alt", e.target.value)}
+            />
+          </>
+        )}
         <Btn variant="ghost" onClick={onClose}>
           Cancelar
         </Btn>
