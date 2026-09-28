@@ -473,13 +473,24 @@ function ContentManager({
   const upd = (id: string, v: Update) =>
     db.from("product_content_blocks").update(v).eq("id", id).then(reload);
   const duplicate = async (b: ProductContentBlock) => {
-    await db.from("product_content_blocks").insert({
+    const following = blocks
+      .filter((block) => block.position > b.position)
+      .sort((left, right) => right.position - left.position);
+    for (const block of following) {
+      const { error } = await db
+        .from("product_content_blocks")
+        .update({ position: block.position + 1 })
+        .eq("id", block.id);
+      if (error) throw error;
+    }
+    const { error } = await db.from("product_content_blocks").insert({
       product_id: productId,
       type: b.type,
       position: b.position + 1,
       is_visible: b.is_visible,
       config: b.config,
     });
+    if (error) throw error;
     reload();
   };
   return (
