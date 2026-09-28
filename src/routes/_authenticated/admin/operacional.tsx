@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { PageHeader, DarkPanel } from "@/components/admin/ui";
 import { CustomerQueues } from "@/components/admin/customers/CustomerQueues";
+import { SupplierQueues } from "@/components/admin/suppliers/SupplierQueues";
 import { useOps } from "@/lib/admin/useOps";
 import { num } from "@/lib/admin/format";
 import { cn } from "@/lib/utils";
@@ -216,6 +217,7 @@ function OpsPage() {
         ))}
       </div>
       <CustomerQueues />
+      <SupplierQueues />
     </>
   );
 }
