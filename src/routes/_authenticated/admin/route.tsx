@@ -13,6 +13,7 @@ function AdminLayout() {
   const { data, isLoading } = useQuery({
     queryKey: ["platform-admin", user.id],
     queryFn: async () => {
+      await supabase.rpc("activate_my_invites"); // invited members become active on first session
       const { data, error } = await supabase.rpc("is_platform_admin", { _uid: user.id });
       if (error) throw error;
       return Boolean(data);

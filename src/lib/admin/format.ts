@@ -39,6 +39,8 @@ export const STATUS_LABEL: Record<string, string> = {
   pending: "Pendente",
   active: "Ativo",
   suspended: "Suspenso",
+  blocked: "Bloqueado",
+  invited: "Convidado",
   archived: "Arquivado",
   draft: "Rascunho",
   pending_review: "Em análise",
