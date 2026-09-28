@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminPermissoesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenticated/admin/precos'
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes/index'
 import { Route as AuthenticatedAdminEmpresasIndexRouteImport } from './routes/_authenticated/admin/empresas/index'
 import { Route as AuthenticatedAdminEmpresasOrgIdRouteImport } from './routes/_authenticated/admin/empresas/$orgId'
 import { Route as AuthenticatedAdminEmpresasNovaRouteImport } from './routes/_authenticated/admin/empresas/nova'
@@ -171,6 +172,12 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/usuarios',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminClientesIndexRoute =
+  AuthenticatedAdminClientesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
+  } as any)
 const AuthenticatedAdminEmpresasIndexRoute =
   AuthenticatedAdminEmpresasIndexRouteImport.update({
     id: '/empresas/',
@@ -240,7 +247,7 @@ export interface FileRoutesByFullPath {
   '/admin/$': typeof AuthenticatedAdminSplatRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
-  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRouteWithChildren
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
@@ -273,7 +281,6 @@ export interface FileRoutesByTo {
   '/admin/$': typeof AuthenticatedAdminSplatRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
-  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
@@ -309,7 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/$': typeof AuthenticatedAdminSplatRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
-  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRouteWithChildren
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
@@ -332,6 +340,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/financeiro/recebiveis': typeof AuthenticatedAdminFinanceiroRecebiveisRoute
   '/_authenticated/admin/financeiro/repasses': typeof AuthenticatedAdminFinanceiroRepassesRoute
   '/_authenticated/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
+  '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/_authenticated/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/_authenticated/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
 }
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/admin/financeiro/recebiveis'
     | '/admin/financeiro/repasses'
     | '/admin/financeiro/transacoes'
+    | '/admin/clientes/'
     | '/admin/empresas/'
     | '/admin/financeiro/'
   fileRoutesByTo: FileRoutesByTo
@@ -378,7 +388,6 @@ export interface FileRouteTypes {
     | '/admin/$'
     | '/admin/auditoria'
     | '/admin/categorias'
-    | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/estoque'
     | '/admin/fornecedores'
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/admin/financeiro/recebiveis'
     | '/admin/financeiro/repasses'
     | '/admin/financeiro/transacoes'
+    | '/admin/clientes'
     | '/admin/empresas'
     | '/admin/financeiro'
   id:
@@ -436,6 +446,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/financeiro/recebiveis'
     | '/_authenticated/admin/financeiro/repasses'
     | '/_authenticated/admin/financeiro/transacoes'
+    | '/_authenticated/admin/clientes/'
     | '/_authenticated/admin/empresas/'
     | '/_authenticated/admin/financeiro/'
   fileRoutesById: FileRoutesById
@@ -610,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/clientes/': {
+      id: '/_authenticated/admin/clientes/'
+      path: '/'
+      fullPath: '/admin/clientes/'
+      preLoaderRoute: typeof AuthenticatedAdminClientesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminClientesRoute
+    }
     '/_authenticated/admin/empresas/': {
       id: '/_authenticated/admin/empresas/'
       path: '/empresas'
@@ -683,11 +701,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminClientesRouteChildren {
+  AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
+}
+
+const AuthenticatedAdminClientesRouteChildren: AuthenticatedAdminClientesRouteChildren =
+  {
+    AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
+  }
+
+const AuthenticatedAdminClientesRouteWithChildren =
+  AuthenticatedAdminClientesRoute._addFileChildren(
+    AuthenticatedAdminClientesRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSplatRoute: typeof AuthenticatedAdminSplatRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
-  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRouteWithChildren
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
   AuthenticatedAdminEstoqueRoute: typeof AuthenticatedAdminEstoqueRoute
   AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
@@ -719,7 +751,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminSplatRoute: AuthenticatedAdminSplatRoute,
     AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
     AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
-    AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+    AuthenticatedAdminClientesRoute:
+      AuthenticatedAdminClientesRouteWithChildren,
     AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
     AuthenticatedAdminEstoqueRoute: AuthenticatedAdminEstoqueRoute,
     AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
