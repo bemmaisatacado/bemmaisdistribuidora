@@ -1,9 +1,10 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatStorePrice } from "@/lib/storefront";
 import { readCart, writeCart } from "@/lib/store-cart";
+import { applyPublishedSeo } from "@/lib/store-seo";
 
 export const Route = createFileRoute("/s/$slug/produtos/$productSlug")({ component: ProductPage });
 type Variant = {
@@ -55,6 +56,14 @@ function ProductPage() {
   const [image, setImage] = useState(0);
   const [variantId, setVariantId] = useState("");
   const [qty, setQty] = useState(1);
+  useEffect(() => {
+    if (!store.data?.store || !q.data) return;
+    applyPublishedSeo(store.data.store, {
+      title: q.data.product.name,
+      description: q.data.product.description,
+      social_image: q.data.product.images?.[0],
+    });
+  }, [q.data, store.data]);
   if (q.isLoading) return <main className="min-h-screen p-8">Carregando produto…</main>;
   if (!q.data)
     return (

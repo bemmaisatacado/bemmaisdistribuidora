@@ -1,9 +1,16 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, Search, ShoppingBag } from "lucide-react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeTheme } from "@/lib/storefront";
 import { ProductCard, type PublicListing } from "@/components/storefront/ProductCard";
+import { applyPublishedSeo } from "@/lib/store-seo";
+import {
+  publishedNavigation,
+  storeNavigationHref,
+  type StoreNavigationItem,
+} from "@/lib/store-navigation";
 
 export const Route = createFileRoute("/s/$slug")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -20,8 +27,12 @@ type StorefrontData = {
     description: string | null;
     theme: unknown;
     whatsapp: string | null;
+    favicon_url?: string | null;
+    seo?: unknown;
+    canonical_url?: string | null;
   };
   sections: Section[];
+  navigation?: StoreNavigationItem[];
   listings: (PublicListing & { product?: { name: string; slug: string; images: string[] } })[];
 };
 const text = (v: unknown) => (typeof v === "string" ? v : "");
@@ -39,6 +50,11 @@ function Storefront() {
       return data as unknown as StorefrontData | null;
     },
   });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const publicStore = q.data?.store;
+  useEffect(() => {
+    if (!preview && publicStore) applyPublishedSeo(publicStore);
+  }, [preview, publicStore]);
   if (q.isLoading) return <main className="min-h-screen bg-white p-8">Carregando loja…</main>;
   if (!q.data)
     return (
@@ -51,6 +67,12 @@ function Storefront() {
     );
   const { store } = q.data,
     t = sanitizeTheme(store.theme);
+  const navigation = q.data.navigation?.length
+    ? publishedNavigation(q.data.navigation)
+    : [
+        { id: "catalog", label: "Catálogo", kind: "catalog", target: "" },
+        { id: "search", label: "Buscar", kind: "external", target: `/s/${slug}/busca` },
+      ];
   const listings: PublicListing[] = q.data.listings.map((l) => ({
     ...l,
     name: l.product?.name ?? l.name,
@@ -76,12 +98,9 @@ function Storefront() {
             <b className="truncate text-base sm:text-lg">{store.name}</b>
           </Link>
           <nav className="hidden items-center gap-6 text-sm sm:flex">
-            <Link to="/s/$slug/catalogo" params={{ slug }}>
-              Catálogo
-            </Link>
-            <Link to="/s/$slug/busca" params={{ slug }}>
-              Buscar
-            </Link>
+            {navigation.map((item) => (
+              <StoreNavigationLink key={item.id} item={item} slug={slug} />
+            ))}
           </nav>
           <div className="flex items-center gap-3">
             <Link aria-label="Buscar" to="/s/$slug/busca" params={{ slug }}>
@@ -90,10 +109,30 @@ function Storefront() {
             <Link aria-label="Carrinho" to="/s/$slug/carrinho" params={{ slug }}>
               <ShoppingBag className="h-5 w-5" />
             </Link>
-            <Menu className="h-5 w-5 sm:hidden" />
+            <button
+              aria-label="Abrir menu"
+              className="sm:hidden"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
+      {mobileMenuOpen ? (
+        <nav className="border-b bg-white px-5 py-4 sm:hidden">
+          <div className="flex flex-col gap-3 text-sm font-medium">
+            {navigation.map((item) => (
+              <StoreNavigationLink
+                key={item.id}
+                item={item}
+                slug={slug}
+                onNavigate={() => setMobileMenuOpen(false)}
+              />
+            ))}
+          </div>
+        </nav>
+      ) : null}
       {q.data.sections.length ? (
         q.data.sections.map((section) => (
           <HomeSection
@@ -118,6 +157,22 @@ function Storefront() {
       </footer>
     </main>
   );
+}
+function StoreNavigationLink({
+  item,
+  slug,
+  onNavigate,
+}: {
+  item: StoreNavigationItem;
+  slug: string;
+  onNavigate?: () => void;
+}) {
+  const href = storeNavigationHref(item, slug);
+  return href ? (
+    <a href={href} onClick={onNavigate}>
+      {item.label}
+    </a>
+  ) : null;
 }
 function Hero({
   slug,

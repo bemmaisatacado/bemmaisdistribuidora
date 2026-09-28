@@ -1,10 +1,12 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { applyPublishedSeo } from "@/lib/store-seo";
 export const Route = createFileRoute("/s/$slug/paginas/$pageSlug")({
   component: InstitutionalPage,
 });
-type Page = { title: string; content: string };
+type Page = { title: string; content: string; seo?: Record<string, unknown> };
 function InstitutionalPage() {
   const { slug, pageSlug } = Route.useParams();
   const q = useQuery({
@@ -18,6 +20,17 @@ function InstitutionalPage() {
       return data as unknown as Page | null;
     },
   });
+  const store = useQuery({
+    queryKey: ["store-page-seo", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("public_storefront", { _slug: slug });
+      if (error) throw error;
+      return data as unknown as { store?: Parameters<typeof applyPublishedSeo>[0] } | null;
+    },
+  });
+  useEffect(() => {
+    if (store.data?.store && q.data) applyPublishedSeo(store.data.store, q.data.seo);
+  }, [q.data, store.data]);
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-5 py-10">
       <Link to="/s/$slug" params={{ slug }} className="text-sm text-slate-500">
