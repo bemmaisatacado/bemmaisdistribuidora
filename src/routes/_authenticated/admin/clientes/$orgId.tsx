@@ -11,7 +11,7 @@ import { EntityHeader, Btn, Badge, Empty, Panel } from "@/components/admin/ui";
 import { StatusDialog } from "@/components/admin/orgs/StatusDialog";
 import { CreateStoreModal } from "@/components/admin/orgs/CreateStoreModal";
 import {
-  MembersTab, CapabilitiesTab, StoresTab, ProductsTab, FinanceTab, ActivityTab, PlaceholderTab, InviteModal, DataTab,
+  MembersTab, CapabilitiesTab, StoresTab, ProductsTab, FinanceTab, ActivityTab, InviteModal, DataTab,
 } from "@/components/admin/orgs/OrgTabs";
 import { Customer360View, RelationshipTab } from "@/components/admin/customers/CustomerPanels";
 import { ORG_STATUSES, ORG_STATUS_LABEL, formatDocument, type OrgCtx, type OrgStatus } from "@/lib/admin/orgs";
@@ -128,7 +128,7 @@ function CustomerProfile() {
       {tab === "dados" && <DataTab ctx={ctx} />}
       {tab === "atividade" && <ActivityTab ctx={ctx} />}
 
-      {statusTarget && <StatusDialog org={org} target={statusTarget} onClose={() => setStatusTarget(null)} />}
+      <StatusDialog org={org} target={statusTarget} onClose={() => setStatusTarget(null)} />
       {storeOpen && <CreateStoreModal organizationId={org.id} organizationName={org.name} onClose={() => setStoreOpen(false)} />}
       {inviteOpen && <InviteModal orgId={org.id} onClose={() => setInviteOpen(false)} />}
     </>
@@ -147,4 +147,3 @@ function FutureTab({ title, text }: { title: string; text: string }) {
   );
 }
 
-export { PlaceholderTab };

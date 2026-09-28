@@ -4,6 +4,7 @@ import {
   ChevronRight, Boxes, Handshake, Package, Building2, Factory, CreditCard, Send, Landmark, ShoppingCart, Truck, Plug, AlertTriangle, Lock,
 } from "lucide-react";
 import { PageHeader, DarkPanel } from "@/components/admin/ui";
+import { CustomerQueues } from "@/components/admin/customers/CustomerQueues";
 import { useOps } from "@/lib/admin/useOps";
 import { num } from "@/lib/admin/format";
 import { cn } from "@/lib/utils";
@@ -91,6 +92,7 @@ function OpsPage() {
           </section>
         ))}
       </div>
+      <CustomerQueues />
     </>
   );
 }
