@@ -1,131 +1,429 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Archive, Copy, Grid2X2, List, PackagePlus, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Constants, type Database } from "@/integrations/supabase/types";
-import { PageHeader, Panel, DataTable, Pager, Badge, Btn, Field, TextInput, SelectInput, SearchBox } from "@/components/admin/ui";
-import { FormModal } from "@/components/admin/Modal";
-import { pageRange, slugify, STATUS_LABEL } from "@/lib/admin/format";
+import {
+  Badge,
+  Btn,
+  DataTable,
+  Empty,
+  FilterBar,
+  MetricCard,
+  PageHeader,
+  Panel,
+  Pager,
+  SearchBox,
+  SelectInput,
+  TextInput,
+} from "@/components/admin/ui";
+import { pageRange, STATUS_LABEL } from "@/lib/admin/format";
+import {
+  isOfficialGtin,
+  variantLabel,
+  variantMatrix,
+  type VariantDraft,
+} from "@/lib/catalog/identity";
 import { useCatalogRefs } from "@/lib/admin/queries";
 
+type Status = Database["public"]["Enums"]["catalog_status"];
+const db: any = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos")({ component: Products });
-type CStatus = Database["public"]["Enums"]["catalog_status"];
 
 function Products() {
-  const qc = useQueryClient();
-  const [page, setPage] = useState(0);
-  const [q, setQ] = useState("");
-  const [status, setStatusF] = useState<"" | CStatus>("");
-  const [open, setOpen] = useState(false);
-  const [skuFor, setSkuFor] = useState<{ id: string; name: string } | null>(null);
+  const [page, setPage] = useState(0),
+    [input, setInput] = useState(""),
+    [query, setQuery] = useState(""),
+    [status, setStatus] = useState<"" | Status>(""),
+    [view, setView] = useState<"table" | "cards">(() =>
+      localStorage.getItem("catalog-view") === "cards" ? "cards" : "table",
+    ),
+    [create, setCreate] = useState<"quick" | "full" | null>(null);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setQuery(input);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [input]);
+  useEffect(() => localStorage.setItem("catalog-view", view), [view]);
   const list = useQuery({
-    queryKey: ["products", page, q, status],
+    queryKey: ["catalog-central", page, query, status],
     queryFn: async () => {
-      let query = supabase.from("products").select("id,name,slug,status,categories(name),brands(name),product_variants(count)", { count: "exact" })
-        .order("created_at", { ascending: false }).range(...pageRange(page));
-      if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
-      if (status) query = query.eq("status", status);
-      const { data, error, count } = await query;
+      let q = db
+        .from("products")
+        .select(
+          "id,name,slug,status,updated_at,reference,images,categories(name),brands(name),product_variants(id,sku,internal_code,is_active),supplier_offers(count),product_media(count)",
+          { count: "exact" },
+        )
+        .order("updated_at", { ascending: false })
+        .range(...pageRange(page));
+      if (status) q = q.eq("status", status);
+      if (query.trim()) {
+        const like = `%${query.trim()}%`;
+        q = q.or(`name.ilike.${like},reference.ilike.${like}`);
+      }
+      const { data, error, count } = await q;
       if (error) throw error;
-      return { rows: data, count };
+      return { rows: data ?? [], count: count ?? 0 };
     },
   });
-  const setStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: CStatus }) => {
-      const { error } = await supabase.from("products").update({ status }).eq("id", id);
+  const rows = useMemo(() => list.data?.rows ?? [], [list.data?.rows]);
+  const metrics = useMemo(
+    () => ({
+      total: list.data?.count ?? 0,
+      active: rows.filter((r: any) => r.status === "active").length,
+      draft: rows.filter((r: any) => r.status === "draft").length,
+      noImage: rows.filter((r: any) => !r.product_media?.[0]?.count && !r.images?.length).length,
+      noOffer: rows.filter((r: any) => !r.supplier_offers?.[0]?.count).length,
+    }),
+    [list.data, rows],
+  );
+  const archive = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from("products").update({ status: "archived" }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => list.refetch(),
   });
-  type Row = NonNullable<typeof list.data>["rows"][number];
+  const duplicate = useMutation({
+    mutationFn: async (r: any) => {
+      const { error } = await db.rpc("create_product_master", {
+        _name: `${r.name} (cópia)`,
+        _slug: `${r.slug}-copia`,
+        _variants: r.product_variants.map((v: any) => ({ attributes: {}, is_active: v.is_active })),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => list.refetch(),
+  });
+  const actions = (r: any) => (
+    <div className="flex justify-end gap-1">
+      <Link to="/admin/produtos/$productId" params={{ productId: r.id }}>
+        <Btn variant="outline" className="h-8 text-xs">
+          Ver
+        </Btn>
+      </Link>
+      <Btn variant="ghost" title="Duplicar" onClick={() => duplicate.mutate(r)}>
+        <Copy className="h-4 w-4" />
+      </Btn>
+      <Btn variant="ghost" title="Arquivar" onClick={() => archive.mutate(r.id)}>
+        <Archive className="h-4 w-4" />
+      </Btn>
+    </div>
+  );
   return (
     <>
-      <PageHeader eyebrow="Catálogo" title="Produtos" description="Catálogo mestre: a identidade do item. Custos e condições ficam nas ofertas dos fornecedores."
-        actions={<Btn onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Novo produto</Btn>} />
+      <PageHeader
+        eyebrow="Product Master"
+        title="Central de Catálogo"
+        description="Identidade global separada de ofertas, custos e lojas."
+        actions={
+          <>
+            <Btn variant="outline" onClick={() => setCreate("quick")}>
+              <PackagePlus className="h-4 w-4" /> Cadastro rápido
+            </Btn>
+            <Btn onClick={() => setCreate("full")}>
+              <Plus className="h-4 w-4" /> Cadastro completo
+            </Btn>
+          </>
+        }
+      />
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <MetricCard label="Produtos" value={metrics.total} />
+        <MetricCard label="Ativos nesta página" value={metrics.active} />
+        <MetricCard label="Rascunhos" value={metrics.draft} />
+        <MetricCard label="Sem imagem" value={metrics.noImage} />
+        <MetricCard label="Sem oferta" value={metrics.noOffer} />
+      </div>
       <Panel>
-        <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4">
-          <SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} />
-          <SelectInput value={status} onChange={(e) => { setStatusF(e.target.value as CStatus); setPage(0); }} className="w-44">
+        <FilterBar
+          active={Number(!!status)}
+          onClear={() => {
+            setStatus("");
+            setInput("");
+          }}
+        >
+          <SearchBox
+            value={input}
+            onChange={setInput}
+            placeholder="Nome, referência, marca ou SKU"
+          />
+          <SelectInput
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value as Status);
+              setPage(0);
+            }}
+            className="w-44"
+          >
             <option value="">Todos os status</option>
-            {Constants.public.Enums.catalog_status.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+            {Constants.public.Enums.catalog_status.map((s) => (
+              <option key={s} value={s}>
+                {STATUS_LABEL[s]}
+              </option>
+            ))}
           </SelectInput>
-        </div>
-        <DataTable<Row> rowKey={(r) => r.id} rows={list.data?.rows} loading={list.isLoading} empty="Nenhum produto no catálogo." columns={[
-          { key: "n", label: "Produto", render: (r) => <span className="font-semibold">{r.name}</span> },
-          { key: "c", label: "Categoria", render: (r) => r.categories?.name ?? "—" },
-          { key: "b", label: "Marca", render: (r) => r.brands?.name ?? "—" },
-          { key: "v", label: "SKUs", render: (r) => r.product_variants?.[0]?.count ?? 0 },
-          { key: "s", label: "Status", render: (r) => <Badge value={r.status} /> },
-          { key: "a", label: "", className: "text-right whitespace-nowrap", render: (r) => (
-            <div className="flex justify-end gap-2">
-              <Btn variant="outline" className="h-8 text-xs" onClick={() => setSkuFor({ id: r.id, name: r.name })}>+ SKU</Btn>
-              <SelectInput aria-label="Status" value={r.status} className="h-8 w-32 text-xs" onChange={(e) => setStatus.mutate({ id: r.id, status: e.target.value as CStatus })}>
-                {Constants.public.Enums.catalog_status.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-              </SelectInput>
-            </div>) },
-        ]} />
+          <span className="ml-auto flex rounded-lg bg-secondary p-1">
+            <Btn
+              variant={view === "table" ? "primary" : "ghost"}
+              className="h-8 px-2"
+              onClick={() => setView("table")}
+            >
+              <List className="h-4 w-4" />
+            </Btn>
+            <Btn
+              variant={view === "cards" ? "primary" : "ghost"}
+              className="h-8 px-2"
+              onClick={() => setView("cards")}
+            >
+              <Grid2X2 className="h-4 w-4" />
+            </Btn>
+          </span>
+        </FilterBar>
+        {view === "table" ? (
+          <DataTable<any>
+            rowKey={(r) => r.id}
+            rows={rows}
+            loading={list.isLoading}
+            empty="Nenhum produto encontrado para estes filtros."
+            columns={[
+              {
+                key: "p",
+                label: "Produto",
+                render: (r) => (
+                  <div>
+                    <p className="font-semibold">{r.name}</p>
+                    <p className="text-xs text-muted-foreground">{r.reference || r.slug}</p>
+                  </div>
+                ),
+              },
+              {
+                key: "brand",
+                label: "Marca / categoria",
+                render: (r) => (
+                  <span>
+                    {r.brands?.name || "Sem marca"}
+                    <br />
+                    <small>{r.categories?.name || "Sem categoria"}</small>
+                  </span>
+                ),
+              },
+              {
+                key: "sku",
+                label: "Variantes / SKUs",
+                render: (r) => r.product_variants?.length ?? 0,
+              },
+              { key: "offer", label: "Ofertas", render: (r) => r.supplier_offers?.[0]?.count ?? 0 },
+              { key: "status", label: "Status", render: (r) => <Badge value={r.status} /> },
+              { key: "a", label: "", className: "text-right", render: actions },
+            ]}
+          />
+        ) : (
+          <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-3">
+            {rows.length ? (
+              rows.map((r: any) => (
+                <article
+                  key={r.id}
+                  className="rounded-xl border border-border-subtle bg-surface-elevated p-4"
+                >
+                  <div className="flex justify-between gap-3">
+                    <div>
+                      <h2 className="font-semibold">{r.name}</h2>
+                      <p className="text-xs text-muted-foreground">
+                        {r.brands?.name || "Sem marca"} · {r.categories?.name || "Sem categoria"}
+                      </p>
+                    </div>
+                    <Badge value={r.status} />
+                  </div>
+                  <p className="mt-5 text-sm">
+                    {r.product_variants?.length ?? 0} variantes ·{" "}
+                    {r.supplier_offers?.[0]?.count ?? 0} ofertas
+                  </p>
+                  {actions(r)}
+                </article>
+              ))
+            ) : (
+              <Empty text="Nenhum produto encontrado." />
+            )}
+          </div>
+        )}
         <Pager page={page} setPage={setPage} total={list.data?.count} />
       </Panel>
-      {open && <CreateProduct onClose={() => setOpen(false)} />}
-      {skuFor && <CreateSku product={skuFor} onClose={() => setSkuFor(null)} />}
+      {create && <ProductWizard mode={create} onClose={() => setCreate(null)} />}
     </>
   );
 }
 
-function CreateProduct({ onClose }: { onClose: () => void }) {
-  const qc = useQueryClient();
-  const refs = useCatalogRefs();
-  const [f, setF] = useState({ name: "", description: "", category_id: "", brand_id: "" });
-  const m = useMutation({
+function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () => void }) {
+  const qc = useQueryClient(),
+    refs = useCatalogRefs();
+  const [step, setStep] = useState(0),
+    [name, setName] = useState(""),
+    [reference, setReference] = useState(""),
+    [category, setCategory] = useState(""),
+    [brand, setBrand] = useState(""),
+    [color, setColor] = useState(""),
+    [sizes, setSizes] = useState(""),
+    [variants, setVariants] = useState<VariantDraft[]>([]),
+    [gtin, setGtin] = useState("");
+  const finalStep = mode === "quick" ? 1 : 2;
+  const generate = () =>
+    setVariants(
+      color || sizes
+        ? variantMatrix([
+            { code: "cor", values: color ? color.split(",").map((x) => x.trim()) : ["Padrão"] },
+            { code: "tamanho", values: sizes ? sizes.split(",").map((x) => x.trim()) : ["Padrão"] },
+          ]).map((v) => ({
+            ...v,
+            attributes: Object.fromEntries(
+              Object.entries(v.attributes).filter(([, x]) => x !== "Padrão"),
+            ),
+          }))
+        : [{ attributes: {} }],
+    );
+  const save = useMutation({
     mutationFn: async () => {
-      const base = slugify(f.name);
-      if (!base) throw new Error("Informe o nome.");
-      const { error } = await supabase.from("products").insert({
-        name: f.name.trim(), slug: `${base}-${Math.random().toString(36).slice(2, 6)}`, description: f.description || null,
-        category_id: f.category_id || null, brand_id: f.brand_id || null,
+      if (!name.trim()) throw new Error("Informe o nome do produto.");
+      if (!isOfficialGtin(gtin))
+        throw new Error("GTIN/EAN oficial deve ter 8 a 14 dígitos; código interno não é GTIN.");
+      const { error } = await db.rpc("create_product_master", {
+        _name: name,
+        _slug: name,
+        _category_id: category || null,
+        _brand_id: brand || null,
+        _reference: reference || null,
+        _variants: (variants.length ? variants : [{ attributes: {} }]).map((v) => ({
+          ...v,
+          gtin: v.gtin ?? (gtin || null),
+        })),
       });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["products"] }); qc.invalidateQueries({ queryKey: ["product-options"] }); onClose(); },
-  });
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
-  return (
-    <FormModal open onOpenChange={(v) => !v && onClose()} title="Novo produto" onSubmit={() => m.mutate()} submitting={m.isPending} error={m.error}>
-      <Field label="Nome"><TextInput value={f.name} onChange={set("name")} required maxLength={160} /></Field>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Categoria"><SelectInput value={f.category_id} onChange={set("category_id")}><option value="">—</option>{refs.data?.categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</SelectInput></Field>
-        <Field label="Marca"><SelectInput value={f.brand_id} onChange={set("brand_id")}><option value="">—</option>{refs.data?.brands.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</SelectInput></Field>
-      </div>
-      <Field label="Descrição"><TextInput value={f.description} onChange={set("description")} maxLength={2000} /></Field>
-      <p className="text-xs text-muted-foreground">O produto nasce como rascunho.</p>
-    </FormModal>
-  );
-}
-
-function CreateSku({ product, onClose }: { product: { id: string; name: string }; onClose: () => void }) {
-  const qc = useQueryClient();
-  const [f, setF] = useState({ sku: "", color: "", size: "", barcode: "" });
-  const m = useMutation({
-    mutationFn: async () => {
-      if (!f.sku.trim()) throw new Error("Informe o código SKU.");
-      const attributes: Record<string, string> = {};
-      if (f.color) attributes["cor"] = f.color;
-      if (f.size) attributes["tamanho"] = f.size;
-      const { error } = await supabase.from("product_variants").insert({ product_id: product.id, sku: f.sku.trim(), barcode: f.barcode || null, attributes });
-      if (error) throw error.code === "23505" ? new Error("SKU já existe.") : error;
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["catalog-central"] });
+      onClose();
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["products"] }); onClose(); },
   });
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
   return (
-    <FormModal open onOpenChange={(v) => !v && onClose()} title={`Novo SKU — ${product.name}`} onSubmit={() => m.mutate()} submitting={m.isPending} error={m.error}>
-      <Field label="SKU"><TextInput value={f.sku} onChange={set("sku")} required maxLength={60} /></Field>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Cor"><TextInput value={f.color} onChange={set("color")} maxLength={40} /></Field>
-        <Field label="Tamanho"><TextInput value={f.size} onChange={set("size")} maxLength={20} /></Field>
-      </div>
-      <Field label="Código de barras"><TextInput value={f.barcode} onChange={set("barcode")} maxLength={40} /></Field>
-    </FormModal>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+      <section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl bg-surface-elevated p-6 shadow-float">
+        <header className="mb-5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">
+              {mode === "quick" ? "Cadastro rápido" : `Cadastro completo · etapa ${step + 1}/3`}
+            </p>
+            <h2 className="mt-1 text-xl font-bold">Novo Product Master</h2>
+          </div>
+          <Btn variant="ghost" onClick={onClose}>
+            Cancelar
+          </Btn>
+        </header>
+        {step === 0 && (
+          <div className="grid gap-4">
+            <label>
+              Nome
+              <TextInput value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+            </label>
+            <label>
+              Modelo / referência
+              <TextInput value={reference} onChange={(e) => setReference(e.target.value)} />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label>
+                Categoria
+                <SelectInput value={category} onChange={(e) => setCategory(e.target.value)}>
+                  <option value="">Selecionar</option>
+                  {refs.data?.categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </SelectInput>
+              </label>
+              <label>
+                Marca
+                <SelectInput value={brand} onChange={(e) => setBrand(e.target.value)}>
+                  <option value="">Selecionar</option>
+                  {refs.data?.brands.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </SelectInput>
+              </label>
+            </div>
+          </div>
+        )}
+        {step === 1 && (
+          <div className="grid gap-4">
+            <p className="text-sm">Valores separados por vírgula geram a matriz comercial.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label>
+                Cor
+                <TextInput
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  placeholder="Preto, Branco"
+                />
+              </label>
+              <label>
+                Numeração
+                <TextInput
+                  value={sizes}
+                  onChange={(e) => setSizes(e.target.value)}
+                  placeholder="38, 39, 40"
+                />
+              </label>
+            </div>
+            <Btn variant="outline" onClick={generate}>
+              Gerar combinações
+            </Btn>
+            {variants.length > 0 && (
+              <div className="rounded-xl bg-secondary p-3 text-sm">
+                {variants.length} variante(s): {variants.map(variantLabel).join(" · ")}
+              </div>
+            )}
+            <label>
+              GTIN/EAN oficial (opcional)
+              <TextInput
+                value={gtin}
+                onChange={(e) => setGtin(e.target.value)}
+                placeholder="Nunca use o código interno aqui"
+              />
+            </label>
+          </div>
+        )}
+        {step === 2 && (
+          <div className="space-y-3 text-sm">
+            <p>
+              <b>{name}</b> · {variants.length || 1} variante(s)
+            </p>
+            <p>
+              SKU BemMais e código interno serão gerados de forma única. GTIN oficial:{" "}
+              {gtin || "não informado"}.
+            </p>
+            <p className="rounded-lg bg-warning-soft p-3 text-warning">
+              Produto será salvo como rascunho. Mídias podem ser adicionadas no Product 360.
+            </p>
+          </div>
+        )}
+        <footer className="mt-6 flex justify-between">
+          <Btn variant="outline" disabled={!step} onClick={() => setStep(step - 1)}>
+            Voltar
+          </Btn>
+          {step < finalStep ? (
+            <Btn onClick={() => setStep(step + 1)}>Continuar</Btn>
+          ) : (
+            <Btn onClick={() => save.mutate()} disabled={save.isPending}>
+              {save.isPending ? "Salvando…" : "Criar produto"}
+            </Btn>
+          )}
+        </footer>
+        {save.error && <p className="mt-3 text-sm text-danger">{save.error.message}</p>}
+      </section>
+    </div>
   );
 }
