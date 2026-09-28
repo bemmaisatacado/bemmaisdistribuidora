@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { resolveStoreByHostname } from "@/lib/domains/hostname";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +122,26 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    const host = window.location.hostname;
+    if (
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "bemmaisdistribuidora.com.br" ||
+      host === "www.bemmaisdistribuidora.com.br" ||
+      window.location.pathname.startsWith("/s/")
+    )
+      return;
+    void resolveStoreByHostname(host)
+      .then((resolved) => {
+        if (!resolved) return;
+        const path = window.location.pathname === "/" ? "" : window.location.pathname;
+        window.location.replace(
+          `/s/${resolved.store.slug}${path}${window.location.search}${window.location.hash}`,
+        );
+      })
+      .catch(() => undefined);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
