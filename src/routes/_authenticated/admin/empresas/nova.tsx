@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -213,7 +213,7 @@ function Review({ title, rows }: { title: string; rows: [string, string][] }) {
     <div className="rounded-xl bg-secondary/50 p-4">
       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
       <dl className="mt-2 grid grid-cols-[120px_1fr] gap-y-1 text-sm">
-        {rows.map(([k, v]) => <><dt key={`${k}-k`} className="text-muted-foreground">{k}</dt><dd key={`${k}-v`} className="truncate">{v || "—"}</dd></>)}
+        {rows.map(([k, v]) => <Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd className="truncate">{v || "—"}</dd></Fragment>)}
       </dl>
     </div>
   );
