@@ -4,7 +4,11 @@ export const brl = (v: number | string | null | undefined) =>
 export const num = (v: number | null | undefined) => new Intl.NumberFormat("pt-BR").format(v ?? 0);
 
 export const dateTime = (v: string | null | undefined) =>
-  v ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(v)) : "—";
+  v
+    ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(
+        new Date(v),
+      )
+    : "—";
 
 export function slugify(s: string) {
   return s
@@ -60,4 +64,5 @@ export const STATUS_LABEL: Record<string, string> = {
 };
 
 export const PAGE_SIZE = 20;
-export const pageRange = (page: number) => [page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1] as const;
+export const pageRange = (page: number) =>
+  [page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1] as const;

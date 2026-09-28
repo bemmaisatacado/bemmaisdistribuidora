@@ -184,14 +184,12 @@ function NewOrg() {
         if (e) throw e;
       }
       if (f.note.trim()) {
-        const { error: e } = await supabase
-          .from("organization_notes")
-          .insert({
-            organization_id: id,
-            body: f.note.trim().slice(0, 4000),
-            kind: f.note_kind,
-            author_id: user.id,
-          });
+        const { error: e } = await supabase.from("organization_notes").insert({
+          organization_id: id,
+          body: f.note.trim().slice(0, 4000),
+          kind: f.note_kind,
+          author_id: user.id,
+        });
         if (e) throw e;
       }
       return id;
