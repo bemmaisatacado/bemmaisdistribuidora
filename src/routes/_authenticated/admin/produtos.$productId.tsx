@@ -419,6 +419,7 @@ function ContentManager({
   reload: () => unknown;
 }) {
   const [type, setType] = useState("text");
+  const [editing, setEditing] = useState<ProductContentBlock | null>(null);
   const add = async () => {
     await db.from("product_content_blocks").insert({
       product_id: productId,
@@ -487,6 +488,9 @@ function ContentManager({
                     <Btn variant="ghost" onClick={() => upd(b.id, { is_visible: !b.is_visible })}>
                       {b.is_visible ? "Ocultar" : "Mostrar"}
                     </Btn>
+                    <Btn variant="ghost" onClick={() => setEditing(b)}>
+                      Editar
+                    </Btn>
                     <Btn variant="ghost" onClick={() => duplicate(b)}>
                       Duplicar
                     </Btn>
@@ -528,11 +532,113 @@ function ContentManager({
           )}
         </div>
       </Panel>
+      {editing && (
+        <BasicBlockForm
+          block={editing}
+          media={media}
+          onClose={() => setEditing(null)}
+          onSave={(config) => upd(editing.id, { config })}
+        />
+      )}
       <Panel title="Preview">
         <div className="p-5">
           <ProductRichContent blocks={blocks.filter((b: ProductContentBlock) => b.is_visible)} />
         </div>
       </Panel>
     </div>
+  );
+}
+
+function BasicBlockForm({
+  block,
+  media,
+  onClose,
+  onSave,
+}: {
+  block: ProductContentBlock;
+  media: ProductMedia[];
+  onClose: () => void;
+  onSave: (config: ContentConfig) => unknown;
+}) {
+  const [config, setConfig] = useState<ContentConfig>(block.config);
+  const set = (key: string, value: string) => setConfig({ ...config, [key]: value });
+  const visual = block.type === "image" || block.type === "banner";
+  return (
+    <Panel
+      title={`Editar ${block.type}`}
+      actions={
+        <Btn
+          onClick={() => {
+            onSave(config);
+            onClose();
+          }}
+        >
+          Salvar
+        </Btn>
+      }
+    >
+      <div className="grid gap-3 p-5">
+        {block.type === "text" && (
+          <>
+            <input
+              placeholder="Título"
+              value={String(config.title || "")}
+              onChange={(e) => set("title", e.target.value)}
+            />
+            <input
+              placeholder="Subtítulo"
+              value={String(config.subtitle || "")}
+              onChange={(e) => set("subtitle", e.target.value)}
+            />
+            <textarea
+              placeholder="Texto"
+              value={String(config.text || "")}
+              onChange={(e) => set("text", e.target.value)}
+            />
+          </>
+        )}
+        {visual && (
+          <>
+            <select
+              value={String(config.image || "")}
+              onChange={(e) => set("image", e.target.value)}
+            >
+              <option value="">Selecionar imagem</option>
+              {media.map((m) => (
+                <option key={m.id} value={m.storage_path}>
+                  {m.alt_text || "Imagem"}
+                </option>
+              ))}
+            </select>
+            {config.image && (
+              <img src={String(config.image)} alt="" className="h-24 w-24 object-cover" />
+            )}
+            <input
+              placeholder="Alt text"
+              value={String(config.alt || "")}
+              onChange={(e) => set("alt", e.target.value)}
+            />
+            <input
+              placeholder="Link opcional"
+              value={String(config.link || "")}
+              onChange={(e) => set("link", e.target.value)}
+            />
+          </>
+        )}
+        {block.type === "spacer" && (
+          <select
+            value={String(config.size || "medium")}
+            onChange={(e) => set("size", e.target.value)}
+          >
+            <option value="small">Pequeno</option>
+            <option value="medium">Médio</option>
+            <option value="large">Grande</option>
+          </select>
+        )}
+        <Btn variant="ghost" onClick={onClose}>
+          Cancelar
+        </Btn>
+      </div>
+    </Panel>
   );
 }
