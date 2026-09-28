@@ -423,6 +423,30 @@ export type Database = {
           },
         ]
       }
+      org_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organization_capabilities: {
         Row: {
           capability: Database["public"]["Enums"]["org_capability"]
@@ -449,6 +473,57 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_invitations: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          role_key: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          role_key: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          role_key?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_invitations_role_key_fkey"
+            columns: ["role_key"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -497,48 +572,179 @@ export type Database = {
           },
         ]
       }
-      organizations: {
+      organization_notes: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          kind?: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_notes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_tag_links: {
         Row: {
           created_at: string
+          id: string
+          organization_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_tag_links_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_tag_links_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "org_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          account_manager_id: string | null
+          city: string | null
+          complement: string | null
+          country: string
+          created_at: string
           created_by: string | null
+          district: string | null
           document: string | null
           email: string | null
           id: string
           is_platform: boolean
           legal_name: string | null
+          logo_url: string | null
           name: string
+          origin: string | null
+          person_type: string
           phone: string | null
+          postal_code: string | null
+          responsible_document: string | null
+          responsible_email: string | null
+          responsible_name: string | null
+          responsible_role: string | null
+          responsible_whatsapp: string | null
           slug: string
+          state: string | null
           status: Database["public"]["Enums"]["org_status"]
+          street: string | null
+          street_number: string | null
           updated_at: string
+          website: string | null
+          whatsapp: string | null
         }
         Insert: {
+          account_manager_id?: string | null
+          city?: string | null
+          complement?: string | null
+          country?: string
           created_at?: string
           created_by?: string | null
+          district?: string | null
           document?: string | null
           email?: string | null
           id?: string
           is_platform?: boolean
           legal_name?: string | null
+          logo_url?: string | null
           name: string
+          origin?: string | null
+          person_type?: string
           phone?: string | null
+          postal_code?: string | null
+          responsible_document?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          responsible_role?: string | null
+          responsible_whatsapp?: string | null
           slug: string
+          state?: string | null
           status?: Database["public"]["Enums"]["org_status"]
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Update: {
+          account_manager_id?: string | null
+          city?: string | null
+          complement?: string | null
+          country?: string
           created_at?: string
           created_by?: string | null
+          district?: string | null
           document?: string | null
           email?: string | null
           id?: string
           is_platform?: boolean
           legal_name?: string | null
+          logo_url?: string | null
           name?: string
+          origin?: string | null
+          person_type?: string
           phone?: string | null
+          postal_code?: string | null
+          responsible_document?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          responsible_role?: string | null
+          responsible_whatsapp?: string | null
           slug?: string
+          state?: string | null
           status?: Database["public"]["Enums"]["org_status"]
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -1356,17 +1562,58 @@ export type Database = {
       }
     }
     Functions: {
+      activate_my_invites: { Args: never; Returns: number }
       admin_dashboard_metrics: {
         Args: { _from: string; _to: string }
         Returns: Json
       }
       admin_ops_queue: { Args: never; Returns: Json }
+      admin_org_stats: { Args: never; Returns: Json }
+      admin_search_organizations: {
+        Args: {
+          _capability?: string
+          _from?: string
+          _has_products?: boolean
+          _has_store?: boolean
+          _page?: number
+          _profile?: string
+          _q?: string
+          _size?: number
+          _status?: string
+          _tag?: string
+          _to?: string
+        }
+        Returns: Json
+      }
+      find_user_id_by_email: { Args: { _email: string }; Returns: string }
       has_org_permission: {
         Args: { _org: string; _perm: string; _uid: string }
         Returns: boolean
       }
       is_org_member: { Args: { _org: string; _uid: string }; Returns: boolean }
       is_platform_admin: { Args: { _uid: string }; Returns: boolean }
+      org_member_directory: {
+        Args: { _org: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          last_sign_in_at: string
+          member_id: string
+          role_key: string
+          status: string
+          user_id: string
+        }[]
+      }
+      org_summary: { Args: { _org: string }; Returns: Json }
+      platform_team: {
+        Args: never
+        Returns: {
+          email: string
+          full_name: string
+          user_id: string
+        }[]
+      }
       resolve_platform_price: {
         Args: {
           _buyer_org?: string
@@ -1422,7 +1669,7 @@ export type Database = {
         | "sell_retail"
         | "sell_wholesale"
         | "operate_store"
-      org_status: "pending" | "active" | "suspended" | "archived"
+      org_status: "pending" | "active" | "suspended" | "archived" | "blocked"
       payment_account_kind: "gateway_recipient" | "pix"
       payment_account_status: "pending" | "active" | "disabled"
       payment_status:
@@ -1621,7 +1868,7 @@ export const Constants = {
         "sell_wholesale",
         "operate_store",
       ],
-      org_status: ["pending", "active", "suspended", "archived"],
+      org_status: ["pending", "active", "suspended", "archived", "blocked"],
       payment_account_kind: ["gateway_recipient", "pix"],
       payment_account_status: ["pending", "active", "disabled"],
       payment_status: [

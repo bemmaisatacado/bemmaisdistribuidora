@@ -23,3 +23,6 @@
 - Super Admin lives under src/routes/_authenticated/admin/*; future modules route to the admin splat page — no invented data.
 - Architecture reference: docs/ARCHITECTURE.md.
 - Super Admin design system: tokens (canvas, surface-elevated/dark, success/warning/danger/info) in src/styles.css + shared components in src/components/admin/ui.tsx — every admin module must reuse them, never hand-roll white/bordered cards.
+- Organizations module: list/stats/search via SQL RPCs (admin_search_organizations, admin_org_stats, org_summary) and profile at /admin/empresas/$orgId?tab=… — server-side filtering and permission checks stay in the database.
+- Member invites go through the inviteMember server fn (Supabase Auth inviteUserByEmail); admins never set passwords; invited members activate via activate_my_invites on first session.
+- Internal notes and tags (organization_notes, org_tags, organization_tag_links) are platform-only via RLS — never exposed to tenant orgs.
