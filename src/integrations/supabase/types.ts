@@ -407,6 +407,7 @@ export type Database = {
           name: string
           offer_id: string
           organization_id: string
+          price: number | null
           total_units: number
           updated_at: string
         }
@@ -418,6 +419,7 @@ export type Database = {
           name: string
           offer_id: string
           organization_id: string
+          price?: number | null
           total_units?: number
           updated_at?: string
         }
@@ -429,6 +431,7 @@ export type Database = {
           name?: string
           offer_id?: string
           organization_id?: string
+          price?: number | null
           total_units?: number
           updated_at?: string
         }
@@ -1430,6 +1433,69 @@ export type Database = {
         }
         Relationships: []
       }
+      store_domains: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          hostname: string
+          id: string
+          is_primary: boolean
+          last_error: string | null
+          organization_id: string
+          store_id: string
+          type: string
+          updated_at: string
+          verification_data: Json
+          verification_status: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          hostname: string
+          id?: string
+          is_primary?: boolean
+          last_error?: string | null
+          organization_id: string
+          store_id: string
+          type: string
+          updated_at?: string
+          verification_data?: Json
+          verification_status?: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          hostname?: string
+          id?: string
+          is_primary?: boolean
+          last_error?: string | null
+          organization_id?: string
+          store_id?: string
+          type?: string
+          updated_at?: string
+          verification_data?: Json
+          verification_status?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_domains_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_domains_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_listings: {
         Row: {
           created_at: string
@@ -1625,46 +1691,64 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          drop_config: Json
           id: string
           lead_time_days: number | null
+          mixed_config: Json
           modalities: Database["public"]["Enums"]["commercial_modality"][]
           moq: number
           organization_id: string
           product_id: string
+          rejection_reason: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          ship_days: number | null
           status: Database["public"]["Enums"]["catalog_status"]
+          submitted_at: string | null
+          submitted_by: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          drop_config?: Json
           id?: string
           lead_time_days?: number | null
+          mixed_config?: Json
           modalities?: Database["public"]["Enums"]["commercial_modality"][]
           moq?: number
           organization_id: string
           product_id: string
+          rejection_reason?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          ship_days?: number | null
           status?: Database["public"]["Enums"]["catalog_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          drop_config?: Json
           id?: string
           lead_time_days?: number | null
+          mixed_config?: Json
           modalities?: Database["public"]["Enums"]["commercial_modality"][]
           moq?: number
           organization_id?: string
           product_id?: string
+          rejection_reason?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          ship_days?: number | null
           status?: Database["public"]["Enums"]["catalog_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1680,6 +1764,136 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_profiles: {
+        Row: {
+          category_ids: string[]
+          commercial_notes: string | null
+          created_at: string
+          created_by: string | null
+          finance_status: string
+          freight_policy: string | null
+          fulfillment_mode: string
+          instagram: string | null
+          logistics_notes: string | null
+          min_order_value: number | null
+          min_quantity: number | null
+          modalities: Database["public"]["Enums"]["commercial_modality"][]
+          organization_id: string
+          own_fulfillment: boolean
+          payout_method: string | null
+          prep_days: number | null
+          return_policy: string | null
+          service_regions: string | null
+          ship_days: number | null
+          ship_origin: string | null
+          supplier_type: string
+          supports_unit_sale: boolean
+          updated_at: string
+        }
+        Insert: {
+          category_ids?: string[]
+          commercial_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          finance_status?: string
+          freight_policy?: string | null
+          fulfillment_mode?: string
+          instagram?: string | null
+          logistics_notes?: string | null
+          min_order_value?: number | null
+          min_quantity?: number | null
+          modalities?: Database["public"]["Enums"]["commercial_modality"][]
+          organization_id: string
+          own_fulfillment?: boolean
+          payout_method?: string | null
+          prep_days?: number | null
+          return_policy?: string | null
+          service_regions?: string | null
+          ship_days?: number | null
+          ship_origin?: string | null
+          supplier_type?: string
+          supports_unit_sale?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category_ids?: string[]
+          commercial_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          finance_status?: string
+          freight_policy?: string | null
+          fulfillment_mode?: string
+          instagram?: string | null
+          logistics_notes?: string | null
+          min_order_value?: number | null
+          min_quantity?: number | null
+          modalities?: Database["public"]["Enums"]["commercial_modality"][]
+          organization_id?: string
+          own_fulfillment?: boolean
+          payout_method?: string | null
+          prep_days?: number | null
+          return_policy?: string | null
+          service_regions?: string | null
+          ship_days?: number | null
+          ship_origin?: string | null
+          supplier_type?: string
+          supports_unit_sale?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_relationships: {
+        Row: {
+          account_manager_id: string | null
+          created_at: string
+          created_by: string | null
+          last_contact_at: string | null
+          next_action: string | null
+          next_action_at: string | null
+          organization_id: string
+          relationship_status: string
+          updated_at: string
+        }
+        Insert: {
+          account_manager_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          last_contact_at?: string | null
+          next_action?: string | null
+          next_action_at?: string | null
+          organization_id: string
+          relationship_status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_manager_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          last_contact_at?: string | null
+          next_action?: string | null
+          next_action_at?: string | null
+          organization_id?: string
+          relationship_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_relationships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -1756,6 +1970,29 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_supplier_list: {
+        Args: {
+          _capability?: string
+          _from?: string
+          _has_offers?: boolean
+          _has_products?: boolean
+          _has_store?: boolean
+          _manager?: string
+          _modality?: string
+          _page?: number
+          _q?: string
+          _relationship?: string
+          _size?: number
+          _state?: string
+          _status?: string
+          _tag?: string
+          _to?: string
+          _type?: string
+        }
+        Returns: Json
+      }
+      admin_supplier_queues: { Args: never; Returns: Json }
+      admin_supplier_stats: { Args: never; Returns: Json }
       customer_360: { Args: { _org: string }; Returns: Json }
       customer_timeline: { Args: { _org: string }; Returns: Json }
       find_user_id_by_email: { Args: { _email: string }; Returns: string }
@@ -1766,6 +2003,8 @@ export type Database = {
       is_customer_org: { Args: { _org: string }; Returns: boolean }
       is_org_member: { Args: { _org: string; _uid: string }; Returns: boolean }
       is_platform_admin: { Args: { _uid: string }; Returns: boolean }
+      is_reserved_slug: { Args: { _slug: string }; Returns: boolean }
+      is_supplier_org: { Args: { _org: string }; Returns: boolean }
       org_member_directory: {
         Args: { _org: string }
         Returns: {
@@ -1801,6 +2040,7 @@ export type Database = {
           supply_cost: number
         }[]
       }
+      supplier_360: { Args: { _org: string }; Returns: Json }
     }
     Enums: {
       catalog_status:
