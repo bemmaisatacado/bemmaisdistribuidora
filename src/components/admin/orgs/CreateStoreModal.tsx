@@ -54,6 +54,8 @@ export function CreateStoreModal({
       qc.invalidateQueries({ queryKey: ["stores"] });
       qc.invalidateQueries({ queryKey: ["org"] });
       qc.invalidateQueries({ queryKey: ["orgs"] });
+      qc.invalidateQueries({ queryKey: ["customer-360"] });
+      qc.invalidateQueries({ queryKey: ["customers"] });
       onClose();
     },
   });

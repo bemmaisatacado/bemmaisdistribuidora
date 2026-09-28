@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Factory, ShoppingBag, Truck, Shuffle, Boxes, Store, Tag, Building } from "lucide-react";
+import { Factory, ShoppingBag, Truck, Shuffle, Boxes, Store, Tag, Building, Warehouse } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Cap = Database["public"]["Enums"]["org_capability"];
@@ -60,6 +60,12 @@ export const CAPABILITY_INFO: Record<
     profile: "opera loja",
     icon: Store,
   },
+  own_inventory: {
+    title: "Estoque próprio",
+    desc: "Opera estoque próprio junto ao estoque BemMais.",
+    profile: "tem estoque próprio",
+    icon: Warehouse,
+  },
 };
 
 export const CAP_ORDER: Cap[] = [
@@ -71,6 +77,7 @@ export const CAP_ORDER: Cap[] = [
   "sell_retail",
   "sell_wholesale",
   "operate_store",
+  "own_inventory",
 ];
 
 export const ORG_STATUSES: OrgStatus[] = ["pending", "active", "suspended", "blocked", "archived"];
