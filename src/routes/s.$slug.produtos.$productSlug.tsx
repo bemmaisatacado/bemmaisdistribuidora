@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatStorePrice } from "@/lib/storefront";
 import { readCart, writeCart } from "@/lib/store-cart";
 import { applyPublishedSeo } from "@/lib/store-seo";
+import { ProductRichContent } from "@/components/storefront/ProductRichContent";
 
 export const Route = createFileRoute("/s/$slug/produtos/$productSlug")({ component: ProductPage });
 type Variant = {
@@ -30,6 +31,7 @@ type ProductData = {
     images: string[];
     variants: Variant[];
     category: { name: string; slug: string } | null;
+    content_blocks?: { id: string; type: string; config: Record<string, unknown> }[];
   };
 };
 function ProductPage() {
@@ -248,6 +250,7 @@ function ProductPage() {
           ) : null}
         </section>
       </div>
+      <ProductRichContent blocks={product.content_blocks} />
     </main>
   );
 }
