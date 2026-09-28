@@ -4,35 +4,31 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/s/$slug/paginas/$pageSlug")({
   component: InstitutionalPage,
 });
+type Page = { title: string; content: string };
 function InstitutionalPage() {
   const { slug, pageSlug } = Route.useParams();
   const q = useQuery({
-    queryKey: ["public-store", slug],
+    queryKey: ["store-page", slug, pageSlug],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_storefront", { _slug: slug });
+      const { data, error } = await supabase.rpc("public_storefront_page", {
+        _slug: slug,
+        _page_slug: pageSlug,
+      });
       if (error) throw error;
-      return data as unknown as {
-        store: { name: string };
-        sections: { type: string; config: Record<string, unknown> }[];
-      } | null;
+      return data as unknown as Page | null;
     },
   });
-  const page = q.data?.sections.find(
-    (x) => x.type === "footer" && x.config.slug === pageSlug,
-  )?.config;
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-5 py-10">
       <Link to="/s/$slug" params={{ slug }} className="text-sm text-slate-500">
-        ← {q.data?.store.name || "Loja"}
+        ← Voltar para loja
       </Link>
       {q.isLoading ? (
         <p className="mt-8">Carregando…</p>
-      ) : page ? (
+      ) : q.data ? (
         <article className="mt-8">
-          <h1 className="text-3xl font-bold">{String(page.title || pageSlug)}</h1>
-          <p className="mt-5 whitespace-pre-line leading-7 text-slate-700">
-            {String(page.content || "")}
-          </p>
+          <h1 className="text-3xl font-bold">{q.data.title}</h1>
+          <p className="mt-5 whitespace-pre-line leading-7 text-slate-700">{q.data.content}</p>
         </article>
       ) : (
         <div className="mt-8">

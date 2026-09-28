@@ -33,6 +33,14 @@ type ProductData = {
 };
 function ProductPage() {
   const { slug, productSlug } = Route.useParams();
+  const store = useQuery({
+    queryKey: ["public-store-contact", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("public_storefront", { _slug: slug });
+      if (error) throw error;
+      return data as unknown as { store?: { whatsapp?: string | null } } | null;
+    },
+  });
   const q = useQuery({
     queryKey: ["store-product", slug, productSlug],
     queryFn: async () => {
@@ -211,6 +219,16 @@ function ProductPage() {
               Adicionar ao carrinho
             </button>
           </div>
+          {store.data?.store?.whatsapp ? (
+            <a
+              href={`https://wa.me/${store.data.store.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Tenho interesse no produto ${product.name}: ${typeof window === "undefined" ? "" : window.location.href}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex text-sm font-semibold underline"
+            >
+              Falar sobre este produto
+            </a>
+          ) : null}
           {product.description ? (
             <div className="mt-9 border-t pt-6">
               <h2 className="font-bold">Descrição</h2>
