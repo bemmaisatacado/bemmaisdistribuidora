@@ -246,7 +246,9 @@ function MediaManager({ productId, media, variants, reload }: any) {
           sort_order: media.length,
           is_primary: !media.length,
         });
-      } catch {}
+      } catch {
+        // One rejected file must not interrupt the remaining uploads.
+      }
     }
     setBusy(false);
     reload();
@@ -356,15 +358,13 @@ function ContentManager({ productId, blocks, media, reload }: any) {
   const upd = (id: string, v: any) =>
     db.from("product_content_blocks").update(v).eq("id", id).then(reload);
   const duplicate = async (b: any) => {
-    await db
-      .from("product_content_blocks")
-      .insert({
-        product_id: productId,
-        type: b.type,
-        position: b.position + 1,
-        is_visible: b.is_visible,
-        config: b.config,
-      });
+    await db.from("product_content_blocks").insert({
+      product_id: productId,
+      type: b.type,
+      position: b.position + 1,
+      is_visible: b.is_visible,
+      config: b.config,
+    });
     reload();
   };
   return (
