@@ -22,6 +22,7 @@ type ContentConfig = Record<
 >;
 type BenefitItem = { title: string; text: string };
 type FaqItem = { question: string; answer: string };
+type SizeGuideRows = string[][];
 type ProductContentBlock = {
   id: string;
   product_id: string;
@@ -589,6 +590,14 @@ function BasicBlockForm({
     });
   };
   const setFaqs = (items: FaqItem[]) => setConfig({ ...config, items });
+  const sizeRows = (): SizeGuideRows =>
+    Array.isArray(config.rows)
+      ? config.rows.filter(
+          (row): row is string[] =>
+            Array.isArray(row) && row.every((cell) => typeof cell === "string"),
+        )
+      : [];
+  const setSizeRows = (rows: SizeGuideRows) => setConfig({ ...config, rows });
   const set = (key: string, value: string) => setConfig({ ...config, [key]: value });
   const visual = block.type === "image" || block.type === "banner";
   return (
@@ -901,6 +910,70 @@ function BasicBlockForm({
             ))}
           </div>
         )}
+        {block.type === "size_guide" &&
+          (() => {
+            const rows = sizeRows();
+            const columns = rows[0]?.length ?? 0;
+            const addColumn = () =>
+              setSizeRows(rows.length ? rows.map((row) => [...row, ""]) : [[""]]);
+            const removeColumn = (column: number) =>
+              setSizeRows(rows.map((row) => row.filter((_, i) => i !== column)));
+            const change = (row: number, column: number, value: string) =>
+              setSizeRows(
+                rows.map((cells, ri) =>
+                  ri === row ? cells.map((cell, ci) => (ci === column ? value : cell)) : cells,
+                ),
+              );
+            return (
+              <div className="grid gap-3 overflow-x-auto">
+                <div className="flex gap-2">
+                  <Btn variant="outline" onClick={addColumn}>
+                    + Adicionar coluna
+                  </Btn>
+                  <Btn
+                    variant="outline"
+                    disabled={!columns}
+                    onClick={() =>
+                      setSizeRows([...rows, Array.from({ length: columns }, () => "")])
+                    }
+                  >
+                    + Adicionar linha
+                  </Btn>
+                </div>
+                {!rows.length && (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum guia de medidas configurado.
+                  </p>
+                )}
+                {rows.map((row, ri) => (
+                  <div key={ri} className="flex min-w-max gap-2">
+                    {row.map((cell, ci) => (
+                      <div key={ci} className="grid gap-1">
+                        <input
+                          value={cell}
+                          placeholder={ri === 0 ? "Cabeçalho" : "Célula"}
+                          onChange={(e) => change(ri, ci, e.target.value)}
+                        />
+                        {ri === 0 && (
+                          <Btn variant="ghost" onClick={() => removeColumn(ci)}>
+                            Remover coluna
+                          </Btn>
+                        )}
+                      </div>
+                    ))}
+                    {ri > 0 && (
+                      <Btn
+                        variant="ghost"
+                        onClick={() => setSizeRows(rows.filter((_, i) => i !== ri))}
+                      >
+                        Remover linha
+                      </Btn>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         <Btn variant="ghost" onClick={onClose}>
           Cancelar
         </Btn>
