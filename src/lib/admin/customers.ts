@@ -5,7 +5,13 @@ import type { Cap } from "@/lib/admin/orgs";
 
 export type CommercialStatus = Database["public"]["Enums"]["customer_status"];
 
-export const COMMERCIAL_STATUSES: CommercialStatus[] = ["novo", "onboarding", "ativo", "inativo", "em_risco"];
+export const COMMERCIAL_STATUSES: CommercialStatus[] = [
+  "novo",
+  "onboarding",
+  "ativo",
+  "inativo",
+  "em_risco",
+];
 export const COMMERCIAL_LABEL: Record<CommercialStatus, string> = {
   novo: "Novo",
   onboarding: "Onboarding",
@@ -13,13 +19,14 @@ export const COMMERCIAL_LABEL: Record<CommercialStatus, string> = {
   inativo: "Inativo",
   em_risco: "Em risco",
 };
-export const COMMERCIAL_TONE: Record<CommercialStatus, "ok" | "warn" | "bad" | "info" | "neutral"> = {
-  novo: "info",
-  onboarding: "warn",
-  ativo: "ok",
-  inativo: "neutral",
-  em_risco: "bad",
-};
+export const COMMERCIAL_TONE: Record<CommercialStatus, "ok" | "warn" | "bad" | "info" | "neutral"> =
+  {
+    novo: "info",
+    onboarding: "warn",
+    ativo: "ok",
+    inativo: "neutral",
+    em_risco: "bad",
+  };
 
 export const INTERACTION_KINDS = [
   ["ligacao", "Ligação"],
@@ -31,7 +38,15 @@ export const INTERACTION_KINDS = [
 ] as const;
 export const INTERACTION_LABEL: Record<string, string> = Object.fromEntries(INTERACTION_KINDS);
 
-export const ORIGINS = ["Indicação", "Instagram", "WhatsApp", "Site", "Evento", "Equipe comercial", "Outro"];
+export const ORIGINS = [
+  "Indicação",
+  "Instagram",
+  "WhatsApp",
+  "Site",
+  "Evento",
+  "Equipe comercial",
+  "Outro",
+];
 
 /** "How will this customer operate?" — each answer maps to a real capability. */
 export const OPERATION_OPTIONS: { cap: Cap; label: string; short: string }[] = [
@@ -91,7 +106,12 @@ export type Customer360 = {
     listings: number;
     products: number;
   };
-  finance: { receivables_open: number; payouts_open: number; active_accounts: number; paid_payments: number };
+  finance: {
+    receivables_open: number;
+    payouts_open: number;
+    active_accounts: number;
+    paid_payments: number;
+  };
   journey: { key: string; done: boolean; future?: boolean; at?: string }[];
   pendencies: { key: string }[];
 };
@@ -166,6 +186,7 @@ export function useOrgTags() {
   });
 }
 
-export const isLate = (d: string | null | undefined) => !!d && d < new Date().toISOString().slice(0, 10);
+export const isLate = (d: string | null | undefined) =>
+  !!d && d < new Date().toISOString().slice(0, 10);
 export const shortDate = (d: string | null | undefined) =>
   d ? new Date(d.length === 10 ? `${d}T12:00:00` : d).toLocaleDateString("pt-BR") : "—";
