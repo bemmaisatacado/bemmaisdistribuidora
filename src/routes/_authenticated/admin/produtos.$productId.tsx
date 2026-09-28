@@ -240,14 +240,12 @@ function MediaManager({ productId, media, variants, reload }: any) {
     for (const file of Array.from(files)) {
       try {
         const path = await uploadProductMedia(productId, file);
-        await db
-          .from("product_media")
-          .insert({
-            product_id: productId,
-            storage_path: path,
-            sort_order: media.length,
-            is_primary: !media.length,
-          });
+        await db.from("product_media").insert({
+          product_id: productId,
+          storage_path: path,
+          sort_order: media.length,
+          is_primary: !media.length,
+        });
       } catch {}
     }
     setBusy(false);
@@ -257,8 +255,12 @@ function MediaManager({ productId, media, variants, reload }: any) {
     db.from("product_media").update(v).eq("id", id).then(reload);
   const remove = async (m: any) => {
     if (!confirm("Remover esta imagem?")) return;
-    await db.storage.from("product-media").remove([m.storage_path]);
+    if (m.is_primary) {
+      const next = media.find((x: any) => x.id !== m.id);
+      if (next) await db.from("product_media").update({ is_primary: true }).eq("id", next.id);
+    }
     await db.from("product_media").delete().eq("id", m.id);
+    await db.storage.from("product-media").remove([m.storage_path]);
     reload();
   };
   return (
@@ -319,6 +321,17 @@ function MediaManager({ productId, media, variants, reload }: any) {
               >
                 ↑
               </Btn>
+              <Btn
+                variant="ghost"
+                disabled={i === media.length - 1}
+                onClick={() =>
+                  update(m.id, { sort_order: media[i + 1].sort_order }).then(() =>
+                    update(media[i + 1].id, { sort_order: m.sort_order }),
+                  )
+                }
+              >
+                ↓
+              </Btn>
               <Btn variant="ghost" onClick={() => remove(m)}>
                 Remover
               </Btn>
@@ -332,18 +345,28 @@ function MediaManager({ productId, media, variants, reload }: any) {
 function ContentManager({ productId, blocks, media, reload }: any) {
   const [type, setType] = useState("text");
   const add = async () => {
-    await db
-      .from("product_content_blocks")
-      .insert({
-        product_id: productId,
-        type,
-        position: blocks.length,
-        config: type === "faq" ? { items: [] } : type === "benefits" ? { items: [] } : {},
-      });
+    await db.from("product_content_blocks").insert({
+      product_id: productId,
+      type,
+      position: blocks.length,
+      config: type === "faq" ? { items: [] } : type === "benefits" ? { items: [] } : {},
+    });
     reload();
   };
   const upd = (id: string, v: any) =>
     db.from("product_content_blocks").update(v).eq("id", id).then(reload);
+  const duplicate = async (b: any) => {
+    await db
+      .from("product_content_blocks")
+      .insert({
+        product_id: productId,
+        type: b.type,
+        position: b.position + 1,
+        is_visible: b.is_visible,
+        config: b.config,
+      });
+    reload();
+  };
   return (
     <div className="space-y-4">
       <Panel
@@ -391,7 +414,7 @@ function ContentManager({ productId, blocks, media, reload }: any) {
                     <Btn variant="ghost" onClick={() => upd(b.id, { is_visible: !b.is_visible })}>
                       {b.is_visible ? "Ocultar" : "Mostrar"}
                     </Btn>
-                    <Btn variant="ghost" onClick={() => upd(b.id, { position: blocks.length })}>
+                    <Btn variant="ghost" onClick={() => duplicate(b)}>
                       Duplicar
                     </Btn>
                     <Btn
