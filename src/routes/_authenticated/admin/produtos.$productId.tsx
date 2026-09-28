@@ -20,6 +20,7 @@ type ContentConfig = Record<
   string,
   string | boolean | number | string[] | Record<string, string>[] | string[][]
 >;
+type BenefitItem = { title: string; text: string };
 type ProductContentBlock = {
   id: string;
   product_id: string;
@@ -561,6 +562,19 @@ function BasicBlockForm({
   onSave: (config: ContentConfig) => unknown;
 }) {
   const [config, setConfig] = useState<ContentConfig>(block.config);
+  const benefits = (): BenefitItem[] => {
+    const items = config.items;
+    if (!Array.isArray(items)) return [];
+    return items.flatMap((item): BenefitItem[] => {
+      if (typeof item !== "object" || item === null || Array.isArray(item)) return [];
+      const title = item.title;
+      const text = item.text;
+      return typeof title === "string"
+        ? [{ title, text: typeof text === "string" ? text : "" }]
+        : [];
+    });
+  };
+  const setBenefits = (items: BenefitItem[]) => setConfig({ ...config, items });
   const set = (key: string, value: string) => setConfig({ ...config, [key]: value });
   const visual = block.type === "image" || block.type === "banner";
   return (
@@ -735,6 +749,76 @@ function BasicBlockForm({
               onChange={(e) => set("right_alt", e.target.value)}
             />
           </>
+        )}
+        {block.type === "benefits" && (
+          <div className="grid gap-3">
+            <Btn
+              variant="outline"
+              onClick={() => setBenefits([...benefits(), { title: "", text: "" }])}
+            >
+              + Adicionar benefício
+            </Btn>
+            {!benefits().length && (
+              <p className="text-sm text-muted-foreground">Nenhum benefício adicionado.</p>
+            )}
+            {benefits().map((item, index, items) => (
+              <div key={index} className="grid gap-2 rounded-xl border border-border-subtle p-3">
+                <b className="text-xs">Benefício {index + 1}</b>
+                <input
+                  placeholder="Título"
+                  value={item.title}
+                  onChange={(e) =>
+                    setBenefits(
+                      items.map((current, i) =>
+                        i === index ? { ...current, title: e.target.value } : current,
+                      ),
+                    )
+                  }
+                />
+                <textarea
+                  placeholder="Descrição"
+                  value={item.text}
+                  onChange={(e) =>
+                    setBenefits(
+                      items.map((current, i) =>
+                        i === index ? { ...current, text: e.target.value } : current,
+                      ),
+                    )
+                  }
+                />
+                <div className="flex gap-1">
+                  <Btn
+                    variant="ghost"
+                    disabled={!index}
+                    onClick={() => {
+                      const next = [...items];
+                      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                      setBenefits(next);
+                    }}
+                  >
+                    ↑
+                  </Btn>
+                  <Btn
+                    variant="ghost"
+                    disabled={index === items.length - 1}
+                    onClick={() => {
+                      const next = [...items];
+                      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                      setBenefits(next);
+                    }}
+                  >
+                    ↓
+                  </Btn>
+                  <Btn
+                    variant="ghost"
+                    onClick={() => setBenefits(items.filter((_, i) => i !== index))}
+                  >
+                    Remover
+                  </Btn>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
         <Btn variant="ghost" onClick={onClose}>
           Cancelar
