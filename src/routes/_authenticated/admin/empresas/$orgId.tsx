@@ -10,7 +10,7 @@ import { StatusDialog } from "@/components/admin/orgs/StatusDialog";
 import { CreateStoreModal } from "@/components/admin/orgs/CreateStoreModal";
 import { SummaryTab, DataTab, MembersTab, CapabilitiesTab, StoresTab, ProductsTab, OffersTab, FinanceTab, ActivityTab, PlaceholderTab, InviteModal } from "@/components/admin/orgs/OrgTabs";
 import { dateTime } from "@/lib/admin/format";
-import { CAP_ORDER, CAPABILITY_INFO, ORG_STATUSES, ORG_STATUS_LABEL, formatDocument, type Cap, type OrgStatus } from "@/lib/admin/orgs";
+import { CAP_ORDER, CAPABILITY_INFO, ORG_STATUSES, ORG_STATUS_LABEL, formatDocument, type Cap, type OrgStatus, type OrgCtx } from "@/lib/admin/orgs";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -24,8 +24,6 @@ export const Route = createFileRoute("/_authenticated/admin/empresas/$orgId")({
   validateSearch: z.object({ tab: z.enum(TAB_KEYS).catch("resumo").default("resumo") }),
   component: OrgProfile,
 });
-
-export type OrgCtx = { org: NonNullable<ReturnType<typeof useOrg>["data"]>["org"]; caps: Cap[]; managerName: string | null };
 
 function useOrg(id: string) {
   return useQuery({

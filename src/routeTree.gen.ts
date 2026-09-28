@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminEmpresasIndexRouteImport } from './routes/_authenticated/admin/empresas/index'
+import { Route as AuthenticatedAdminEmpresasOrgIdRouteImport } from './routes/_authenticated/admin/empresas/$orgId'
 import { Route as AuthenticatedAdminEmpresasNovaRouteImport } from './routes/_authenticated/admin/empresas/nova'
 import { Route as AuthenticatedAdminFinanceiroIndexRouteImport } from './routes/_authenticated/admin/financeiro/index'
 import { Route as AuthenticatedAdminFinanceiroAllocationsRouteImport } from './routes/_authenticated/admin/financeiro/allocations'
@@ -176,6 +177,12 @@ const AuthenticatedAdminEmpresasIndexRoute =
     path: '/empresas/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminEmpresasOrgIdRoute =
+  AuthenticatedAdminEmpresasOrgIdRouteImport.update({
+    id: '/empresas/$orgId',
+    path: '/empresas/$orgId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminEmpresasNovaRoute =
   AuthenticatedAdminEmpresasNovaRouteImport.update({
     id: '/empresas/nova',
@@ -248,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
   '/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
@@ -280,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
   '/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
@@ -315,6 +324,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/_authenticated/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/_authenticated/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
   '/_authenticated/admin/financeiro/contas': typeof AuthenticatedAdminFinanceiroContasRoute
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/produtos'
     | '/admin/usuarios'
     | '/admin/'
+    | '/admin/empresas/$orgId'
     | '/admin/empresas/nova'
     | '/admin/financeiro/allocations'
     | '/admin/financeiro/contas'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin/produtos'
     | '/admin/usuarios'
     | '/admin'
+    | '/admin/empresas/$orgId'
     | '/admin/empresas/nova'
     | '/admin/financeiro/allocations'
     | '/admin/financeiro/contas'
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/empresas/$orgId'
     | '/_authenticated/admin/empresas/nova'
     | '/_authenticated/admin/financeiro/allocations'
     | '/_authenticated/admin/financeiro/contas'
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmpresasIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/empresas/$orgId': {
+      id: '/_authenticated/admin/empresas/$orgId'
+      path: '/empresas/$orgId'
+      fullPath: '/admin/empresas/$orgId'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasOrgIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/empresas/nova': {
       id: '/_authenticated/admin/empresas/nova'
       path: '/empresas/nova'
@@ -682,6 +702,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminEmpresasOrgIdRoute: typeof AuthenticatedAdminEmpresasOrgIdRoute
   AuthenticatedAdminEmpresasNovaRoute: typeof AuthenticatedAdminEmpresasNovaRoute
   AuthenticatedAdminFinanceiroAllocationsRoute: typeof AuthenticatedAdminFinanceiroAllocationsRoute
   AuthenticatedAdminFinanceiroContasRoute: typeof AuthenticatedAdminFinanceiroContasRoute
@@ -713,6 +734,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRoute,
     AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminEmpresasOrgIdRoute: AuthenticatedAdminEmpresasOrgIdRoute,
     AuthenticatedAdminEmpresasNovaRoute: AuthenticatedAdminEmpresasNovaRoute,
     AuthenticatedAdminFinanceiroAllocationsRoute:
       AuthenticatedAdminFinanceiroAllocationsRoute,

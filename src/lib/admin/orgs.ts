@@ -5,6 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type Cap = Database["public"]["Enums"]["org_capability"];
 export type OrgStatus = Database["public"]["Enums"]["org_status"];
 export type OrgRow = Database["public"]["Tables"]["organizations"]["Row"];
+export type OrgCtx = { org: OrgRow; caps: Cap[]; managerName: string | null };
 
 /** Descriptive copy only — authorization never relies on these texts. */
 export const CAPABILITY_INFO: Record<Cap, { title: string; desc: string; profile: string; icon: LucideIcon }> = {
