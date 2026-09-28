@@ -526,6 +526,17 @@ function ContentManager({
                     >
                       ↑
                     </Btn>
+                    <Btn
+                      variant="ghost"
+                      disabled={i === blocks.length - 1}
+                      onClick={() =>
+                        upd(b.id, { position: blocks[i + 1].position }).then(() =>
+                          upd(blocks[i + 1].id, { position: b.position }),
+                        )
+                      }
+                    >
+                      ↓
+                    </Btn>
                     <Btn variant="ghost" onClick={() => upd(b.id, { is_visible: !b.is_visible })}>
                       {b.is_visible ? "Ocultar" : "Mostrar"}
                     </Btn>
