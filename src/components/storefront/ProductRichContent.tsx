@@ -1,4 +1,6 @@
-type Block = { id: string; type: string; config: Record<string, any> };
+type ContentValue =
+  string | boolean | string[] | Record<string, unknown> | Record<string, unknown>[];
+type Block = { id: string; type: string; config: Record<string, ContentValue> };
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
 export function ProductRichContent({ blocks }: { blocks?: Block[] }) {
@@ -58,7 +60,7 @@ function BlockView({ block: b }: { block: Block }) {
   if (b.type === "benefits")
     return (
       <div className="grid gap-3 sm:grid-cols-2">
-        {(c.items || []).map((x: any, i: number) => (
+        {((c.items as Record<string, unknown>[]) || []).map((x, i: number) => (
           <div key={i} className="rounded-xl bg-stone-100 p-5">
             <b>{x.title || x}</b>
             {x.text && <p className="mt-1 text-sm text-slate-600">{x.text}</p>}
@@ -69,7 +71,7 @@ function BlockView({ block: b }: { block: Block }) {
   if (b.type === "faq")
     return (
       <div>
-        {(c.items || []).map((x: any, i: number) => (
+        {((c.items as Record<string, unknown>[]) || []).map((x, i: number) => (
           <details key={i} className="border-b py-4">
             <summary className="cursor-pointer font-semibold">{x.question}</summary>
             <p className="mt-3 whitespace-pre-line text-slate-600">{x.answer}</p>
