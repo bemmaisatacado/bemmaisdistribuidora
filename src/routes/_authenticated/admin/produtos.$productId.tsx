@@ -21,6 +21,7 @@ type ContentConfig = Record<
   string | boolean | number | string[] | Record<string, string>[] | string[][]
 >;
 type BenefitItem = { title: string; text: string };
+type FaqItem = { question: string; answer: string };
 type ProductContentBlock = {
   id: string;
   product_id: string;
@@ -575,6 +576,19 @@ function BasicBlockForm({
     });
   };
   const setBenefits = (items: BenefitItem[]) => setConfig({ ...config, items });
+  const faqs = (): FaqItem[] => {
+    const items = config.items;
+    if (!Array.isArray(items)) return [];
+    return items.flatMap((item): FaqItem[] => {
+      if (typeof item !== "object" || item === null || Array.isArray(item)) return [];
+      const question = item.question;
+      const answer = item.answer;
+      return typeof question === "string"
+        ? [{ question, answer: typeof answer === "string" ? answer : "" }]
+        : [];
+    });
+  };
+  const setFaqs = (items: FaqItem[]) => setConfig({ ...config, items });
   const set = (key: string, value: string) => setConfig({ ...config, [key]: value });
   const visual = block.type === "image" || block.type === "banner";
   return (
@@ -813,6 +827,73 @@ function BasicBlockForm({
                     variant="ghost"
                     onClick={() => setBenefits(items.filter((_, i) => i !== index))}
                   >
+                    Remover
+                  </Btn>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {block.type === "faq" && (
+          <div className="grid gap-3">
+            <Btn
+              variant="outline"
+              onClick={() => setFaqs([...faqs(), { question: "", answer: "" }])}
+            >
+              + Adicionar pergunta
+            </Btn>
+            {!faqs().length && (
+              <p className="text-sm text-muted-foreground">Nenhuma pergunta adicionada.</p>
+            )}
+            {faqs().map((item, index, items) => (
+              <div key={index} className="grid gap-2 rounded-xl border border-border-subtle p-3">
+                <b className="text-xs">Pergunta {index + 1}</b>
+                <input
+                  placeholder="Pergunta"
+                  value={item.question}
+                  onChange={(e) =>
+                    setFaqs(
+                      items.map((current, i) =>
+                        i === index ? { ...current, question: e.target.value } : current,
+                      ),
+                    )
+                  }
+                />
+                <textarea
+                  placeholder="Resposta"
+                  value={item.answer}
+                  onChange={(e) =>
+                    setFaqs(
+                      items.map((current, i) =>
+                        i === index ? { ...current, answer: e.target.value } : current,
+                      ),
+                    )
+                  }
+                />
+                <div className="flex gap-1">
+                  <Btn
+                    variant="ghost"
+                    disabled={!index}
+                    onClick={() => {
+                      const next = [...items];
+                      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                      setFaqs(next);
+                    }}
+                  >
+                    ↑
+                  </Btn>
+                  <Btn
+                    variant="ghost"
+                    disabled={index === items.length - 1}
+                    onClick={() => {
+                      const next = [...items];
+                      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                      setFaqs(next);
+                    }}
+                  >
+                    ↓
+                  </Btn>
+                  <Btn variant="ghost" onClick={() => setFaqs(items.filter((_, i) => i !== index))}>
                     Remover
                   </Btn>
                 </div>
