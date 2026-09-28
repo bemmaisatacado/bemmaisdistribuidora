@@ -1,11 +1,93 @@
 export const PLATFORM_STORE_DOMAIN = "bemmaisdistribuidora.com.br";
 
-export type StoreTheme = { primary: string; secondary: string; accent: string; background: string; surface: string; text: string; mutedText: string; border: string; radius: "none" | "small" | "medium" | "large"; fontHeading: "sora" | "manrope"; fontBody: "sora" | "manrope"; buttonStyle: "solid" | "outline"; cardStyle: "flat" | "soft" };
-export const defaultTheme: StoreTheme = { primary: "#111111", secondary: "#ffffff", accent: "#e8641e", background: "#ffffff", surface: "#ffffff", text: "#161616", mutedText: "#6b7280", border: "#e5e7eb", radius: "medium", fontHeading: "sora", fontBody: "manrope", buttonStyle: "solid", cardStyle: "soft" };
+export type StoreTheme = {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
+  mutedText: string;
+  border: string;
+  radius: "none" | "small" | "medium" | "large";
+  fontHeading: "sora" | "manrope";
+  fontBody: "sora" | "manrope";
+  buttonStyle: "solid" | "outline";
+  cardStyle: "flat" | "soft";
+};
+export const defaultTheme: StoreTheme = {
+  primary: "#111111",
+  secondary: "#ffffff",
+  accent: "#e8641e",
+  background: "#ffffff",
+  surface: "#ffffff",
+  text: "#161616",
+  mutedText: "#6b7280",
+  border: "#e5e7eb",
+  radius: "medium",
+  fontHeading: "sora",
+  fontBody: "manrope",
+  buttonStyle: "solid",
+  cardStyle: "soft",
+};
 const color = /^#[0-9a-f]{6}$/i;
-export function sanitizeTheme(value: unknown): StoreTheme { const v = (value && typeof value === "object" ? value : {}) as Partial<StoreTheme>; return { ...defaultTheme, ...Object.fromEntries(Object.entries(v).filter(([k, x]) => !["primary","secondary","accent","background","surface","text","mutedText","border"].includes(k) || typeof x === "string" && color.test(x))) } as StoreTheme; }
-export function resolveStoreSlug(hostname: string): string | null { const h = hostname.toLowerCase().split(":")[0] ?? ""; const suffix = `.${PLATFORM_STORE_DOMAIN}`; return h.endsWith(suffix) ? h.slice(0, -suffix.length) : null; }
-export function publicationMissing(store: { name?: string | null; logo_url?: string | null; theme?: unknown }, listingCount: number): string[] { const missing: string[] = []; if (!store.name?.trim()) missing.push("Nome da loja"); if (!store.logo_url) missing.push("Logo"); if (!listingCount) missing.push("Pelo menos um produto publicado"); sanitizeTheme(store.theme); return missing; }
-export type CartItem = { key: string; name: string; price: number; quantity: number; available?: number | null };
-export function cartTotal(items: CartItem[]) { return items.reduce((n, x) => n + x.price * x.quantity, 0); }
-export function changeCartQuantity(items: CartItem[], key: string, quantity: number) { return items.flatMap((x) => x.key !== key ? [x] : quantity <= 0 ? [] : [ { ...x, quantity: x.available == null ? quantity : Math.min(quantity, x.available) } ]); }
+export function sanitizeTheme(value: unknown): StoreTheme {
+  const v = (value && typeof value === "object" ? value : {}) as Partial<StoreTheme>;
+  return {
+    ...defaultTheme,
+    ...Object.fromEntries(
+      Object.entries(v).filter(
+        ([k, x]) =>
+          ![
+            "primary",
+            "secondary",
+            "accent",
+            "background",
+            "surface",
+            "text",
+            "mutedText",
+            "border",
+          ].includes(k) ||
+          (typeof x === "string" && color.test(x)),
+      ),
+    ),
+  } as StoreTheme;
+}
+export function resolveStoreSlug(hostname: string): string | null {
+  const h = hostname.toLowerCase().split(":")[0] ?? "";
+  const suffix = `.${PLATFORM_STORE_DOMAIN}`;
+  return h.endsWith(suffix) ? h.slice(0, -suffix.length) : null;
+}
+export function publicationMissing(
+  store: { name?: string | null; logo_url?: string | null; theme?: unknown },
+  listingCount: number,
+): string[] {
+  const missing: string[] = [];
+  if (!store.name?.trim()) missing.push("Nome da loja");
+  if (!store.logo_url) missing.push("Logo");
+  if (!listingCount) missing.push("Pelo menos um produto publicado");
+  sanitizeTheme(store.theme);
+  return missing;
+}
+export type CartItem = {
+  key: string;
+  listingId: string;
+  variantId: string;
+  name: string;
+  sku?: string;
+  price: number;
+  quantity: number;
+  available?: number | null;
+};
+export function cartTotal(items: CartItem[]) {
+  return items.reduce((n, x) => n + x.price * x.quantity, 0);
+}
+export function changeCartQuantity(items: CartItem[], key: string, quantity: number) {
+  return items.flatMap((x) =>
+    x.key !== key
+      ? [x]
+      : quantity <= 0
+        ? []
+        : [{ ...x, quantity: x.available == null ? quantity : Math.min(quantity, x.available) }],
+  );
+}

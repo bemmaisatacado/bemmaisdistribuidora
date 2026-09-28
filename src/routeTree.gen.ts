@@ -31,7 +31,9 @@ import { Route as AuthenticatedAdminPermissoesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenticated/admin/precos'
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as SSlugBuscaRouteImport } from './routes/s.$slug.busca'
 import { Route as SSlugCarrinhoRouteImport } from './routes/s.$slug.carrinho'
+import { Route as SSlugCatalogoRouteImport } from './routes/s.$slug.catalogo'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes/index'
 import { Route as AuthenticatedAdminClientesOrgIdRouteImport } from './routes/_authenticated/admin/clientes/$orgId'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes/novo'
@@ -48,6 +50,9 @@ import { Route as AuthenticatedAdminFinanceiroTransacoesRouteImport } from './ro
 import { Route as AuthenticatedAdminFornecedoresIndexRouteImport } from './routes/_authenticated/admin/fornecedores/index'
 import { Route as AuthenticatedAdminFornecedoresOrgIdRouteImport } from './routes/_authenticated/admin/fornecedores/$orgId'
 import { Route as AuthenticatedAdminFornecedoresNovoRouteImport } from './routes/_authenticated/admin/fornecedores/novo'
+import { Route as SSlugCategoriasCategorySlugRouteImport } from './routes/s.$slug.categorias.$categorySlug'
+import { Route as SSlugPaginasPageSlugRouteImport } from './routes/s.$slug.paginas.$pageSlug'
+import { Route as SSlugProdutosProductSlugRouteImport } from './routes/s.$slug.produtos.$productSlug'
 import { Route as AuthenticatedAdminLojasStoreIdBuilderRouteImport } from './routes/_authenticated/admin/lojas.$storeId.builder'
 
 const IndexRoute = IndexRouteImport.update({
@@ -171,9 +176,19 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/usuarios',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const SSlugBuscaRoute = SSlugBuscaRouteImport.update({
+  id: '/busca',
+  path: '/busca',
+  getParentRoute: () => SSlugRoute,
+} as any)
 const SSlugCarrinhoRoute = SSlugCarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
+  getParentRoute: () => SSlugRoute,
+} as any)
+const SSlugCatalogoRoute = SSlugCatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
   getParentRoute: () => SSlugRoute,
 } as any)
 const AuthenticatedAdminClientesIndexRoute =
@@ -272,6 +287,23 @@ const AuthenticatedAdminFornecedoresNovoRoute =
     path: '/fornecedores/novo',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const SSlugCategoriasCategorySlugRoute =
+  SSlugCategoriasCategorySlugRouteImport.update({
+    id: '/categorias/$categorySlug',
+    path: '/categorias/$categorySlug',
+    getParentRoute: () => SSlugRoute,
+  } as any)
+const SSlugPaginasPageSlugRoute = SSlugPaginasPageSlugRouteImport.update({
+  id: '/paginas/$pageSlug',
+  path: '/paginas/$pageSlug',
+  getParentRoute: () => SSlugRoute,
+} as any)
+const SSlugProdutosProductSlugRoute =
+  SSlugProdutosProductSlugRouteImport.update({
+    id: '/produtos/$productSlug',
+    path: '/produtos/$productSlug',
+    getParentRoute: () => SSlugRoute,
+  } as any)
 const AuthenticatedAdminLojasStoreIdBuilderRoute =
   AuthenticatedAdminLojasStoreIdBuilderRouteImport.update({
     id: '/$storeId/builder',
@@ -300,7 +332,9 @@ export interface FileRoutesByFullPath {
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/s/$slug/busca': typeof SSlugBuscaRoute
   '/s/$slug/carrinho': typeof SSlugCarrinhoRoute
+  '/s/$slug/catalogo': typeof SSlugCatalogoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$orgId': typeof AuthenticatedAdminClientesOrgIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
@@ -314,6 +348,9 @@ export interface FileRoutesByFullPath {
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
   '/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
+  '/s/$slug/categorias/$categorySlug': typeof SSlugCategoriasCategorySlugRoute
+  '/s/$slug/paginas/$pageSlug': typeof SSlugPaginasPageSlugRoute
+  '/s/$slug/produtos/$productSlug': typeof SSlugProdutosProductSlugRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
@@ -340,7 +377,9 @@ export interface FileRoutesByTo {
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/s/$slug/busca': typeof SSlugBuscaRoute
   '/s/$slug/carrinho': typeof SSlugCarrinhoRoute
+  '/s/$slug/catalogo': typeof SSlugCatalogoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$orgId': typeof AuthenticatedAdminClientesOrgIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
@@ -354,6 +393,9 @@ export interface FileRoutesByTo {
   '/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
   '/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
+  '/s/$slug/categorias/$categorySlug': typeof SSlugCategoriasCategorySlugRoute
+  '/s/$slug/paginas/$pageSlug': typeof SSlugPaginasPageSlugRoute
+  '/s/$slug/produtos/$productSlug': typeof SSlugProdutosProductSlugRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasIndexRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroIndexRoute
@@ -383,7 +425,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/s/$slug/busca': typeof SSlugBuscaRoute
   '/s/$slug/carrinho': typeof SSlugCarrinhoRoute
+  '/s/$slug/catalogo': typeof SSlugCatalogoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/clientes/$orgId': typeof AuthenticatedAdminClientesOrgIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
@@ -397,6 +441,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/financeiro/transacoes': typeof AuthenticatedAdminFinanceiroTransacoesRoute
   '/_authenticated/admin/fornecedores/$orgId': typeof AuthenticatedAdminFornecedoresOrgIdRoute
   '/_authenticated/admin/fornecedores/novo': typeof AuthenticatedAdminFornecedoresNovoRoute
+  '/s/$slug/categorias/$categorySlug': typeof SSlugCategoriasCategorySlugRoute
+  '/s/$slug/paginas/$pageSlug': typeof SSlugPaginasPageSlugRoute
+  '/s/$slug/produtos/$productSlug': typeof SSlugProdutosProductSlugRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
   '/_authenticated/admin/empresas/': typeof AuthenticatedAdminEmpresasIndexRoute
   '/_authenticated/admin/financeiro/': typeof AuthenticatedAdminFinanceiroIndexRoute
@@ -426,7 +473,9 @@ export interface FileRouteTypes {
     | '/admin/precos'
     | '/admin/produtos'
     | '/admin/usuarios'
+    | '/s/$slug/busca'
     | '/s/$slug/carrinho'
+    | '/s/$slug/catalogo'
     | '/admin/'
     | '/admin/clientes/$orgId'
     | '/admin/clientes/novo'
@@ -440,6 +489,9 @@ export interface FileRouteTypes {
     | '/admin/financeiro/transacoes'
     | '/admin/fornecedores/$orgId'
     | '/admin/fornecedores/novo'
+    | '/s/$slug/categorias/$categorySlug'
+    | '/s/$slug/paginas/$pageSlug'
+    | '/s/$slug/produtos/$productSlug'
     | '/admin/clientes/'
     | '/admin/empresas/'
     | '/admin/financeiro/'
@@ -466,7 +518,9 @@ export interface FileRouteTypes {
     | '/admin/precos'
     | '/admin/produtos'
     | '/admin/usuarios'
+    | '/s/$slug/busca'
     | '/s/$slug/carrinho'
+    | '/s/$slug/catalogo'
     | '/admin'
     | '/admin/clientes/$orgId'
     | '/admin/clientes/novo'
@@ -480,6 +534,9 @@ export interface FileRouteTypes {
     | '/admin/financeiro/transacoes'
     | '/admin/fornecedores/$orgId'
     | '/admin/fornecedores/novo'
+    | '/s/$slug/categorias/$categorySlug'
+    | '/s/$slug/paginas/$pageSlug'
+    | '/s/$slug/produtos/$productSlug'
     | '/admin/clientes'
     | '/admin/empresas'
     | '/admin/financeiro'
@@ -508,7 +565,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/precos'
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/usuarios'
+    | '/s/$slug/busca'
     | '/s/$slug/carrinho'
+    | '/s/$slug/catalogo'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/clientes/$orgId'
     | '/_authenticated/admin/clientes/novo'
@@ -522,6 +581,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/financeiro/transacoes'
     | '/_authenticated/admin/fornecedores/$orgId'
     | '/_authenticated/admin/fornecedores/novo'
+    | '/s/$slug/categorias/$categorySlug'
+    | '/s/$slug/paginas/$pageSlug'
+    | '/s/$slug/produtos/$productSlug'
     | '/_authenticated/admin/clientes/'
     | '/_authenticated/admin/empresas/'
     | '/_authenticated/admin/financeiro/'
@@ -693,11 +755,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/s/$slug/busca': {
+      id: '/s/$slug/busca'
+      path: '/busca'
+      fullPath: '/s/$slug/busca'
+      preLoaderRoute: typeof SSlugBuscaRouteImport
+      parentRoute: typeof SSlugRoute
+    }
     '/s/$slug/carrinho': {
       id: '/s/$slug/carrinho'
       path: '/carrinho'
       fullPath: '/s/$slug/carrinho'
       preLoaderRoute: typeof SSlugCarrinhoRouteImport
+      parentRoute: typeof SSlugRoute
+    }
+    '/s/$slug/catalogo': {
+      id: '/s/$slug/catalogo'
+      path: '/catalogo'
+      fullPath: '/s/$slug/catalogo'
+      preLoaderRoute: typeof SSlugCatalogoRouteImport
       parentRoute: typeof SSlugRoute
     }
     '/_authenticated/admin/clientes/': {
@@ -811,6 +887,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/fornecedores/novo'
       preLoaderRoute: typeof AuthenticatedAdminFornecedoresNovoRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/s/$slug/categorias/$categorySlug': {
+      id: '/s/$slug/categorias/$categorySlug'
+      path: '/categorias/$categorySlug'
+      fullPath: '/s/$slug/categorias/$categorySlug'
+      preLoaderRoute: typeof SSlugCategoriasCategorySlugRouteImport
+      parentRoute: typeof SSlugRoute
+    }
+    '/s/$slug/paginas/$pageSlug': {
+      id: '/s/$slug/paginas/$pageSlug'
+      path: '/paginas/$pageSlug'
+      fullPath: '/s/$slug/paginas/$pageSlug'
+      preLoaderRoute: typeof SSlugPaginasPageSlugRouteImport
+      parentRoute: typeof SSlugRoute
+    }
+    '/s/$slug/produtos/$productSlug': {
+      id: '/s/$slug/produtos/$productSlug'
+      path: '/produtos/$productSlug'
+      fullPath: '/s/$slug/produtos/$productSlug'
+      preLoaderRoute: typeof SSlugProdutosProductSlugRouteImport
+      parentRoute: typeof SSlugRoute
     }
     '/_authenticated/admin/lojas/$storeId/builder': {
       id: '/_authenticated/admin/lojas/$storeId/builder'
@@ -935,11 +1032,21 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface SSlugRouteChildren {
+  SSlugBuscaRoute: typeof SSlugBuscaRoute
   SSlugCarrinhoRoute: typeof SSlugCarrinhoRoute
+  SSlugCatalogoRoute: typeof SSlugCatalogoRoute
+  SSlugCategoriasCategorySlugRoute: typeof SSlugCategoriasCategorySlugRoute
+  SSlugPaginasPageSlugRoute: typeof SSlugPaginasPageSlugRoute
+  SSlugProdutosProductSlugRoute: typeof SSlugProdutosProductSlugRoute
 }
 
 const SSlugRouteChildren: SSlugRouteChildren = {
+  SSlugBuscaRoute: SSlugBuscaRoute,
   SSlugCarrinhoRoute: SSlugCarrinhoRoute,
+  SSlugCatalogoRoute: SSlugCatalogoRoute,
+  SSlugCategoriasCategorySlugRoute: SSlugCategoriasCategorySlugRoute,
+  SSlugPaginasPageSlugRoute: SSlugPaginasPageSlugRoute,
+  SSlugProdutosProductSlugRoute: SSlugProdutosProductSlugRoute,
 }
 
 const SSlugRouteWithChildren = SSlugRoute._addFileChildren(SSlugRouteChildren)
