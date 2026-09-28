@@ -33,10 +33,16 @@ const db: any = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos")({ component: Products });
 
 function Products() {
+  const catalogRefs = useCatalogRefs();
   const [page, setPage] = useState(0),
     [input, setInput] = useState(""),
     [query, setQuery] = useState(""),
     [status, setStatus] = useState<"" | Status>(""),
+    [category, setCategory] = useState(""),
+    [brand, setBrand] = useState(""),
+    [image, setImage] = useState(""),
+    [sku, setSku] = useState(""),
+    [offer, setOffer] = useState(""),
     [view, setView] = useState<"table" | "cards">(() =>
       localStorage.getItem("catalog-view") === "cards" ? "cards" : "table",
     ),
@@ -50,36 +56,41 @@ function Products() {
   }, [input]);
   useEffect(() => localStorage.setItem("catalog-view", view), [view]);
   const list = useQuery({
-    queryKey: ["catalog-central", page, query, status],
+    queryKey: ["catalog-central", page, query, status, category, brand, image, sku, offer],
     queryFn: async () => {
-      let q = db
-        .from("products")
-        .select(
-          "id,name,slug,status,updated_at,reference,images,categories(name),brands(name),product_variants(id,sku,internal_code,is_active),supplier_offers(count),product_media(count)",
-          { count: "exact" },
-        )
-        .order("updated_at", { ascending: false })
-        .range(...pageRange(page));
-      if (status) q = q.eq("status", status);
-      if (query.trim()) {
-        const like = `%${query.trim()}%`;
-        q = q.or(`name.ilike.${like},reference.ilike.${like}`);
-      }
-      const { data, error, count } = await q;
+      const { data, error } = await db.rpc("admin_catalog_search", {
+        _query: query || null,
+        _status: status || null,
+        _category_id: category || null,
+        _brand_id: brand || null,
+        _image: image || null,
+        _sku: sku || null,
+        _offer: offer || null,
+        _limit: 20,
+        _offset: page * 20,
+      });
       if (error) throw error;
-      return { rows: data ?? [], count: count ?? 0 };
+      return { rows: data ?? [], count: data?.[0]?.total_count ?? 0 };
+    },
+  });
+  const globalMetrics = useQuery({
+    queryKey: ["catalog-metrics"],
+    queryFn: async () => {
+      const { data, error } = await db.rpc("admin_catalog_metrics");
+      if (error) throw error;
+      return data;
     },
   });
   const rows = useMemo(() => list.data?.rows ?? [], [list.data?.rows]);
   const metrics = useMemo(
     () => ({
-      total: list.data?.count ?? 0,
+      total: globalMetrics.data?.total ?? 0,
       active: rows.filter((r: any) => r.status === "active").length,
       draft: rows.filter((r: any) => r.status === "draft").length,
       noImage: rows.filter((r: any) => !r.product_media?.[0]?.count && !r.images?.length).length,
       noOffer: rows.filter((r: any) => !r.supplier_offers?.[0]?.count).length,
     }),
-    [list.data, rows],
+    [globalMetrics.data, rows],
   );
   const archive = useMutation({
     mutationFn: async (id: string) => {
@@ -133,17 +144,22 @@ function Products() {
       />
       <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard label="Produtos" value={metrics.total} />
-        <MetricCard label="Ativos nesta página" value={metrics.active} />
-        <MetricCard label="Rascunhos" value={metrics.draft} />
-        <MetricCard label="Sem imagem" value={metrics.noImage} />
-        <MetricCard label="Sem oferta" value={metrics.noOffer} />
+        <MetricCard label="Ativos" value={globalMetrics.data?.active ?? "—"} />
+        <MetricCard label="Rascunhos" value={globalMetrics.data?.draft ?? "—"} />
+        <MetricCard label="Sem imagem" value={globalMetrics.data?.without_image ?? "—"} />
+        <MetricCard label="Sem oferta" value={globalMetrics.data?.without_offer ?? "—"} />
       </div>
       <Panel>
         <FilterBar
-          active={Number(!!status)}
+          active={[status, category, brand, image, sku, offer].filter(Boolean).length}
           onClear={() => {
             setStatus("");
             setInput("");
+            setCategory("");
+            setBrand("");
+            setImage("");
+            setSku("");
+            setOffer("");
           }}
         >
           <SearchBox
@@ -165,6 +181,33 @@ function Products() {
                 {STATUS_LABEL[s]}
               </option>
             ))}
+          </SelectInput>
+          <CatalogFilter
+            label="Categoria"
+            value={category}
+            set={setCategory}
+            options={catalogRefs.data?.categories ?? []}
+          />
+          <CatalogFilter
+            label="Marca"
+            value={brand}
+            set={setBrand}
+            options={catalogRefs.data?.brands ?? []}
+          />
+          <SelectInput value={image} onChange={(e) => setImage(e.target.value)} className="w-36">
+            <option value="">Imagem</option>
+            <option value="yes">Com imagem</option>
+            <option value="no">Sem imagem</option>
+          </SelectInput>
+          <SelectInput value={sku} onChange={(e) => setSku(e.target.value)} className="w-36">
+            <option value="">SKU ativo</option>
+            <option value="yes">Com SKU ativo</option>
+            <option value="no">Sem SKU ativo</option>
+          </SelectInput>
+          <SelectInput value={offer} onChange={(e) => setOffer(e.target.value)} className="w-32">
+            <option value="">Oferta</option>
+            <option value="yes">Com oferta</option>
+            <option value="no">Sem oferta</option>
           </SelectInput>
           <span className="ml-auto flex rounded-lg bg-secondary p-1">
             <Btn
@@ -254,6 +297,29 @@ function Products() {
       </Panel>
       {create && <ProductWizard mode={create} onClose={() => setCreate(null)} />}
     </>
+  );
+}
+
+function CatalogFilter({
+  label,
+  value,
+  set,
+  options,
+}: {
+  label: string;
+  value: string;
+  set: (value: string) => void;
+  options: { id: string; name: string }[];
+}) {
+  return (
+    <SelectInput value={value} onChange={(e) => set(e.target.value)} className="w-40">
+      <option value="">{label}</option>
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.name}
+        </option>
+      ))}
+    </SelectInput>
   );
 }
 
