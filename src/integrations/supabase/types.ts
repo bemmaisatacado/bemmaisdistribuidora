@@ -248,6 +248,156 @@ export type Database = {
           },
         ]
       }
+      customer_followups: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string | null
+          due_at: string | null
+          id: string
+          organization_id: string
+          owner_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_at?: string | null
+          id?: string
+          organization_id: string
+          owner_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_at?: string | null
+          id?: string
+          organization_id?: string
+          owner_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_followups_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_interactions: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          next_action: string | null
+          next_action_at: string | null
+          occurred_at: string
+          organization_id: string
+          owner_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          kind?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          occurred_at?: string
+          organization_id: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          occurred_at?: string
+          organization_id?: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_interactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_relationships: {
+        Row: {
+          account_manager_id: string | null
+          commercial_status: Database["public"]["Enums"]["customer_status"]
+          created_at: string
+          created_by: string | null
+          customer_since: string
+          next_action: string | null
+          next_action_at: string | null
+          next_action_owner_id: string | null
+          organization_id: string
+          origin: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_manager_id?: string | null
+          commercial_status?: Database["public"]["Enums"]["customer_status"]
+          created_at?: string
+          created_by?: string | null
+          customer_since?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          next_action_owner_id?: string | null
+          organization_id: string
+          origin?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_manager_id?: string | null
+          commercial_status?: Database["public"]["Enums"]["customer_status"]
+          created_at?: string
+          created_by?: string | null
+          customer_since?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          next_action_owner_id?: string | null
+          organization_id?: string
+          origin?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_relationships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grade_compositions: {
         Row: {
           created_at: string
@@ -1563,6 +1713,27 @@ export type Database = {
     }
     Functions: {
       activate_my_invites: { Args: never; Returns: number }
+      admin_customer_list: {
+        Args: {
+          _capability?: string
+          _commercial?: string
+          _from?: string
+          _has_store?: boolean
+          _manager?: string
+          _origin?: string
+          _page?: number
+          _q?: string
+          _size?: number
+          _state?: string
+          _status?: string
+          _store_active?: boolean
+          _tag?: string
+          _to?: string
+        }
+        Returns: Json
+      }
+      admin_customer_queues: { Args: never; Returns: Json }
+      admin_customer_stats: { Args: { _from?: string }; Returns: Json }
       admin_dashboard_metrics: {
         Args: { _from: string; _to: string }
         Returns: Json
@@ -1585,11 +1756,14 @@ export type Database = {
         }
         Returns: Json
       }
+      customer_360: { Args: { _org: string }; Returns: Json }
+      customer_timeline: { Args: { _org: string }; Returns: Json }
       find_user_id_by_email: { Args: { _email: string }; Returns: string }
       has_org_permission: {
         Args: { _org: string; _perm: string; _uid: string }
         Returns: boolean
       }
+      is_customer_org: { Args: { _org: string }; Returns: boolean }
       is_org_member: { Args: { _org: string; _uid: string }; Returns: boolean }
       is_platform_admin: { Args: { _uid: string }; Returns: boolean }
       org_member_directory: {
@@ -1643,6 +1817,7 @@ export type Database = {
         | "closed_grade"
         | "retail"
         | "wholesale"
+      customer_status: "novo" | "onboarding" | "ativo" | "inativo" | "em_risco"
       inventory_movement_type:
         | "in"
         | "out"
@@ -1669,6 +1844,7 @@ export type Database = {
         | "sell_retail"
         | "sell_wholesale"
         | "operate_store"
+        | "own_inventory"
       org_status: "pending" | "active" | "suspended" | "archived" | "blocked"
       payment_account_kind: "gateway_recipient" | "pix"
       payment_account_status: "pending" | "active" | "disabled"
@@ -1839,6 +2015,7 @@ export const Constants = {
         "retail",
         "wholesale",
       ],
+      customer_status: ["novo", "onboarding", "ativo", "inativo", "em_risco"],
       inventory_movement_type: [
         "in",
         "out",
@@ -1867,6 +2044,7 @@ export const Constants = {
         "sell_retail",
         "sell_wholesale",
         "operate_store",
+        "own_inventory",
       ],
       org_status: ["pending", "active", "suspended", "archived", "blocked"],
       payment_account_kind: ["gateway_recipient", "pix"],
