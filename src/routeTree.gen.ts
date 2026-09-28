@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes/index'
+import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes/novo'
 import { Route as AuthenticatedAdminEmpresasIndexRouteImport } from './routes/_authenticated/admin/empresas/index'
 import { Route as AuthenticatedAdminEmpresasOrgIdRouteImport } from './routes/_authenticated/admin/empresas/$orgId'
 import { Route as AuthenticatedAdminEmpresasNovaRouteImport } from './routes/_authenticated/admin/empresas/nova'
@@ -178,6 +179,12 @@ const AuthenticatedAdminClientesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminClientesRoute,
   } as any)
+const AuthenticatedAdminClientesNovoRoute =
+  AuthenticatedAdminClientesNovoRouteImport.update({
+    id: '/novo',
+    path: '/novo',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
+  } as any)
 const AuthenticatedAdminEmpresasIndexRoute =
   AuthenticatedAdminEmpresasIndexRouteImport.update({
     id: '/empresas/',
@@ -262,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
@@ -332,6 +341,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/_authenticated/admin/empresas/$orgId': typeof AuthenticatedAdminEmpresasOrgIdRoute
   '/_authenticated/admin/empresas/nova': typeof AuthenticatedAdminEmpresasNovaRoute
   '/_authenticated/admin/financeiro/allocations': typeof AuthenticatedAdminFinanceiroAllocationsRoute
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/produtos'
     | '/admin/usuarios'
     | '/admin/'
+    | '/admin/clientes/novo'
     | '/admin/empresas/$orgId'
     | '/admin/empresas/nova'
     | '/admin/financeiro/allocations'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/admin/produtos'
     | '/admin/usuarios'
     | '/admin'
+    | '/admin/clientes/novo'
     | '/admin/empresas/$orgId'
     | '/admin/empresas/nova'
     | '/admin/financeiro/allocations'
@@ -438,6 +450,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/clientes/novo'
     | '/_authenticated/admin/empresas/$orgId'
     | '/_authenticated/admin/empresas/nova'
     | '/_authenticated/admin/financeiro/allocations'
@@ -628,6 +641,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesIndexRouteImport
       parentRoute: typeof AuthenticatedAdminClientesRoute
     }
+    '/_authenticated/admin/clientes/novo': {
+      id: '/_authenticated/admin/clientes/novo'
+      path: '/novo'
+      fullPath: '/admin/clientes/novo'
+      preLoaderRoute: typeof AuthenticatedAdminClientesNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminClientesRoute
+    }
     '/_authenticated/admin/empresas/': {
       id: '/_authenticated/admin/empresas/'
       path: '/empresas'
@@ -702,11 +722,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminClientesRouteChildren {
+  AuthenticatedAdminClientesNovoRoute: typeof AuthenticatedAdminClientesNovoRoute
   AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
 }
 
 const AuthenticatedAdminClientesRouteChildren: AuthenticatedAdminClientesRouteChildren =
   {
+    AuthenticatedAdminClientesNovoRoute: AuthenticatedAdminClientesNovoRoute,
     AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
   }
 
