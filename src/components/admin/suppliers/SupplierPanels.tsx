@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Globe, Plus, Star, Trash2, Store, CheckCircle2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Constants } from "@/integrations/supabase/types";
+
 import {
   Panel,
   MetricCard,
@@ -410,4 +410,3 @@ export function SupplierDomainsTab({ orgId, onCreateStore }: { orgId: string; on
   );
 }
 
-export const DOMAIN_TYPES = Constants.public.Enums.store_status;
