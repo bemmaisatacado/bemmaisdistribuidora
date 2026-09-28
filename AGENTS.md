@@ -27,3 +27,4 @@
 - Member invites go through the inviteMember server fn (Supabase Auth inviteUserByEmail); admins never set passwords; invited members activate via activate_my_invites on first session.
 - Internal notes and tags (organization_notes, org_tags, organization_tag_links) are platform-only via RLS — never exposed to tenant orgs.
 - Clientes BemMais reuse organizations; commercial CRM lives in customer_relationships/customer_interactions/customer_followups (platform-only RLS) with RPCs admin_customer_list/stats/queues, customer_360, customer_timeline — no duplicated identity data.
+- Fornecedores reuse organizations (capability supply_products) with supplier_profiles/supplier_relationships (platform CRM) and RPCs admin_supplier_list/stats/queues + supplier_360; offers/SKU costs/grades/stock/domains managed per supplier at /admin/fornecedores/$orgId — domain activation and offer approval enforced by SQL triggers.
