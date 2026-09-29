@@ -3,10 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
-import {
-  ProductRichContent,
-  visibleContentBlocks,
-} from "@/components/storefront/ProductRichContent";
+import { ProductRichContent } from "@/components/storefront/ProductRichContent";
+import { visibleContentBlocks } from "@/lib/product-rich-content";
 import { uploadProductMedia } from "@/lib/catalog/media";
 
 type ContentBlockType =

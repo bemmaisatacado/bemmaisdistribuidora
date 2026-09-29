@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { visibleContentBlocks } from "../src/components/storefront/ProductRichContent.tsx";
+import { visibleContentBlocks } from "../src/lib/product-rich-content.ts";
 
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
