@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { visibleContentBlocks } from "../src/lib/product-rich-content.ts";
+import {
+  duplicateContentBlockPosition,
+  moveContentBlock,
+  visibleContentBlocks,
+} from "../src/lib/product-rich-content.ts";
 
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
@@ -76,4 +80,66 @@ test("visible rich-content blocks preserve order and omit hidden blocks", () => 
     visibleContentBlocks(blocks).map((block) => block.id),
     ["a", "c"],
   );
+});
+
+const orderedBlocks = [
+  {
+    id: "a",
+    product_id: "product-1",
+    type: "text",
+    config: { title: "A" },
+    is_visible: true,
+    position: 0,
+  },
+  {
+    id: "b",
+    product_id: "product-1",
+    type: "faq",
+    config: { items: [] },
+    is_visible: false,
+    position: 1,
+  },
+  { id: "c", product_id: "product-1", type: "spacer", config: {}, is_visible: true, position: 2 },
+];
+
+test("moves a content block up by swapping only positions", () => {
+  assert.deepEqual(moveContentBlock(orderedBlocks, "b", "up"), [
+    { id: "b", position: 0 },
+    { id: "a", position: 1 },
+  ]);
+  assert.equal(moveContentBlock(orderedBlocks, "a", "up"), null);
+  assert.deepEqual(orderedBlocks[1], {
+    id: "b",
+    product_id: "product-1",
+    type: "faq",
+    config: { items: [] },
+    is_visible: false,
+    position: 1,
+  });
+});
+
+test("moves a content block down by swapping only positions", () => {
+  assert.deepEqual(moveContentBlock(orderedBlocks, "b", "down"), [
+    { id: "b", position: 2 },
+    { id: "c", position: 1 },
+  ]);
+  assert.equal(moveContentBlock(orderedBlocks, "c", "down"), null);
+});
+
+test("opens an adjacent position for a duplicated content block", () => {
+  const plan = duplicateContentBlockPosition(orderedBlocks, "b");
+  assert.deepEqual(plan, {
+    copyPosition: 2,
+    positionUpdates: [{ id: "c", position: 3 }],
+  });
+  assert.ok(plan);
+  const positions = [
+    ...orderedBlocks.map(
+      (block) =>
+        plan.positionUpdates.find((update) => update.id === block.id)?.position ?? block.position,
+    ),
+    plan.copyPosition,
+  ];
+  assert.equal(new Set(positions).size, positions.length);
+  assert.equal(duplicateContentBlockPosition(orderedBlocks, "missing"), null);
 });

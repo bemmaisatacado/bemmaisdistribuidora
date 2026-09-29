@@ -4,7 +4,11 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
 import { ProductRichContent } from "@/components/storefront/ProductRichContent";
-import { visibleContentBlocks } from "@/lib/product-rich-content";
+import {
+  duplicateContentBlockPosition,
+  moveContentBlock,
+  visibleContentBlocks,
+} from "@/lib/product-rich-content";
 import { uploadProductMedia } from "@/lib/catalog/media";
 
 type ContentBlockType =
@@ -473,21 +477,32 @@ function ContentManager({
   };
   const upd = (id: string, v: Update) =>
     db.from("product_content_blocks").update(v).eq("id", id).then(reload);
-  const duplicate = async (b: ProductContentBlock) => {
-    const following = blocks
-      .filter((block) => block.position > b.position)
-      .sort((left, right) => right.position - left.position);
-    for (const block of following) {
+  const move = async (id: string, direction: "up" | "down") => {
+    const updates = moveContentBlock(blocks, id, direction);
+    if (!updates) return;
+    for (const update of updates) {
       const { error } = await db
         .from("product_content_blocks")
-        .update({ position: block.position + 1 })
-        .eq("id", block.id);
+        .update({ position: update.position })
+        .eq("id", update.id);
+      if (error) throw error;
+    }
+    reload();
+  };
+  const duplicate = async (b: ProductContentBlock) => {
+    const plan = duplicateContentBlockPosition(blocks, b.id);
+    if (!plan) return;
+    for (const update of plan.positionUpdates) {
+      const { error } = await db
+        .from("product_content_blocks")
+        .update({ position: update.position })
+        .eq("id", update.id);
       if (error) throw error;
     }
     const { error } = await db.from("product_content_blocks").insert({
       product_id: productId,
       type: b.type,
-      position: b.position + 1,
+      position: plan.copyPosition,
       is_visible: b.is_visible,
       config: b.config,
     });
@@ -527,25 +542,13 @@ function ContentManager({
                 <div className="flex justify-between">
                   <b>{b.type}</b>
                   <div>
-                    <Btn
-                      variant="ghost"
-                      disabled={!i}
-                      onClick={() =>
-                        upd(b.id, { position: b.position - 1 }).then(() =>
-                          upd(blocks[i - 1].id, { position: b.position }),
-                        )
-                      }
-                    >
+                    <Btn variant="ghost" disabled={!i} onClick={() => move(b.id, "up")}>
                       ↑
                     </Btn>
                     <Btn
                       variant="ghost"
                       disabled={i === blocks.length - 1}
-                      onClick={() =>
-                        upd(b.id, { position: blocks[i + 1].position }).then(() =>
-                          upd(blocks[i + 1].id, { position: b.position }),
-                        )
-                      }
+                      onClick={() => move(b.id, "down")}
                     >
                       ↓
                     </Btn>
