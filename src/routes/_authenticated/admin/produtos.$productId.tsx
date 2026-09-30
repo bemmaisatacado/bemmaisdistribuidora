@@ -30,6 +30,8 @@ import {
   type ProductMediaUploadStatus,
 } from "@/lib/catalog/product-media";
 import { useCatalogRefs } from "@/lib/admin/queries";
+import { CatalogReferencePicker } from "@/components/admin/CatalogReferencePicker";
+import { selectCatalogReference } from "@/lib/catalog/quick-references";
 import {
   editableVariantAttributes,
   isCategoryChangeBlocked,
@@ -441,30 +443,24 @@ function ProductMasterEditor({
             label="Categoria"
             hint="Categorias com variantes estruturadas exigem preservação dos atributos atuais."
           >
-            <SelectInput
+            <CatalogReferencePicker
+              kind="category"
+              items={refs.data?.categories ?? []}
               value={draft.categoryId}
-              onChange={(event) => set("categoryId", event.target.value)}
-            >
-              <option value="">Sem categoria</option>
-              {refs.data?.categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </SelectInput>
+              onChange={(id) =>
+                setDraft((current) => selectCatalogReference(current, "categoryId", id))
+              }
+            />
           </Field>
           <Field label="Marca">
-            <SelectInput
+            <CatalogReferencePicker
+              kind="brand"
+              items={refs.data?.brands ?? []}
               value={draft.brandId}
-              onChange={(event) => set("brandId", event.target.value)}
-            >
-              <option value="">Sem marca</option>
-              {refs.data?.brands.map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
-            </SelectInput>
+              onChange={(id) =>
+                setDraft((current) => selectCatalogReference(current, "brandId", id))
+              }
+            />
           </Field>
         </div>
         <Field label="Tags" hint="Separe tags por vírgula.">

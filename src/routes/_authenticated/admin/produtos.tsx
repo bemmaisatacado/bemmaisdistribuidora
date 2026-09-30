@@ -28,6 +28,7 @@ import {
 } from "@/lib/catalog/identity";
 import { readCategoryAttributeOptions } from "@/lib/catalog/category-attributes";
 import { useCatalogRefs } from "@/lib/admin/queries";
+import { CatalogReferencePicker } from "@/components/admin/CatalogReferencePicker";
 
 type Status = Database["public"]["Enums"]["catalog_status"];
 const db: any = supabase;
@@ -420,34 +421,27 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
               <TextInput value={reference} onChange={(e) => setReference(e.target.value)} />
             </label>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label>
-                Categoria
-                <SelectInput
+              <div className="grid gap-1.5 text-sm">
+                <span className="text-xs font-semibold text-foreground/80">Categoria</span>
+                <CatalogReferencePicker
+                  kind="category"
+                  items={refs.data?.categories ?? []}
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
+                  onChange={(id) => {
+                    setCategory(id);
                     setMatrixValues({});
                   }}
-                >
-                  <option value="">Selecionar</option>
-                  {refs.data?.categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </SelectInput>
-              </label>
-              <label>
-                Marca
-                <SelectInput value={brand} onChange={(e) => setBrand(e.target.value)}>
-                  <option value="">Selecionar</option>
-                  {refs.data?.brands.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </SelectInput>
-              </label>
+                />
+              </div>
+              <div className="grid gap-1.5 text-sm">
+                <span className="text-xs font-semibold text-foreground/80">Marca</span>
+                <CatalogReferencePicker
+                  kind="brand"
+                  items={refs.data?.brands ?? []}
+                  value={brand}
+                  onChange={setBrand}
+                />
+              </div>
             </div>
           </div>
         )}

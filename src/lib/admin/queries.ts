@@ -34,8 +34,12 @@ export function useCatalogRefs() {
     queryKey: ["catalog-refs"],
     queryFn: async () => {
       const [c, b] = await Promise.all([
-        supabase.from("categories").select("id,name").order("name").limit(500),
-        supabase.from("brands").select("id,name").order("name").limit(500),
+        supabase
+          .from("categories")
+          .select("id,name,slug,parent_id,sort_order")
+          .order("name")
+          .limit(500),
+        supabase.from("brands").select("id,name,slug").order("name").limit(500),
       ]);
       if (c.error) throw c.error;
       if (b.error) throw b.error;
