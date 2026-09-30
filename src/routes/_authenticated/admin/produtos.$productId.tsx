@@ -10,6 +10,16 @@ import {
   visibleContentBlocks,
 } from "@/lib/product-rich-content";
 import { uploadProductMedia } from "@/lib/catalog/media";
+import {
+  initialProductMediaFields,
+  moveProductMedia,
+  primaryProductMediaUpdate,
+  productMediaRemovalPlan,
+  productMediaUploadErrorMessage,
+  productMediaVariantUpdate,
+  updateProductMediaUploadStatus,
+  type ProductMediaUploadStatus,
+} from "@/lib/catalog/product-media";
 
 type ContentBlockType =
   | "text"
@@ -53,8 +63,7 @@ type ProductVariant = {
   attributes: Record<string, string>;
   is_active: boolean;
 };
-type UploadStatus = "pending" | "uploading" | "success" | "error";
-type UploadItem = { id: string; file: File; status: UploadStatus; message?: string };
+type UploadItem = { id: string; file: File; status: ProductMediaUploadStatus; message?: string };
 type Update = Record<string, string | boolean | number | null | ContentConfig>;
 const db = supabase;
 export const Route = createFileRoute("/_authenticated/admin/produtos/$productId")({
@@ -317,33 +326,21 @@ function MediaManager({
     setUploads((current) => [...current, ...batch]);
     await Promise.all(
       batch.map(async (item) => {
-        setUploads((current) =>
-          current.map((entry) =>
-            entry.id === item.id ? { ...entry, status: "uploading" } : entry,
-          ),
-        );
+        setUploads((current) => updateProductMediaUploadStatus(current, item.id, "uploading"));
         try {
           const path = await uploadProductMedia(productId, item.file);
           await db.from("product_media").insert({
             product_id: productId,
             storage_path: path,
-            sort_order: media.length,
-            is_primary: !media.length,
+            ...initialProductMediaFields(media.length),
           });
           setUploads((current) =>
-            current.map((entry) =>
-              entry.id === item.id ? { ...entry, status: "success", message: "Concluído" } : entry,
-            ),
+            updateProductMediaUploadStatus(current, item.id, "success", "Concluído"),
           );
         } catch (error) {
-          const message =
-            error instanceof Error && /10 MB|JPG|PNG|WebP/.test(error.message)
-              ? error.message
-              : "Não foi possível enviar este arquivo.";
+          const message = productMediaUploadErrorMessage(error);
           setUploads((current) =>
-            current.map((entry) =>
-              entry.id === item.id ? { ...entry, status: "error", message } : entry,
-            ),
+            updateProductMediaUploadStatus(current, item.id, "error", message),
           );
         }
       }),
@@ -354,9 +351,9 @@ function MediaManager({
     db.from("product_media").update(v).eq("id", id).then(reload);
   const remove = async (m: ProductMedia) => {
     if (!confirm("Remover esta imagem?")) return;
-    if (m.is_primary) {
-      const next = media.find((x: ProductMedia) => x.id !== m.id);
-      if (next) await db.from("product_media").update({ is_primary: true }).eq("id", next.id);
+    const plan = productMediaRemovalPlan(media, m.id);
+    if (plan.promoteId) {
+      await db.from("product_media").update({ is_primary: true }).eq("id", plan.promoteId);
     }
     await db.from("product_media").delete().eq("id", m.id);
     await db.storage.from("product-media").remove([m.storage_path]);
@@ -408,7 +405,7 @@ function MediaManager({
             <select
               className="mt-2 w-full"
               value={m.variant_id || ""}
-              onChange={(e) => update(m.id, { variant_id: e.target.value || null })}
+              onChange={(e) => update(m.id, productMediaVariantUpdate(e.target.value || null))}
             >
               <option value="">Sem variante</option>
               {variants.map((v: ProductVariant) => (
@@ -418,28 +415,34 @@ function MediaManager({
               ))}
             </select>
             <div className="mt-2 flex gap-1">
-              <Btn variant="outline" onClick={() => update(m.id, { is_primary: true })}>
+              <Btn variant="outline" onClick={() => update(m.id, primaryProductMediaUpdate(m.id))}>
                 Principal
               </Btn>
               <Btn
                 variant="ghost"
                 disabled={!i}
-                onClick={() =>
-                  update(m.id, { sort_order: media[i - 1].sort_order }).then(() =>
-                    update(media[i - 1].id, { sort_order: m.sort_order }),
-                  )
-                }
+                onClick={() => {
+                  const updates = moveProductMedia(media, m.id, "up");
+                  if (updates) {
+                    update(updates[0].id, { sort_order: updates[0].sort_order }).then(() =>
+                      update(updates[1].id, { sort_order: updates[1].sort_order }),
+                    );
+                  }
+                }}
               >
                 ↑
               </Btn>
               <Btn
                 variant="ghost"
                 disabled={i === media.length - 1}
-                onClick={() =>
-                  update(m.id, { sort_order: media[i + 1].sort_order }).then(() =>
-                    update(media[i + 1].id, { sort_order: m.sort_order }),
-                  )
-                }
+                onClick={() => {
+                  const updates = moveProductMedia(media, m.id, "down");
+                  if (updates) {
+                    update(updates[0].id, { sort_order: updates[0].sort_order }).then(() =>
+                      update(updates[1].id, { sort_order: updates[1].sort_order }),
+                    );
+                  }
+                }}
               >
                 ↓
               </Btn>

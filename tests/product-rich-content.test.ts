@@ -5,6 +5,15 @@ import {
   moveContentBlock,
   visibleContentBlocks,
 } from "../src/lib/product-rich-content.ts";
+import {
+  initialProductMediaFields,
+  moveProductMedia,
+  primaryProductMediaUpdate,
+  productMediaRemovalPlan,
+  productMediaUploadErrorMessage,
+  productMediaVariantUpdate,
+  updateProductMediaUploadStatus,
+} from "../src/lib/catalog/product-media.ts";
 
 const safeHref = (href?: string) =>
   href && (/^https?:\/\//.test(href) || href.startsWith("/")) ? href : undefined;
@@ -142,4 +151,66 @@ test("opens an adjacent position for a duplicated content block", () => {
   ];
   assert.equal(new Set(positions).size, positions.length);
   assert.equal(duplicateContentBlockPosition(orderedBlocks, "missing"), null);
+});
+
+const productMedia = [
+  { id: "media-a", sort_order: 0, is_primary: true, variant_id: null },
+  { id: "media-b", sort_order: 1, is_primary: false, variant_id: "variant-black" },
+  { id: "media-c", sort_order: 2, is_primary: false, variant_id: null },
+];
+
+test("plans product media primary, promotion, ordering, and variant association", () => {
+  assert.deepEqual(initialProductMediaFields(0), { sort_order: 0, is_primary: true });
+  assert.deepEqual(initialProductMediaFields(2), { sort_order: 2, is_primary: false });
+  assert.deepEqual(primaryProductMediaUpdate("media-b"), { id: "media-b", is_primary: true });
+  assert.deepEqual(productMediaRemovalPlan(productMedia, "media-a"), { promoteId: "media-b" });
+  assert.deepEqual(productMediaRemovalPlan(productMedia, "media-b"), { promoteId: null });
+  assert.deepEqual(moveProductMedia(productMedia, "media-b", "up"), [
+    { id: "media-b", sort_order: 0 },
+    { id: "media-a", sort_order: 1 },
+  ]);
+  assert.deepEqual(moveProductMedia(productMedia, "media-b", "down"), [
+    { id: "media-b", sort_order: 2 },
+    { id: "media-c", sort_order: 1 },
+  ]);
+  assert.equal(moveProductMedia(productMedia, "media-a", "up"), null);
+  assert.equal(moveProductMedia(productMedia, "media-c", "down"), null);
+  assert.deepEqual(productMediaVariantUpdate("variant-black"), { variant_id: "variant-black" });
+  assert.deepEqual(productMediaVariantUpdate(null), { variant_id: null });
+});
+
+test("tracks individual product media upload states without propagating failures", () => {
+  const pending = [
+    { id: "a", status: "pending" as const },
+    { id: "b", status: "pending" as const },
+    { id: "c", status: "pending" as const },
+  ];
+  const uploading = pending.map((item) => ({ ...item, status: "uploading" as const }));
+  const completed = updateProductMediaUploadStatus(
+    updateProductMediaUploadStatus(
+      updateProductMediaUploadStatus(uploading, "a", "success", "Concluído"),
+      "b",
+      "error",
+      "Cada imagem pode ter no máximo 10 MB.",
+    ),
+    "c",
+    "success",
+    "Concluído",
+  );
+  assert.deepEqual(completed, [
+    { id: "a", status: "success", message: "Concluído" },
+    { id: "b", status: "error", message: "Cada imagem pode ter no máximo 10 MB." },
+    { id: "c", status: "success", message: "Concluído" },
+  ]);
+});
+
+test("uses safe product media upload messages", () => {
+  assert.equal(
+    productMediaUploadErrorMessage(new Error("Cada imagem pode ter no máximo 10 MB.")),
+    "Cada imagem pode ter no máximo 10 MB.",
+  );
+  assert.equal(
+    productMediaUploadErrorMessage(new Error("storage response details")),
+    "Não foi possível enviar este arquivo.",
+  );
 });
