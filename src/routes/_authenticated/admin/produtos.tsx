@@ -21,11 +21,12 @@ import {
 } from "@/components/admin/ui";
 import { pageRange, STATUS_LABEL } from "@/lib/admin/format";
 import {
-  isOfficialGtin,
+  MAX_VARIANT_COMBINATIONS,
+  buildVariantMatrix,
+  normalizeVariantValues,
   variantLabel,
-  variantMatrix,
-  type VariantDraft,
 } from "@/lib/catalog/identity";
+import { readCategoryAttributeOptions } from "@/lib/catalog/category-attributes";
 import { useCatalogRefs } from "@/lib/admin/queries";
 
 type Status = Database["public"]["Enums"]["catalog_status"];
@@ -331,39 +332,60 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
     [reference, setReference] = useState(""),
     [category, setCategory] = useState(""),
     [brand, setBrand] = useState(""),
-    [color, setColor] = useState(""),
-    [sizes, setSizes] = useState(""),
-    [variants, setVariants] = useState<VariantDraft[]>([]),
-    [gtin, setGtin] = useState("");
+    [matrixValues, setMatrixValues] = useState<Record<string, string[]>>({});
   const finalStep = mode === "quick" ? 1 : 2;
-  const generate = () =>
-    setVariants(
-      color || sizes
-        ? variantMatrix([
-            { code: "cor", values: color ? color.split(",").map((x) => x.trim()) : ["Padrão"] },
-            { code: "tamanho", values: sizes ? sizes.split(",").map((x) => x.trim()) : ["Padrão"] },
-          ]).map((v) => ({
-            ...v,
-            attributes: Object.fromEntries(
-              Object.entries(v.attributes).filter(([, x]) => x !== "Padrão"),
-            ),
-          }))
-        : [{ attributes: {} }],
-    );
+  const matrixAttributes = useQuery({
+    queryKey: ["category-variant-attributes", category],
+    enabled: !!category,
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("category_attributes")
+        .select("id,name,code,options,sort_order")
+        .eq("category_id", category)
+        .eq("is_variant", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const axes = useMemo(
+    () =>
+      (matrixAttributes.data ?? []).map((attribute) => ({
+        code: attribute.code,
+        values: matrixValues[attribute.code] ?? [],
+      })),
+    [matrixAttributes.data, matrixValues],
+  );
+  const matrix = useMemo(() => buildVariantMatrix(axes), [axes]);
+  const canPersistMatrix = !matrixAttributes.isLoading && !matrix.exceedsLimit && matrix.count > 0;
+  const toggleValue = (code: string, value: string) =>
+    setMatrixValues((current) => {
+      const selected = current[code] ?? [];
+      return {
+        ...current,
+        [code]: selected.includes(value)
+          ? selected.filter((item) => item !== value)
+          : normalizeVariantValues([...selected, value]),
+      };
+    });
   const save = useMutation({
     mutationFn: async () => {
       if (!name.trim()) throw new Error("Informe o nome do produto.");
-      if (!isOfficialGtin(gtin))
-        throw new Error("GTIN/EAN oficial deve ter 8 a 14 dígitos; código interno não é GTIN.");
+      if (!canPersistMatrix)
+        throw new Error(
+          "Selecione valores para todos os atributos de variante antes de criar o produto.",
+        );
       const { error } = await db.rpc("create_product_master", {
         _name: name,
         _slug: name,
         _category_id: category || null,
         _brand_id: brand || null,
         _reference: reference || null,
-        _variants: (variants.length ? variants : [{ attributes: {} }]).map((v) => ({
-          ...v,
-          gtin: v.gtin ?? (gtin || null),
+        _variants: matrix.variants.map((variant) => ({
+          ...variant,
+          sku: "",
+          internal_code: "",
+          gtin: null,
         })),
       });
       if (error) throw error;
@@ -400,7 +422,13 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
             <div className="grid gap-3 sm:grid-cols-2">
               <label>
                 Categoria
-                <SelectInput value={category} onChange={(e) => setCategory(e.target.value)}>
+                <SelectInput
+                  value={category}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setMatrixValues({});
+                  }}
+                >
                   <option value="">Selecionar</option>
                   {refs.data?.categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -425,51 +453,94 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
         )}
         {step === 1 && (
           <div className="grid gap-4">
-            <p className="text-sm">Valores separados por vírgula geram a matriz comercial.</p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label>
-                Cor
-                <TextInput
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  placeholder="Preto, Branco"
-                />
-              </label>
-              <label>
-                Numeração
-                <TextInput
-                  value={sizes}
-                  onChange={(e) => setSizes(e.target.value)}
-                  placeholder="38, 39, 40"
-                />
-              </label>
-            </div>
-            <Btn variant="outline" onClick={generate}>
-              Gerar combinações
-            </Btn>
-            {variants.length > 0 && (
-              <div className="rounded-xl bg-secondary p-3 text-sm">
-                {variants.length} variante(s): {variants.map(variantLabel).join(" · ")}
+            <p className="text-sm text-muted-foreground">
+              A matriz usa somente os atributos configurados nesta categoria para gerar variantes.
+            </p>
+            {!category ? (
+              <p className="rounded-xl bg-secondary p-3 text-sm">
+                Selecione uma categoria para configurar a matriz.
+              </p>
+            ) : matrixAttributes.isLoading ? (
+              <p className="text-sm text-muted-foreground">Carregando atributos da categoria...</p>
+            ) : matrixAttributes.error ? (
+              <p className="rounded-xl bg-danger-soft p-3 text-sm text-danger">
+                Não foi possível carregar os atributos de variante.
+              </p>
+            ) : !matrixAttributes.data?.length ? (
+              <p className="rounded-xl bg-secondary p-3 text-sm">
+                Esta categoria não possui atributos que geram variante. Será criado um SKU base.
+              </p>
+            ) : (
+              <div className="grid gap-3">
+                {matrixAttributes.data.map((attribute) => {
+                  const options = readCategoryAttributeOptions(attribute.options);
+                  const selected = matrixValues[attribute.code] ?? [];
+                  return (
+                    <fieldset
+                      key={attribute.id}
+                      className="grid gap-2 rounded-xl bg-secondary/60 p-3"
+                    >
+                      <legend className="px-1 text-sm font-semibold">{attribute.name}</legend>
+                      {options.length ? (
+                        <div className="flex flex-wrap gap-2">
+                          {options.map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              onClick={() => toggleValue(attribute.code, option)}
+                              className={
+                                selected.includes(option)
+                                  ? "rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+                                  : "rounded-lg border border-border bg-surface-elevated px-3 py-2 text-sm font-semibold hover:border-primary/40"
+                              }
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <TextInput
+                          value={selected.join(", ")}
+                          onChange={(e) =>
+                            setMatrixValues((current) => ({
+                              ...current,
+                              [attribute.code]: normalizeVariantValues(e.target.value.split(",")),
+                            }))
+                          }
+                          placeholder="Valores separados por vírgula"
+                        />
+                      )}
+                    </fieldset>
+                  );
+                })}
               </div>
             )}
-            <label>
-              GTIN/EAN oficial (opcional)
-              <TextInput
-                value={gtin}
-                onChange={(e) => setGtin(e.target.value)}
-                placeholder="Nunca use o código interno aqui"
-              />
-            </label>
+            <div
+              className={
+                matrix.exceedsLimit
+                  ? "rounded-xl bg-danger-soft p-3 text-sm text-danger"
+                  : "rounded-xl bg-secondary p-3 text-sm"
+              }
+            >
+              {matrix.exceedsLimit
+                ? `${matrix.count} combinações solicitadas. O limite operacional é ${MAX_VARIANT_COMBINATIONS}.`
+                : `${matrix.count} variante(s) serão geradas.`}
+            </div>
+            {!matrix.exceedsLimit && matrix.variants.length > 0 && (
+              <div className="max-h-32 overflow-auto rounded-xl border border-border-subtle bg-surface-elevated p-3 text-sm">
+                {matrix.variants.map(variantLabel).join(" · ")}
+              </div>
+            )}
           </div>
         )}
         {step === 2 && (
           <div className="space-y-3 text-sm">
             <p>
-              <b>{name}</b> · {variants.length || 1} variante(s)
+              <b>{name}</b> · {matrix.count} variante(s)
             </p>
             <p>
-              SKU BemMais e código interno serão gerados de forma única. GTIN oficial:{" "}
-              {gtin || "não informado"}.
+              SKU BemMais e código interno serão gerados de forma única pelo mecanismo existente.
+              GTIN/EAN oficial permanecerá vazio até ser informado posteriormente.
             </p>
             <p className="rounded-lg bg-warning-soft p-3 text-warning">
               Produto será salvo como rascunho. Mídias podem ser adicionadas no Product 360.
@@ -483,7 +554,7 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
           {step < finalStep ? (
             <Btn onClick={() => setStep(step + 1)}>Continuar</Btn>
           ) : (
-            <Btn onClick={() => save.mutate()} disabled={save.isPending}>
+            <Btn onClick={() => save.mutate()} disabled={save.isPending || !canPersistMatrix}>
               {save.isPending ? "Salvando…" : "Criar produto"}
             </Btn>
           )}
