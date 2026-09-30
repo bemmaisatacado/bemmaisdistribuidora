@@ -2,7 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Badge, Btn, EntityHeader, Panel } from "@/components/admin/ui";
+import {
+  Badge,
+  Btn,
+  EntityHeader,
+  ErrorNote,
+  Field,
+  Panel,
+  SelectInput,
+  TextInput,
+} from "@/components/admin/ui";
 import { ProductRichContent } from "@/components/storefront/ProductRichContent";
 import {
   duplicateContentBlockPosition,
@@ -20,6 +29,25 @@ import {
   updateProductMediaUploadStatus,
   type ProductMediaUploadStatus,
 } from "@/lib/catalog/product-media";
+import { useCatalogRefs } from "@/lib/admin/queries";
+import {
+  editableVariantAttributes,
+  isCategoryChangeBlocked,
+  isDuplicateVariantCombination,
+  mergeVariantAttributes,
+  productMasterUpdate,
+  readVariantDimensions,
+  validateVariantEdit,
+  variantAttributeDefinitions,
+  variantDimensionsUpdate,
+  variantUpdateTarget,
+  type EditableProductVariant,
+  type VariantAttributeDefinition,
+} from "@/lib/catalog/product-editing";
+import {
+  isCategoryAttributeType,
+  readCategoryAttributeOptions,
+} from "@/lib/catalog/category-attributes";
 
 type ContentBlockType =
   | "text"
@@ -56,12 +84,29 @@ type ProductMedia = {
 };
 type ProductVariant = {
   id: string;
+  product_id: string;
   sku: string;
   internal_code?: string | null;
   gtin?: string | null;
   barcode?: string | null;
   attributes: Record<string, string>;
   is_active: boolean;
+  weight_grams?: number | null;
+  dimensions?: unknown;
+};
+type ProductMaster = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  short_description?: string | null;
+  reference?: string | null;
+  audience?: string | null;
+  tags?: string[] | null;
+  category_id: string | null;
+  brand_id: string | null;
+  status: string;
+  updated_at: string;
 };
 type UploadItem = { id: string; file: File; status: ProductMediaUploadStatus; message?: string };
 type Update = Record<string, string | boolean | number | null | ContentConfig>;
@@ -188,41 +233,19 @@ function Product360() {
               )}
             </div>
           </Panel>
+          <ProductMasterEditor
+            product={p as ProductMaster}
+            variants={d.variants as ProductVariant[]}
+            reload={q.refetch}
+          />
         </div>
       ) : null}
       {tab === "Variantes/SKUs" ? (
-        <Panel title="Variantes e SKUs">
-          <div className="overflow-x-auto p-5">
-            <table className="w-full text-sm">
-              <thead>
-                <tr>
-                  <th>SKU BemMais</th>
-                  <th>Código interno</th>
-                  <th>GTIN/EAN oficial</th>
-                  <th>Atributos</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.variants.map((v: ProductVariant) => (
-                  <tr key={v.id} className="border-t">
-                    <td className="py-3 font-mono">{v.sku}</td>
-                    <td className="font-mono">{v.internal_code || "—"}</td>
-                    <td>{v.gtin || v.barcode || "—"}</td>
-                    <td>
-                      {Object.entries(v.attributes || {})
-                        .map(([k, val]) => `${k}: ${val}`)
-                        .join(" · ") || "Padrão"}
-                    </td>
-                    <td>
-                      <Badge value={v.is_active ? "active" : "paused"} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
+        <VariantManager
+          categoryId={p.category_id}
+          variants={d.variants as ProductVariant[]}
+          reload={q.refetch}
+        />
       ) : null}
       {tab === "Mídia" ? (
         <MediaManager
@@ -301,6 +324,472 @@ function Product360() {
         </Panel>
       ) : null}
     </main>
+  );
+}
+
+function ProductMasterEditor({
+  product,
+  variants,
+  reload,
+}: {
+  product: ProductMaster;
+  variants: ProductVariant[];
+  reload: () => unknown;
+}) {
+  const refs = useCatalogRefs();
+  const initialDraft = () => ({
+    name: product.name,
+    shortDescription: product.short_description ?? "",
+    description: product.description ?? "",
+    reference: product.reference ?? "",
+    audience: product.audience ?? "",
+    tags: (product.tags ?? []).join(", "),
+    categoryId: product.category_id ?? "",
+    brandId: product.brand_id ?? "",
+  });
+  const [draft, setDraft] = useState(initialDraft);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const set = (key: keyof ReturnType<typeof initialDraft>, value: string) =>
+    setDraft((current) => ({ ...current, [key]: value }));
+  const save = async () => {
+    setError(null);
+    setSuccess(null);
+    if (!draft.name.trim()) {
+      setError("Informe o nome do Product Master.");
+      return;
+    }
+    if (isCategoryChangeBlocked(product.category_id, draft.categoryId || null, variants)) {
+      setError(
+        "A categoria não pode ser alterada enquanto as variantes possuem atributos estruturais. Preserve a categoria ou revise as variantes em uma operação segura.",
+      );
+      return;
+    }
+    setSaving(true);
+    const { data, error: updateError } = await db
+      .from("products")
+      .update(productMasterUpdate(draft))
+      .eq("id", product.id)
+      .eq("updated_at", product.updated_at)
+      .select("id")
+      .maybeSingle();
+    setSaving(false);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    if (!data) {
+      setError(
+        "Este produto foi alterado em outra sessão. Atualize a página antes de tentar novamente.",
+      );
+      return;
+    }
+    setSuccess("Product Master atualizado.");
+    reload();
+  };
+  return (
+    <Panel
+      title="Editar Product Master"
+      description="Identidade comercial e dados descritivos. SKU e código interno pertencem às variantes."
+      actions={
+        <div className="flex gap-2">
+          <Btn variant="ghost" disabled={saving} onClick={() => setDraft(initialDraft())}>
+            Cancelar
+          </Btn>
+          <Btn disabled={saving} onClick={save}>
+            {saving ? "Salvando…" : "Salvar alterações"}
+          </Btn>
+        </div>
+      }
+    >
+      <div className="grid gap-4 p-5">
+        <ErrorNote error={error} />
+        {success && (
+          <p className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success">{success}</p>
+        )}
+        <Field label="Nome">
+          <TextInput value={draft.name} onChange={(event) => set("name", event.target.value)} />
+        </Field>
+        <Field label="Descrição curta">
+          <TextInput
+            value={draft.shortDescription}
+            onChange={(event) => set("shortDescription", event.target.value)}
+          />
+        </Field>
+        <Field label="Descrição">
+          <textarea
+            className="min-h-28 w-full rounded-lg border border-border bg-surface-elevated px-3 py-2 text-sm"
+            value={draft.description}
+            onChange={(event) => set("description", event.target.value)}
+          />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Modelo / referência">
+            <TextInput
+              value={draft.reference}
+              onChange={(event) => set("reference", event.target.value)}
+            />
+          </Field>
+          <Field label="Público / gênero">
+            <TextInput
+              value={draft.audience}
+              onChange={(event) => set("audience", event.target.value)}
+            />
+          </Field>
+          <Field
+            label="Categoria"
+            hint="Categorias com variantes estruturadas exigem preservação dos atributos atuais."
+          >
+            <SelectInput
+              value={draft.categoryId}
+              onChange={(event) => set("categoryId", event.target.value)}
+            >
+              <option value="">Sem categoria</option>
+              {refs.data?.categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+          <Field label="Marca">
+            <SelectInput
+              value={draft.brandId}
+              onChange={(event) => set("brandId", event.target.value)}
+            >
+              <option value="">Sem marca</option>
+              {refs.data?.brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+        </div>
+        <Field label="Tags" hint="Separe tags por vírgula.">
+          <TextInput value={draft.tags} onChange={(event) => set("tags", event.target.value)} />
+        </Field>
+      </div>
+    </Panel>
+  );
+}
+
+function VariantManager({
+  categoryId,
+  variants,
+  reload,
+}: {
+  categoryId: string | null;
+  variants: ProductVariant[];
+  reload: () => unknown;
+}) {
+  const [editing, setEditing] = useState<ProductVariant | null>(null);
+  const attributes = useQuery({
+    queryKey: ["product-variant-attributes", categoryId],
+    enabled: Boolean(categoryId),
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("category_attributes")
+        .select("code,name,type,options,is_required,is_variant,sort_order")
+        .eq("category_id", categoryId)
+        .order("sort_order");
+      if (error) throw error;
+      return (data ?? []).flatMap((attribute): VariantAttributeDefinition[] =>
+        isCategoryAttributeType(attribute.type)
+          ? [
+              {
+                ...attribute,
+                type: attribute.type,
+              },
+            ]
+          : [],
+      );
+    },
+  });
+  const definitions = variantAttributeDefinitions(attributes.data ?? []);
+  return (
+    <div className="space-y-5">
+      <Panel
+        title="Variantes e SKUs"
+        description="Edite apenas dados operacionais seguros. SKU BemMais e código interno são identificadores automáticos."
+      >
+        <div className="overflow-x-auto p-5">
+          <table className="w-full text-sm">
+            <thead>
+              <tr>
+                <th>SKU BemMais</th>
+                <th>Código interno</th>
+                <th>GTIN/EAN oficial</th>
+                <th>Atributos</th>
+                <th>Status</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {variants.map((variant) => (
+                <tr key={variant.id} className="border-t">
+                  <td className="py-3 font-mono">{variant.sku}</td>
+                  <td className="font-mono">{variant.internal_code || "—"}</td>
+                  <td>{variant.gtin || variant.barcode || "—"}</td>
+                  <td>
+                    {Object.entries(variant.attributes || {})
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join(" · ") || "Padrão"}
+                  </td>
+                  <td>
+                    <Badge value={variant.is_active ? "active" : "paused"} />
+                  </td>
+                  <td className="text-right">
+                    <Btn variant="outline" onClick={() => setEditing(variant)}>
+                      Editar
+                    </Btn>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+      {editing && (
+        <VariantEditor
+          variant={editing}
+          variants={variants}
+          definitions={definitions}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            reload();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function VariantEditor({
+  variant,
+  variants,
+  definitions,
+  onClose,
+  onSaved,
+}: {
+  variant: ProductVariant;
+  variants: ProductVariant[];
+  definitions: readonly VariantAttributeDefinition[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [gtin, setGtin] = useState(variant.gtin ?? variant.barcode ?? "");
+  const [weight, setWeight] = useState(variant.weight_grams?.toString() ?? "");
+  const [dimensions, setDimensions] = useState(() => readVariantDimensions(variant.dimensions));
+  const [attributes, setAttributes] = useState(() =>
+    editableVariantAttributes(variant.attributes ?? {}, definitions),
+  );
+  const [isActive, setIsActive] = useState(variant.is_active);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const save = async () => {
+    const mergedAttributes = mergeVariantAttributes(
+      variant.attributes ?? {},
+      attributes,
+      definitions,
+    );
+    const validation = validateVariantEdit(gtin, attributes, definitions);
+    if (validation) {
+      setError(validation);
+      return;
+    }
+    const editableVariants: EditableProductVariant[] = variants.map((item) => ({
+      id: item.id,
+      product_id: variant.product_id,
+      sku: item.sku,
+      internal_code: item.internal_code ?? null,
+      gtin: item.gtin ?? item.barcode ?? null,
+      attributes: item.attributes ?? {},
+      is_active: item.is_active,
+    }));
+    if (
+      isDuplicateVariantCombination(editableVariants, variant.id, mergedAttributes, definitions)
+    ) {
+      setError("Já existe uma variante com esta combinação de atributos.");
+      return;
+    }
+    if (weight.trim() && (!Number.isInteger(Number(weight)) || Number(weight) < 0)) {
+      setError("Peso deve ser um número inteiro em gramas.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    const target = variantUpdateTarget(variant);
+    const { error: updateError } = await db
+      .from("product_variants")
+      .update({
+        gtin: gtin.trim() || null,
+        weight_grams: weight.trim() ? Number(weight) : null,
+        dimensions,
+        attributes: mergedAttributes,
+        is_active: isActive,
+      })
+      .eq("id", target.id)
+      .eq("product_id", target.productId);
+    setSaving(false);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    onSaved();
+  };
+  return (
+    <Panel
+      title={`Editar variante ${variant.sku}`}
+      description="A atualização preserva o mesmo ID, SKU BemMais, código interno e todas as referências operacionais."
+      actions={
+        <div className="flex gap-2">
+          <Btn variant="ghost" disabled={saving} onClick={onClose}>
+            Cancelar
+          </Btn>
+          <Btn disabled={saving} onClick={save}>
+            {saving ? "Salvando…" : "Salvar variante"}
+          </Btn>
+        </div>
+      }
+    >
+      <div className="grid gap-4 p-5">
+        <ErrorNote error={error} />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="SKU BemMais" hint="Gerado automaticamente; não é editável nesta tela.">
+            <TextInput value={variant.sku} disabled className="font-mono" />
+          </Field>
+          <Field
+            label="Código interno BemMais"
+            hint="Gerado automaticamente; não é editável nesta tela."
+          >
+            <TextInput value={variant.internal_code ?? ""} disabled className="font-mono" />
+          </Field>
+          <Field
+            label="GTIN/EAN oficial"
+            hint="Opcional; informe somente o código oficial do fabricante."
+          >
+            <TextInput
+              value={gtin}
+              inputMode="numeric"
+              onChange={(event) => setGtin(event.target.value)}
+            />
+          </Field>
+          <Field label="Peso (gramas)">
+            <TextInput
+              value={weight}
+              inputMode="numeric"
+              onChange={(event) => setWeight(event.target.value)}
+            />
+          </Field>
+        </div>
+        <fieldset className="grid gap-3 rounded-xl bg-secondary/40 p-4">
+          <legend className="text-xs font-semibold">Dimensões (cm)</legend>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              ["length_cm", "Comprimento"],
+              ["width_cm", "Largura"],
+              ["height_cm", "Altura"],
+            ].map(([key, label]) => (
+              <Field key={key} label={label}>
+                <TextInput
+                  value={dimensions[key]?.toString() ?? ""}
+                  inputMode="decimal"
+                  onChange={(event) =>
+                    setDimensions((current) =>
+                      variantDimensionsUpdate(current, key, event.target.value),
+                    )
+                  }
+                />
+              </Field>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="grid gap-3 rounded-xl bg-secondary/40 p-4">
+          <legend className="text-xs font-semibold">Atributos que geram variante</legend>
+          {!definitions.length ? (
+            <p className="text-sm text-muted-foreground">
+              Esta categoria não possui atributos estruturais de variante. Esta é a variante base do
+              produto.
+            </p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {definitions.map((definition) => {
+                const options = readCategoryAttributeOptions(definition.options);
+                const value = attributes[definition.code] ?? "";
+                const selectable = definition.type === "select" || definition.type === "color";
+                return (
+                  <Field
+                    key={definition.code}
+                    label={definition.name}
+                    hint={definition.is_required ? "Obrigatório" : "Opcional"}
+                  >
+                    {definition.type === "boolean" ? (
+                      <SelectInput
+                        value={value}
+                        onChange={(event) =>
+                          setAttributes((current) => ({
+                            ...current,
+                            [definition.code]: event.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">Selecionar</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </SelectInput>
+                    ) : selectable && options.length ? (
+                      <SelectInput
+                        value={value}
+                        onChange={(event) =>
+                          setAttributes((current) => ({
+                            ...current,
+                            [definition.code]: event.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">Selecionar</option>
+                        {options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </SelectInput>
+                    ) : (
+                      <TextInput
+                        value={value}
+                        inputMode={definition.type === "number" ? "decimal" : undefined}
+                        placeholder={
+                          definition.type === "multi_select"
+                            ? "Separe opções por vírgula"
+                            : undefined
+                        }
+                        onChange={(event) =>
+                          setAttributes((current) => ({
+                            ...current,
+                            [definition.code]: event.target.value,
+                          }))
+                        }
+                      />
+                    )}
+                  </Field>
+                );
+              })}
+            </div>
+          )}
+        </fieldset>
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          <input
+            checked={isActive}
+            type="checkbox"
+            onChange={(event) => setIsActive(event.target.checked)}
+          />
+          Variante ativa
+        </label>
+      </div>
+    </Panel>
   );
 }
 
