@@ -27,11 +27,19 @@ import {
   variantLabel,
 } from "@/lib/catalog/identity";
 import { readCategoryAttributeOptions } from "@/lib/catalog/category-attributes";
+import {
+  canContinueProductCreation,
+  duplicateCandidateSummary,
+  readProductDuplicateCandidates,
+  type ProductDuplicateCandidate,
+  type ProductDuplicateInput,
+} from "@/lib/catalog/product-duplicates";
 import { useCatalogRefs } from "@/lib/admin/queries";
 import { CatalogReferencePicker } from "@/components/admin/CatalogReferencePicker";
 
 type Status = Database["public"]["Enums"]["catalog_status"];
 const db: any = supabase;
+type DuplicateCandidateWithPreview = ProductDuplicateCandidate & { imageUrl: string | null };
 export const Route = createFileRoute("/_authenticated/admin/produtos")({ component: Products });
 
 function Products() {
@@ -333,7 +341,12 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
     [reference, setReference] = useState(""),
     [category, setCategory] = useState(""),
     [brand, setBrand] = useState(""),
-    [matrixValues, setMatrixValues] = useState<Record<string, string[]>>({});
+    [matrixValues, setMatrixValues] = useState<Record<string, string[]>>({}),
+    [duplicateCandidates, setDuplicateCandidates] = useState<
+      DuplicateCandidateWithPreview[] | null
+    >(null),
+    [duplicateCheckError, setDuplicateCheckError] = useState<string | null>(null),
+    [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
   const finalStep = mode === "quick" ? 1 : 2;
   const matrixAttributes = useQuery({
     queryKey: ["category-variant-attributes", category],
@@ -369,6 +382,13 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
           : normalizeVariantValues([...selected, value]),
       };
     });
+  const duplicateInput = (): ProductDuplicateInput => ({
+    name,
+    brandId: brand || null,
+    reference: reference || null,
+    categoryId: category || null,
+    gtin: null,
+  });
   const save = useMutation({
     mutationFn: async () => {
       if (!name.trim()) throw new Error("Informe o nome do produto.");
@@ -396,6 +416,53 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
       onClose();
     },
   });
+  const checkPossibleDuplicates = async () => {
+    if (!name.trim()) {
+      setDuplicateCheckError("Informe o nome do produto.");
+      return;
+    }
+    if (!canPersistMatrix) {
+      setDuplicateCheckError(
+        "Selecione valores para todos os atributos de variante antes de criar o produto.",
+      );
+      return;
+    }
+
+    setDuplicateCheckError(null);
+    setIsCheckingDuplicates(true);
+    const input = duplicateInput();
+    const { data, error } = await db.rpc("admin_find_product_duplicates", {
+      _name: input.name,
+      _brand_id: input.brandId,
+      _reference: input.reference,
+      _category_id: input.categoryId,
+      _gtin: input.gtin,
+      _limit: 8,
+    });
+    setIsCheckingDuplicates(false);
+
+    if (error) {
+      setDuplicateCheckError("Não foi possível verificar possíveis duplicidades.");
+      return;
+    }
+
+    const candidates = readProductDuplicateCandidates(data);
+    if (!candidates.length) {
+      save.mutate();
+      return;
+    }
+
+    const candidatesWithPreview = await Promise.all(
+      candidates.map(async (candidate) => {
+        if (!candidate.image_path) return { ...candidate, imageUrl: null };
+        const { data: signedMedia } = await db.storage
+          .from("product-media")
+          .createSignedUrl(candidate.image_path, 60 * 10);
+        return { ...candidate, imageUrl: signedMedia?.signedUrl ?? null };
+      }),
+    );
+    setDuplicateCandidates(candidatesWithPreview);
+  };
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
       <section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl bg-surface-elevated p-6 shadow-float">
@@ -548,12 +615,94 @@ function ProductWizard({ mode, onClose }: { mode: "quick" | "full"; onClose: () 
           {step < finalStep ? (
             <Btn onClick={() => setStep(step + 1)}>Continuar</Btn>
           ) : (
-            <Btn onClick={() => save.mutate()} disabled={save.isPending || !canPersistMatrix}>
-              {save.isPending ? "Salvando…" : "Criar produto"}
+            <Btn
+              onClick={() => void checkPossibleDuplicates()}
+              disabled={save.isPending || isCheckingDuplicates || !canPersistMatrix}
+            >
+              {save.isPending
+                ? "Salvando…"
+                : isCheckingDuplicates
+                  ? "Verificando…"
+                  : "Criar produto"}
             </Btn>
           )}
         </footer>
         {save.error && <p className="mt-3 text-sm text-danger">{save.error.message}</p>}
+        {duplicateCheckError && <p className="mt-3 text-sm text-danger">{duplicateCheckError}</p>}
+        {duplicateCandidates && (
+          <section className="mt-5 rounded-xl border border-warning/30 bg-warning-soft/50 p-4">
+            <p className="text-sm font-semibold text-warning">
+              Encontramos produtos que podem representar este mesmo item.
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Revise os candidatos. A criação continua disponível quando não for a mesma identidade
+              de produto.
+            </p>
+            <div className="mt-3 grid gap-3">
+              {duplicateCandidates.map((candidate) => (
+                <article
+                  key={candidate.id}
+                  className="flex flex-wrap items-center gap-3 rounded-lg border border-border-subtle bg-surface-elevated p-3"
+                >
+                  {candidate.imageUrl ? (
+                    <img
+                      src={candidate.imageUrl}
+                      alt=""
+                      className="h-14 w-14 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-14 w-14 place-items-center rounded-lg bg-secondary text-[10px] text-muted-foreground">
+                      Sem imagem
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold">{candidate.name}</p>
+                      <Badge value={candidate.status} />
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {[candidate.brand_name, candidate.reference, candidate.category_name]
+                        .filter(Boolean)
+                        .join(" · ") || "Sem marca, referência ou categoria"}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-warning">
+                      {duplicateCandidateSummary(duplicateInput(), candidate)}
+                      {candidate.matching_gtin ? ` · GTIN/EAN ${candidate.matching_gtin}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Link to="/admin/produtos/$productId" params={{ productId: candidate.id }}>
+                      <Btn variant="outline">Abrir existente</Btn>
+                    </Link>
+                    <Link
+                      to="/admin/produtos/$productId"
+                      params={{ productId: candidate.id }}
+                      onClick={onClose}
+                    >
+                      <Btn variant="outline">Usar existente</Btn>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
+              <Btn variant="outline" onClick={() => setDuplicateCandidates(null)}>
+                Revisar dados
+              </Btn>
+              <Btn
+                onClick={() => {
+                  if (canContinueProductCreation()) {
+                    setDuplicateCandidates(null);
+                    save.mutate();
+                  }
+                }}
+                disabled={save.isPending}
+              >
+                Continuar criando
+              </Btn>
+            </div>
+          </section>
+        )}
       </section>
     </div>
   );
