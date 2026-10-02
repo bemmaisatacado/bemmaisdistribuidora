@@ -289,42 +289,50 @@ function Product360() {
       {tab === "Ofertas" ? (
         <Panel title="Ofertas de fornecedores">
           <div className="space-y-2 p-5">
-            {d.offers.map(
-              (o: {
-                id: string;
-                status: string;
-                moq: number;
-                organizations?: { name?: string } | null;
-              }) => (
-                <div key={o.id} className="flex justify-between rounded-lg border p-3">
-                  <span>
-                    {o.organizations?.name || "Fornecedor"} · MOQ {o.moq}
-                  </span>
-                  <Badge value={o.status} />
-                </div>
-              ),
-            ) || <p>Sem ofertas.</p>}
+            {d.offers.length ? (
+              d.offers.map(
+                (o: {
+                  id: string;
+                  status: string;
+                  moq: number;
+                  organizations?: { name?: string } | null;
+                }) => (
+                  <div key={o.id} className="flex justify-between rounded-lg border p-3">
+                    <span>
+                      {o.organizations?.name || "Fornecedor"} · MOQ {o.moq}
+                    </span>
+                    <Badge value={o.status} />
+                  </div>
+                ),
+              )
+            ) : (
+              <p className="text-sm text-muted-foreground">Sem ofertas.</p>
+            )}
           </div>
         </Panel>
       ) : null}
       {tab === "Lojas" ? (
         <Panel title="Lojas que usam este produto">
           <div className="space-y-2 p-5">
-            {d.listings.map(
-              (l: {
-                id: string;
-                status: string;
-                visibility: string;
-                stores?: { name?: string } | null;
-              }) => (
-                <div key={l.id} className="flex justify-between rounded-lg border p-3">
-                  <span>
-                    {l.stores?.name || "Loja"} · {l.visibility}
-                  </span>
-                  <Badge value={l.status} />
-                </div>
-              ),
-            ) || <p>Sem listings.</p>}
+            {d.listings.length ? (
+              d.listings.map(
+                (l: {
+                  id: string;
+                  status: string;
+                  visibility: string;
+                  stores?: { name?: string } | null;
+                }) => (
+                  <div key={l.id} className="flex justify-between rounded-lg border p-3">
+                    <span>
+                      {l.stores?.name || "Loja"} · {l.visibility}
+                    </span>
+                    <Badge value={l.status} />
+                  </div>
+                ),
+              )
+            ) : (
+              <p className="text-sm text-muted-foreground">Sem listings.</p>
+            )}
           </div>
         </Panel>
       ) : null}
@@ -332,30 +340,34 @@ function Product360() {
       {tab === "Atividade" ? (
         <Panel title="Atividade">
           <div className="space-y-2 p-5">
-            {d.activity.map(
-              (a: {
-                id: string;
-                action: string;
-                occurred_at: string;
-                before_data?: { status?: string } | null;
-                after_data?: { status?: string; rejection_reason?: string | null } | null;
-              }) => (
-                <div key={a.id} className="rounded-lg border p-3 text-sm">
-                  <p>
-                    {a.before_data?.status && a.after_data?.status
-                      ? `Lifecycle: ${a.before_data.status} → ${a.after_data.status}`
-                      : a.action}{" "}
-                    · {new Date(a.occurred_at).toLocaleString("pt-BR")}
-                  </p>
-                  {a.after_data?.rejection_reason &&
-                  a.before_data?.status !== a.after_data.status ? (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Motivo: {a.after_data.rejection_reason}
+            {d.activity.length ? (
+              d.activity.map(
+                (a: {
+                  id: string;
+                  action: string;
+                  occurred_at: string;
+                  before_data?: { status?: string } | null;
+                  after_data?: { status?: string; rejection_reason?: string | null } | null;
+                }) => (
+                  <div key={a.id} className="rounded-lg border p-3 text-sm">
+                    <p>
+                      {a.before_data?.status && a.after_data?.status
+                        ? `Lifecycle: ${a.before_data.status} → ${a.after_data.status}`
+                        : a.action}{" "}
+                      · {new Date(a.occurred_at).toLocaleString("pt-BR")}
                     </p>
-                  ) : null}
-                </div>
-              ),
-            ) || <p>Sem atividade.</p>}
+                    {a.after_data?.rejection_reason &&
+                    a.before_data?.status !== a.after_data.status ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Motivo: {a.after_data.rejection_reason}
+                      </p>
+                    ) : null}
+                  </div>
+                ),
+              )
+            ) : (
+              <p className="text-sm text-muted-foreground">Sem atividade.</p>
+            )}
           </div>
         </Panel>
       ) : null}
