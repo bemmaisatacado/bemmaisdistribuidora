@@ -61,6 +61,7 @@ test("status operacional e pagamento permanecem separados", () => {
         order_number: "BM-0000000001",
         status: "pending_payment",
         payment_status: "authorized",
+        fulfillment_status: "unassigned",
         currency: "BRL",
         total_amount: "59.97",
         item_count: 2,
@@ -81,6 +82,7 @@ test("status operacional e pagamento permanecem separados", () => {
         storeName: "Loja BemMais",
         buyerName: "Cliente",
         createdAt: "2026-10-02T12:00:00Z",
+        fulfillmentStatus: "unassigned",
       },
     ],
   );

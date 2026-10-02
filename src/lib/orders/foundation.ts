@@ -43,6 +43,32 @@ export type AdminOrderSummary = {
   storeName: string | null;
   buyerName: string | null;
   createdAt: string;
+  fulfillmentStatus: OrderFulfillmentStatus;
+  totalCount?: number;
+};
+
+export type OrderStatusPresentation = {
+  label: string;
+  tone: "default" | "success" | "warning" | "danger" | "info";
+};
+export const orderStatusPresentation = (
+  status: OrderStatus | OrderPaymentStatus | OrderFulfillmentStatus,
+): OrderStatusPresentation => {
+  const labels: Record<typeof status, OrderStatusPresentation> = {
+    draft: { label: "Rascunho", tone: "default" },
+    pending_payment: { label: "Aguardando pagamento", tone: "warning" },
+    paid: { label: "Pago", tone: "success" },
+    cancelled: { label: "Cancelado", tone: "danger" },
+    pending: { label: "Pendente", tone: "warning" },
+    authorized: { label: "Autorizado", tone: "info" },
+    failed: { label: "Falhou", tone: "danger" },
+    refunded: { label: "Estornado", tone: "info" },
+    partially_refunded: { label: "Estorno parcial", tone: "info" },
+    chargeback: { label: "Contestação", tone: "danger" },
+    unassigned: { label: "Não atribuído", tone: "default" },
+    fulfilled: { label: "Concluído", tone: "success" },
+  };
+  return labels[status];
 };
 
 const moneyPattern = /^\d+(?:\.\d{1,2})?$/;
@@ -97,6 +123,8 @@ const isPaymentStatus = (value: unknown): value is OrderPaymentStatus =>
   value === "partially_refunded" ||
   value === "chargeback" ||
   value === "cancelled";
+const isFulfillmentStatus = (value: unknown): value is OrderFulfillmentStatus =>
+  value === "unassigned" || value === "pending" || value === "fulfilled" || value === "cancelled";
 
 export const readAdminOrderSummaries = (value: unknown): AdminOrderSummary[] =>
   Array.isArray(value)
@@ -110,6 +138,7 @@ export const readAdminOrderSummaries = (value: unknown): AdminOrderSummary[] =>
         const totalAmount = readString(item.total_amount);
         const createdAt = readString(item.created_at);
         const itemCount = item.item_count;
+        const fulfillmentStatus = item.fulfillment_status;
         if (
           !id ||
           !orderNumber ||
@@ -118,7 +147,8 @@ export const readAdminOrderSummaries = (value: unknown): AdminOrderSummary[] =>
           !currency ||
           !totalAmount ||
           !createdAt ||
-          typeof itemCount !== "number"
+          typeof itemCount !== "number" ||
+          !isFulfillmentStatus(fulfillmentStatus)
         ) {
           return [];
         }
@@ -134,6 +164,8 @@ export const readAdminOrderSummaries = (value: unknown): AdminOrderSummary[] =>
             storeName: readString(item.store_name),
             buyerName: readString(item.buyer_name),
             createdAt,
+            fulfillmentStatus,
+            ...(typeof item.total_count === "number" ? { totalCount: item.total_count } : {}),
           },
         ];
       })
