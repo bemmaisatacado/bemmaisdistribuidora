@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Badge,
   Btn,
+  DataTable,
   EntityHeader,
   ErrorNote,
   Field,
+  MetricCard,
   Panel,
   SelectInput,
   TextInput,
@@ -57,6 +59,13 @@ import {
   type ProductLifecycleAction,
   type ProductLifecycleStatus,
 } from "@/lib/catalog/product-lifecycle";
+import {
+  contextualProductInventory,
+  productInventoryMovements,
+  type ProductInventoryBalance,
+  type ProductInventoryMovement,
+} from "@/lib/catalog/product-inventory";
+import { dateTime, num } from "@/lib/admin/format";
 
 type ContentBlockType =
   | "text"
@@ -319,13 +328,7 @@ function Product360() {
           </div>
         </Panel>
       ) : null}
-      {tab === "Estoque" ? (
-        <Panel title="Estoque">
-          <p className="p-5 text-sm text-muted-foreground">
-            O estoque permanece no módulo operacional por SKU; não há ajuste direto nesta tela.
-          </p>
-        </Panel>
-      ) : null}
+      {tab === "Estoque" ? <ProductInventory variants={d.variants as ProductVariant[]} /> : null}
       {tab === "Atividade" ? (
         <Panel title="Atividade">
           <div className="space-y-2 p-5">
@@ -357,6 +360,253 @@ function Product360() {
         </Panel>
       ) : null}
     </main>
+  );
+}
+
+type InventoryBalanceRow = {
+  organization_id: string | null;
+  variant_id: string | null;
+  on_hand: number | null;
+  reserved: number | null;
+  organizations: { name: string } | null;
+};
+type InventoryMovementRow = {
+  id: number;
+  organization_id: string;
+  variant_id: string;
+  movement_type: ProductInventoryMovement["movementType"];
+  quantity: number;
+  reason: string | null;
+  reference_type: string | null;
+  reference_id: string | null;
+  created_at: string;
+  organizations: { name: string } | null;
+};
+type InventoryTableRow = {
+  key: string;
+  sku: string;
+  attributes: Record<string, string>;
+  owner: string | null;
+  onHand: number | null;
+  reserved: number | null;
+  available: number | null;
+  noPosition: boolean;
+  isZero: boolean;
+  hasDivergence: boolean;
+};
+const INVENTORY_MOVEMENT_LABEL: Record<ProductInventoryMovement["movementType"], string> = {
+  in: "Entrada",
+  out: "Saída",
+  reserve: "Reserva",
+  release: "Liberação",
+  adjust: "Ajuste",
+  return: "Devolução",
+};
+
+function ProductInventory({ variants }: { variants: ProductVariant[] }) {
+  const variantIds = variants.map((variant) => variant.id);
+  const inventory = useQuery({
+    queryKey: ["product-360-inventory", variantIds],
+    enabled: variantIds.length > 0,
+    queryFn: async () => {
+      const [balances, movements] = await Promise.all([
+        db
+          .from("inventory_balances")
+          .select("organization_id,variant_id,on_hand,reserved,organizations(name)")
+          .in("variant_id", variantIds),
+        db
+          .from("inventory_movements")
+          .select(
+            "id,organization_id,variant_id,movement_type,quantity,reason,reference_type,reference_id,created_at,organizations(name)",
+          )
+          .in("variant_id", variantIds)
+          .order("created_at", { ascending: false })
+          .limit(50),
+      ]);
+      if (balances.error) throw balances.error;
+      if (movements.error) throw movements.error;
+      const positions: ProductInventoryBalance[] = (balances.data as InventoryBalanceRow[]).flatMap(
+        (balance) =>
+          balance.organization_id && balance.variant_id
+            ? [
+                {
+                  organizationId: balance.organization_id,
+                  organizationName: balance.organizations?.name ?? null,
+                  variantId: balance.variant_id,
+                  onHand: balance.on_hand,
+                  reserved: balance.reserved,
+                },
+              ]
+            : [],
+      );
+      const ledger: ProductInventoryMovement[] = (movements.data as InventoryMovementRow[]).map(
+        (movement) => ({
+          id: movement.id,
+          variantId: movement.variant_id,
+          organizationName: movement.organizations?.name ?? null,
+          movementType: movement.movement_type,
+          quantity: movement.quantity,
+          reason: movement.reason,
+          referenceType: movement.reference_type,
+          referenceId: movement.reference_id,
+          createdAt: movement.created_at,
+        }),
+      );
+      return {
+        stock: contextualProductInventory(variants, positions),
+        movements: productInventoryMovements(variants, ledger),
+      };
+    },
+  });
+  if (!variants.length) {
+    return (
+      <Panel title="Estoque contextual">
+        <p className="p-5 text-sm text-muted-foreground">
+          Este produto ainda não possui variantes/SKUs para consultar estoque.
+        </p>
+      </Panel>
+    );
+  }
+  if (inventory.isLoading)
+    return (
+      <Panel title="Estoque contextual">
+        <p className="p-5 text-sm">Carregando estoque…</p>
+      </Panel>
+    );
+  if (inventory.isError) {
+    return <ErrorNote>Não foi possível consultar o estoque contextual deste produto.</ErrorNote>;
+  }
+  const data = inventory.data;
+  if (!data) return null;
+  const rows: InventoryTableRow[] = data.stock.rows.flatMap((variant) =>
+    variant.positions.length
+      ? variant.positions.map((position) => ({
+          key: `${variant.id}-${position.organizationId}`,
+          sku: variant.sku,
+          attributes: variant.attributes,
+          owner: position.organizationName,
+          onHand: position.onHand,
+          reserved: position.reserved,
+          available: position.available,
+          noPosition: false,
+          isZero: position.isZero,
+          hasDivergence: position.hasDivergence,
+        }))
+      : [
+          {
+            key: `${variant.id}-empty`,
+            sku: variant.sku,
+            attributes: variant.attributes,
+            owner: null,
+            onHand: null,
+            reserved: null,
+            available: null,
+            noPosition: true,
+            isZero: false,
+            hasDivergence: false,
+          },
+        ],
+  );
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Em mãos" value={num(data.stock.summary.onHand)} />
+        <MetricCard label="Reservado" value={num(data.stock.summary.reserved)} />
+        <MetricCard label="Disponível" value={num(data.stock.summary.available)} />
+        <MetricCard
+          label="Cobertura de SKUs"
+          value={`${data.stock.summary.skusWithPosition}/${variants.length}`}
+          hint={`${data.stock.summary.skusWithoutPosition} sem posição`}
+        />
+      </div>
+      {data.stock.summary.divergences ? (
+        <ErrorNote>
+          {data.stock.summary.divergences} posição(ões) com divergência / ajuste necessário. Nenhum
+          saldo foi alterado nesta tela.
+        </ErrorNote>
+      ) : null}
+      <Panel
+        title="Posições por SKU"
+        description="Saldos vêm do ledger: disponível = em mãos − reservado. Esta tela é somente de consulta."
+      >
+        <DataTable<InventoryTableRow>
+          rowKey={(row) => row.key}
+          rows={rows}
+          empty="Nenhuma variante/SKU para consultar."
+          columns={[
+            {
+              key: "sku",
+              label: "Variante / SKU",
+              render: (row) => (
+                <div>
+                  <p className="font-semibold">{row.sku}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {Object.entries(row.attributes)
+                      .map(([name, value]) => `${name}: ${value}`)
+                      .join(" · ") || "Sem atributos de variante"}
+                  </p>
+                </div>
+              ),
+            },
+            { key: "owner", label: "Proprietário", render: (row) => row.owner ?? "—" },
+            {
+              key: "on",
+              label: "Em mãos",
+              render: (row) => (row.noPosition ? "—" : num(row.onHand)),
+            },
+            {
+              key: "res",
+              label: "Reservado",
+              render: (row) => (row.noPosition ? "—" : num(row.reserved)),
+            },
+            {
+              key: "available",
+              label: "Disponível",
+              render: (row) =>
+                row.noPosition ? (
+                  <Badge value="draft" label="Sem posição de estoque" />
+                ) : row.hasDivergence ? (
+                  <Badge value="rejected" label="Divergência / ajuste necessário" />
+                ) : row.isZero ? (
+                  <Badge value="paused" label="Posição zerada" />
+                ) : (
+                  <b>{num(row.available)}</b>
+                ),
+            },
+          ]}
+        />
+      </Panel>
+      <Panel
+        title="Movimentações recentes"
+        description="Histórico do ledger vinculado aos SKUs deste produto."
+      >
+        <DataTable<(typeof data.movements)[number]>
+          rowKey={(movement) => String(movement.id)}
+          rows={data.movements}
+          empty="Nenhuma movimentação para os SKUs deste produto."
+          columns={[
+            { key: "when", label: "Data", render: (movement) => dateTime(movement.createdAt) },
+            {
+              key: "type",
+              label: "Tipo",
+              render: (movement) => INVENTORY_MOVEMENT_LABEL[movement.movementType],
+            },
+            { key: "sku", label: "SKU", render: (movement) => movement.sku },
+            {
+              key: "owner",
+              label: "Proprietário",
+              render: (movement) => movement.organizationName ?? "—",
+            },
+            { key: "quantity", label: "Quantidade", render: (movement) => num(movement.quantity) },
+            {
+              key: "reference",
+              label: "Origem",
+              render: (movement) => movement.reason ?? movement.referenceType ?? "—",
+            },
+          ]}
+        />
+      </Panel>
+    </div>
   );
 }
 
