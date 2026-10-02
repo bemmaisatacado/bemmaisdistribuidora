@@ -34,6 +34,10 @@ import {
   type ProductDuplicateCandidate,
   type ProductDuplicateInput,
 } from "@/lib/catalog/product-duplicates";
+import {
+  isValidProductLifecycleTransition,
+  lifecycleTransitionRequest,
+} from "@/lib/catalog/product-lifecycle";
 import { useCatalogRefs } from "@/lib/admin/queries";
 import { CatalogReferencePicker } from "@/components/admin/CatalogReferencePicker";
 
@@ -103,8 +107,14 @@ function Products() {
     [globalMetrics.data, rows],
   );
   const archive = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await db.from("products").update({ status: "archived" }).eq("id", id);
+    mutationFn: async (product: { id: string; status: Status }) => {
+      if (!isValidProductLifecycleTransition(product.status, "archived")) {
+        throw new Error("Este status não permite arquivamento.");
+      }
+      const { error } = await db.rpc(
+        "transition_product_lifecycle",
+        lifecycleTransitionRequest(product.id, product.status, "archived"),
+      );
       if (error) throw error;
     },
     onSuccess: () => list.refetch(),
@@ -130,9 +140,11 @@ function Products() {
       <Btn variant="ghost" title="Duplicar" onClick={() => duplicate.mutate(r)}>
         <Copy className="h-4 w-4" />
       </Btn>
-      <Btn variant="ghost" title="Arquivar" onClick={() => archive.mutate(r.id)}>
-        <Archive className="h-4 w-4" />
-      </Btn>
+      {isValidProductLifecycleTransition(r.status, "archived") && (
+        <Btn variant="ghost" title="Arquivar" onClick={() => archive.mutate(r)}>
+          <Archive className="h-4 w-4" />
+        </Btn>
+      )}
     </div>
   );
   return (

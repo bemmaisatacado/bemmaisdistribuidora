@@ -50,6 +50,13 @@ import {
   isCategoryAttributeType,
   readCategoryAttributeOptions,
 } from "@/lib/catalog/category-attributes";
+import {
+  availableProductLifecycleActions,
+  lifecycleTransitionRequest,
+  productActivationRequirements,
+  type ProductLifecycleAction,
+  type ProductLifecycleStatus,
+} from "@/lib/catalog/product-lifecycle";
 
 type ContentBlockType =
   | "text"
@@ -107,7 +114,7 @@ type ProductMaster = {
   tags?: string[] | null;
   category_id: string | null;
   brand_id: string | null;
-  status: string;
+  status: ProductLifecycleStatus;
   updated_at: string;
 };
 type UploadItem = { id: string; file: File; status: ProductMediaUploadStatus; message?: string };
@@ -146,7 +153,7 @@ function Product360() {
           .eq("product_id", productId),
         db
           .from("audit_logs")
-          .select("id,occurred_at,action,actor_id")
+          .select("id,occurred_at,action,actor_id,before_data,after_data")
           .eq("entity_id", productId)
           .order("occurred_at", { ascending: false })
           .limit(30),
@@ -212,6 +219,11 @@ function Product360() {
       </div>
       {tab === "Resumo" ? (
         <div className="grid gap-5 lg:grid-cols-2">
+          <ProductLifecycleManager
+            product={p as ProductMaster}
+            variants={d.variants as ProductVariant[]}
+            reload={q.refetch}
+          />
           <Panel title="Informações">
             <div className="space-y-2 p-5 text-sm">
               <p>{p.short_description || p.description || "Sem descrição."}</p>
@@ -317,15 +329,158 @@ function Product360() {
       {tab === "Atividade" ? (
         <Panel title="Atividade">
           <div className="space-y-2 p-5">
-            {d.activity.map((a: { id: string; action: string; occurred_at: string }) => (
-              <p key={a.id} className="rounded-lg border p-3 text-sm">
-                {a.action} · {new Date(a.occurred_at).toLocaleString("pt-BR")}
-              </p>
-            )) || <p>Sem atividade.</p>}
+            {d.activity.map(
+              (a: {
+                id: string;
+                action: string;
+                occurred_at: string;
+                before_data?: { status?: string } | null;
+                after_data?: { status?: string; rejection_reason?: string | null } | null;
+              }) => (
+                <div key={a.id} className="rounded-lg border p-3 text-sm">
+                  <p>
+                    {a.before_data?.status && a.after_data?.status
+                      ? `Lifecycle: ${a.before_data.status} → ${a.after_data.status}`
+                      : a.action}{" "}
+                    · {new Date(a.occurred_at).toLocaleString("pt-BR")}
+                  </p>
+                  {a.after_data?.rejection_reason &&
+                  a.before_data?.status !== a.after_data.status ? (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Motivo: {a.after_data.rejection_reason}
+                    </p>
+                  ) : null}
+                </div>
+              ),
+            ) || <p>Sem atividade.</p>}
           </div>
         </Panel>
       ) : null}
     </main>
+  );
+}
+
+function ProductLifecycleManager({
+  product,
+  variants,
+  reload,
+}: {
+  product: ProductMaster;
+  variants: ProductVariant[];
+  reload: () => unknown;
+}) {
+  const actions = availableProductLifecycleActions(product.status);
+  const [selected, setSelected] = useState<ProductLifecycleAction | null>(null);
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const requirements = productActivationRequirements({
+    name: product.name,
+    categoryId: product.category_id,
+    variants: variants.map((variant) => ({
+      isActive: variant.is_active,
+      sku: variant.sku,
+      internalCode: variant.internal_code,
+    })),
+  });
+  const selectAction = (action: ProductLifecycleAction) => {
+    setError(null);
+    setSuccess(null);
+    setReason("");
+    setSelected(action);
+  };
+  const confirm = async () => {
+    if (!selected) return;
+    if (selected.requiresReason && !reason.trim()) {
+      setError("Informe o motivo da rejeição.");
+      return;
+    }
+    if (selected.target === "active" && requirements.length) {
+      setError(requirements.join(" "));
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    const { error: transitionError } = await db.rpc(
+      "transition_product_lifecycle",
+      lifecycleTransitionRequest(product.id, product.status, selected.target, reason),
+    );
+    setSaving(false);
+    if (transitionError) {
+      setError(transitionError.message);
+      return;
+    }
+    setSuccess(`Status alterado para ${selected.target}.`);
+    setSelected(null);
+    reload();
+  };
+  return (
+    <Panel
+      title="Lifecycle operacional"
+      description="As transições são validadas no banco e preservam variantes, ofertas, lojas e histórico."
+    >
+      <div className="grid gap-4 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground">STATUS ATUAL</p>
+            <div className="mt-1">
+              <Badge value={product.status} />
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {actions.map((action) => (
+              <Btn
+                key={action.target}
+                variant={action.sensitive ? "outline" : "primary"}
+                onClick={() => selectAction(action)}
+              >
+                {action.label}
+              </Btn>
+            ))}
+          </div>
+        </div>
+        {!actions.length && (
+          <p className="rounded-lg bg-secondary px-3 py-2 text-sm text-muted-foreground">
+            Este Product Master está arquivado e não possui transições operacionais disponíveis.
+          </p>
+        )}
+        {product.status === "approved" && requirements.length > 0 && (
+          <div className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
+            Para ativar: {requirements.join(" ")}
+          </div>
+        )}
+        <ErrorNote error={error} />
+        {success && (
+          <p className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success">{success}</p>
+        )}
+        {selected && (
+          <div className="grid gap-3 rounded-xl border border-border-subtle bg-secondary/40 p-4">
+            <p className="text-sm font-semibold">Confirmar: {selected.label}</p>
+            {selected.requiresReason && (
+              <Field label="Motivo da rejeição">
+                <textarea
+                  className="min-h-20 w-full rounded-lg border border-border bg-surface-elevated px-3 py-2 text-sm"
+                  value={reason}
+                  onChange={(event) => setReason(event.target.value)}
+                />
+              </Field>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Esta ação não exclui variantes, mídias, ofertas, listings, estoque ou histórico.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Btn variant="outline" disabled={saving} onClick={() => setSelected(null)}>
+                Cancelar
+              </Btn>
+              <Btn disabled={saving} onClick={() => void confirm()}>
+                {saving ? "Atualizando…" : "Confirmar"}
+              </Btn>
+            </div>
+          </div>
+        )}
+      </div>
+    </Panel>
   );
 }
 
