@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminMarcasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminModalidadesRouteImport } from './routes/_authenticated/admin/modalidades'
 import { Route as AuthenticatedAdminOfertasRouteImport } from './routes/_authenticated/admin/ofertas'
 import { Route as AuthenticatedAdminOperacionalRouteImport } from './routes/_authenticated/admin/operacional'
+import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin/pedidos'
 import { Route as AuthenticatedAdminPermissoesRouteImport } from './routes/_authenticated/admin/permissoes'
 import { Route as AuthenticatedAdminPrecosRouteImport } from './routes/_authenticated/admin/precos'
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin/produtos'
@@ -152,6 +153,12 @@ const AuthenticatedAdminOperacionalRoute =
   AuthenticatedAdminOperacionalRouteImport.update({
     id: '/operacional',
     path: '/operacional',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPedidosRoute =
+  AuthenticatedAdminPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminPermissoesRoute =
@@ -342,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
   '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
@@ -389,6 +397,7 @@ export interface FileRoutesByTo {
   '/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
   '/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
   '/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
@@ -439,6 +448,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/modalidades': typeof AuthenticatedAdminModalidadesRoute
   '/_authenticated/admin/ofertas': typeof AuthenticatedAdminOfertasRoute
   '/_authenticated/admin/operacional': typeof AuthenticatedAdminOperacionalRoute
+  '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/permissoes': typeof AuthenticatedAdminPermissoesRoute
   '/_authenticated/admin/precos': typeof AuthenticatedAdminPrecosRoute
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/admin/modalidades'
     | '/admin/ofertas'
     | '/admin/operacional'
+    | '/admin/pedidos'
     | '/admin/permissoes'
     | '/admin/precos'
     | '/admin/produtos'
@@ -536,6 +547,7 @@ export interface FileRouteTypes {
     | '/admin/modalidades'
     | '/admin/ofertas'
     | '/admin/operacional'
+    | '/admin/pedidos'
     | '/admin/permissoes'
     | '/admin/precos'
     | '/admin/produtos'
@@ -585,6 +597,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/modalidades'
     | '/_authenticated/admin/ofertas'
     | '/_authenticated/admin/operacional'
+    | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/permissoes'
     | '/_authenticated/admin/precos'
     | '/_authenticated/admin/produtos'
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       path: '/operacional'
       fullPath: '/admin/operacional'
       preLoaderRoute: typeof AuthenticatedAdminOperacionalRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/pedidos': {
+      id: '/_authenticated/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/permissoes': {
@@ -1001,6 +1021,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminModalidadesRoute: typeof AuthenticatedAdminModalidadesRoute
   AuthenticatedAdminOfertasRoute: typeof AuthenticatedAdminOfertasRoute
   AuthenticatedAdminOperacionalRoute: typeof AuthenticatedAdminOperacionalRoute
+  AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminPermissoesRoute: typeof AuthenticatedAdminPermissoesRoute
   AuthenticatedAdminPrecosRoute: typeof AuthenticatedAdminPrecosRoute
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRouteWithChildren
@@ -1037,6 +1058,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminModalidadesRoute: AuthenticatedAdminModalidadesRoute,
     AuthenticatedAdminOfertasRoute: AuthenticatedAdminOfertasRoute,
     AuthenticatedAdminOperacionalRoute: AuthenticatedAdminOperacionalRoute,
+    AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
     AuthenticatedAdminPermissoesRoute: AuthenticatedAdminPermissoesRoute,
     AuthenticatedAdminPrecosRoute: AuthenticatedAdminPrecosRoute,
     AuthenticatedAdminProdutosRoute:
