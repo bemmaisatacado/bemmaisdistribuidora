@@ -47,12 +47,13 @@ function Orders() {
   const [orderStatus, setOrderStatus] = useState<"" | OrderStatus>("");
   const [paymentStatus, setPaymentStatus] = useState<"" | OrderPaymentStatus>("");
   const [period, setPeriod] = useState("");
+  const [storeId, setStoreId] = useState("");
   const [page, setPage] = useState(0);
   const filters = {
     _query: query || null,
     _order_status: orderStatus || null,
     _payment_status: paymentStatus || null,
-    _store_id: null,
+    _store_id: storeId || null,
     _from: period ? `${period}T00:00:00.000Z` : null,
     _to: null,
   };
@@ -76,16 +77,26 @@ function Orders() {
       return readStats(data);
     },
   });
+  const stores = useQuery({
+    queryKey: ["admin-order-stores"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("stores").select("id,name").order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const active =
     Number(Boolean(query)) +
     Number(Boolean(orderStatus)) +
     Number(Boolean(paymentStatus)) +
-    Number(Boolean(period));
+    Number(Boolean(period)) +
+    Number(Boolean(storeId));
   const reset = () => {
     setQuery("");
     setOrderStatus("");
     setPaymentStatus("");
     setPeriod("");
+    setStoreId("");
     setPage(0);
   };
   return (
@@ -161,6 +172,22 @@ function Orders() {
                 setPage(0);
               }}
             />
+          </Field>
+          <Field label="Loja">
+            <SelectInput
+              value={storeId}
+              onChange={(event) => {
+                setStoreId(event.target.value);
+                setPage(0);
+              }}
+            >
+              <option value="">Todas</option>
+              {stores.data?.map((store) => (
+                <option key={store.id} value={store.id}>
+                  {store.name}
+                </option>
+              ))}
+            </SelectInput>
           </Field>
         </FilterBar>
         {list.isError ? (
