@@ -9,11 +9,11 @@ import {
   Sparkles,
   UsersRound,
 } from "lucide-react";
-import { Logo } from "@/components/landing/primitives";
 import {
   OPPORTUNITY_ATTRIBUTION_STORAGE_KEY,
   OPPORTUNITY_CTA_REVEAL_AFTER_SECONDS,
   OPPORTUNITY_LINKS,
+  OPPORTUNITY_VIDEO_SOURCE,
   isOpportunityVideoConfigured,
   mergeOpportunityAttribution,
   readOpportunityAttribution,
@@ -23,7 +23,8 @@ import {
 } from "@/lib/opportunity/landing";
 import { trackOpportunityEvent } from "@/lib/opportunity/events";
 
-const configuredVideoSource = import.meta.env.VITE_OPPORTUNITY_VIDEO_URL;
+const configuredVideoSource =
+  import.meta.env.VITE_OPPORTUNITY_VIDEO_URL || OPPORTUNITY_VIDEO_SOURCE;
 const configuredVideoPoster = import.meta.env.VITE_OPPORTUNITY_VIDEO_POSTER_URL;
 
 const benefits = [
@@ -113,8 +114,8 @@ export function OpportunityLanding() {
 
   const ctaLinks = useMemo(
     () => ({
-      atacado: withOpportunityAttribution(OPPORTUNITY_LINKS.atacado, attribution),
-      drop: withOpportunityAttribution(OPPORTUNITY_LINKS.drop, attribution),
+      dropVariado: withOpportunityAttribution(OPPORTUNITY_LINKS.dropVariado, attribution),
+      gradeFechada: withOpportunityAttribution(OPPORTUNITY_LINKS.gradeFechada, attribution),
       support: withOpportunityAttribution(OPPORTUNITY_LINKS.support, attribution),
     }),
     [attribution],
@@ -168,7 +169,13 @@ export function OpportunityLanding() {
             aria-label="BemMais Distribuidora, página inicial"
             className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <Logo className="h-9 sm:h-11" />
+            <img
+              src="/campaign/bemmais-logo.png"
+              alt="BemMais Distribuidora"
+              width={2172}
+              height={724}
+              className="h-9 w-auto object-contain sm:h-11"
+            />
           </a>
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 sm:text-xs">
             Comunidade BemMais
@@ -214,10 +221,10 @@ export function OpportunityLanding() {
                 aria-hidden
               />
               <div className="overflow-hidden rounded-[1.6rem] border border-white/15 bg-[#1b1917] shadow-2xl">
-                <div className="aspect-video w-full">
+                <div className="mx-auto w-full max-w-[25rem] bg-black lg:max-w-[24rem]">
                   {hasVideo ? (
                     <video
-                      className="h-full w-full object-cover"
+                      className="block max-h-[72svh] w-full object-contain"
                       controls
                       playsInline
                       preload="metadata"
@@ -233,7 +240,7 @@ export function OpportunityLanding() {
                       Seu navegador não suporta a reprodução de vídeo.
                     </video>
                   ) : (
-                    <div className="relative flex h-full min-h-64 flex-col justify-end overflow-hidden bg-[linear-gradient(125deg,#26211d_0%,#151412_48%,#bc5715_180%)] p-6 sm:p-9">
+                    <div className="relative flex min-h-96 flex-col justify-end overflow-hidden bg-[linear-gradient(125deg,#26211d_0%,#151412_48%,#bc5715_180%)] p-6 sm:p-9">
                       <div
                         className="absolute right-[-2rem] top-[-3rem] size-48 rounded-full border-[18px] border-primary/35"
                         aria-hidden
@@ -276,16 +283,16 @@ export function OpportunityLanding() {
                 </p>
                 <div className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-2">
                   <OpportunityCta
-                    href={ctaLinks.atacado}
-                    title="🔥 QUERO COMPRAR NO ATACADO"
-                    description="Para lojistas e revendedores que querem comprar no atacado, incluindo oportunidades de variado e grade conforme disponibilidade."
-                    event="click_atacado"
+                    href={ctaLinks.dropVariado}
+                    title="🔥 QUERO DROP + ATACADO VARIADO"
+                    description="Para quem quer começar com menos estoque ou aproveitar oportunidades de Drop e Atacado Variado."
+                    event="click_drop"
                   />
                   <OpportunityCta
-                    href={ctaLinks.drop}
-                    title="🚀 QUERO COMEÇAR NO DROP"
-                    description="Para quem quer começar com menos estoque ou aproveitar oportunidades de Drop e Variado."
-                    event="click_drop"
+                    href={ctaLinks.gradeFechada}
+                    title="🚀 QUERO COMPRAR EM GRADE FECHADA"
+                    description="Para lojistas e revendedores que buscam oportunidades de Grade Fechada."
+                    event="click_atacado"
                     accent="dark"
                   />
                 </div>
@@ -363,16 +370,16 @@ export function OpportunityLanding() {
             {ctasRevealed && (
               <div className="mt-8 grid gap-3 text-left sm:grid-cols-2">
                 <OpportunityCta
-                  href={ctaLinks.atacado}
-                  title="QUERO COMPRAR NO ATACADO"
-                  description="Oportunidades para lojistas e revendedores."
-                  event="click_atacado"
+                  href={ctaLinks.dropVariado}
+                  title="QUERO DROP + ATACADO VARIADO"
+                  description="Oportunidades para começar com mais flexibilidade."
+                  event="click_drop"
                 />
                 <OpportunityCta
-                  href={ctaLinks.drop}
-                  title="QUERO COMEÇAR NO DROP"
-                  description="Drop e Variado para começar com mais flexibilidade."
-                  event="click_drop"
+                  href={ctaLinks.gradeFechada}
+                  title="QUERO COMPRAR EM GRADE FECHADA"
+                  description="Oportunidades para lojistas e revendedores."
+                  event="click_atacado"
                   accent="dark"
                 />
               </div>

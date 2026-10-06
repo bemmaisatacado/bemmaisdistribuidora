@@ -4,6 +4,7 @@ import {
   OPPORTUNITY_CTA_REVEAL_AFTER_SECONDS,
   OPPORTUNITY_LINKS,
   OPPORTUNITY_ROUTE,
+  OPPORTUNITY_VIDEO_SOURCE,
   isOpportunityVideoConfigured,
   mergeOpportunityAttribution,
   readOpportunityAttribution,
@@ -17,6 +18,7 @@ test("a rota comercial pública é memorável e não depende de autenticação",
 });
 
 test("o vídeo tem fallback seguro até o asset oficial ser configurado", () => {
+  assert.equal(OPPORTUNITY_VIDEO_SOURCE, "/campaign/bemmais-video-legendado.mp4");
   assert.equal(isOpportunityVideoConfigured(undefined), false);
   assert.equal(isOpportunityVideoConfigured("   "), false);
   assert.equal(isOpportunityVideoConfigured("/campanha.mp4"), true);
@@ -40,9 +42,9 @@ test("os CTAs ficam ocultos antes de dez segundos e são revelados pelo tempo ou
   );
 });
 
-test("os CTAs usam os grupos oficiais de atacado, drop e suporte", () => {
-  assert.equal(OPPORTUNITY_LINKS.atacado, "https://chat.whatsapp.com/CJ69jmgBIPILSJ3oTEmnuN");
-  assert.equal(OPPORTUNITY_LINKS.drop, "https://chat.whatsapp.com/CwkFawv7e4h1pOYsh2QFJA");
+test("os CTAs usam os grupos oficiais de Drop + Variado, Grade Fechada e suporte", () => {
+  assert.equal(OPPORTUNITY_LINKS.dropVariado, "https://chat.whatsapp.com/CUwFawv7e4h1pOYsh2QFJA");
+  assert.equal(OPPORTUNITY_LINKS.gradeFechada, "https://chat.whatsapp.com/CJ69jmgBrPlLSJ3oTEmnuN");
   assert.equal(OPPORTUNITY_LINKS.support, "https://wa.me/553897233065");
 });
 
@@ -54,7 +56,7 @@ test("UTMs são lidas, preservadas na sessão e enviadas aos links sem dados pes
     new URLSearchParams("utm_medium=paid_social&fbclid=abc123&email=nao-usar"),
   );
   const merged = mergeOpportunityAttribution(saved, current);
-  const destination = new URL(withOpportunityAttribution(OPPORTUNITY_LINKS.atacado, merged));
+  const destination = new URL(withOpportunityAttribution(OPPORTUNITY_LINKS.dropVariado, merged));
 
   assert.equal(destination.searchParams.get("utm_source"), "instagram");
   assert.equal(destination.searchParams.get("utm_medium"), "paid_social");

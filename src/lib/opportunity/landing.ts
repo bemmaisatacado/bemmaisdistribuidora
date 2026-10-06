@@ -1,10 +1,12 @@
 export const OPPORTUNITY_ROUTE = "/oportunidade";
 
 export const OPPORTUNITY_LINKS = {
-  atacado: "https://chat.whatsapp.com/CJ69jmgBIPILSJ3oTEmnuN",
-  drop: "https://chat.whatsapp.com/CwkFawv7e4h1pOYsh2QFJA",
+  dropVariado: "https://chat.whatsapp.com/CUwFawv7e4h1pOYsh2QFJA",
+  gradeFechada: "https://chat.whatsapp.com/CJ69jmgBrPlLSJ3oTEmnuN",
   support: "https://wa.me/553897233065",
 } as const;
+
+export const OPPORTUNITY_VIDEO_SOURCE = "/campaign/bemmais-video-legendado.mp4";
 
 export const OPPORTUNITY_ATTRIBUTION_KEYS = [
   "utm_source",
