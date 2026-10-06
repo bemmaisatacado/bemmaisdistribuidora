@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Produtos", href: "#produtos" },
+  { label: "Comunidade", href: "/oportunidade" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Sua Loja", href: "#sua-loja" },
   { label: "Recursos", href: "#recursos" },
@@ -43,7 +44,10 @@ export function Header() {
           <ul className="flex items-center gap-8">
             {NAV.map((n) => (
               <li key={n.href}>
-                <a href={n.href} className="text-sm font-semibold text-foreground/75 transition-colors hover:text-foreground">
+                <a
+                  href={n.href}
+                  className="text-sm font-semibold text-foreground/75 transition-colors hover:text-foreground"
+                >
                   {n.label}
                 </a>
               </li>
@@ -52,7 +56,9 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" to="/entrar">Entrar</Button>
+          <Button variant="ghost" to="/entrar">
+            Entrar
+          </Button>
           <Button to="/criar-conta">Criar minha conta</Button>
         </div>
 
@@ -84,8 +90,12 @@ export function Header() {
               ))}
             </ul>
             <div className="mt-8 flex flex-col gap-3">
-              <Button to="/criar-conta" size="lg">Criar minha conta</Button>
-              <Button to="/entrar" variant="outline" size="lg">Entrar</Button>
+              <Button to="/criar-conta" size="lg">
+                Criar minha conta
+              </Button>
+              <Button to="/entrar" variant="outline" size="lg">
+                Entrar
+              </Button>
             </div>
           </Container>
         </div>
