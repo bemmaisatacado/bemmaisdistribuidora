@@ -44,8 +44,8 @@ function Storefront() {
     queryKey: ["public-store", slug, preview],
     queryFn: async () => {
       const { data, error } = preview
-        ? await supabase.rpc("preview_storefront", { _store_id: preview })
-        : await supabase.rpc("public_storefront", { _slug: slug });
+        ? await (supabase as any).rpc("preview_storefront", { _store_id: preview })
+        : await (supabase as any).rpc("public_storefront", { _slug: slug });
       if (error) throw error;
       return data as unknown as StorefrontData | null;
     },

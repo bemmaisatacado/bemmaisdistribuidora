@@ -60,7 +60,7 @@ function Orders() {
   const list = useQuery({
     queryKey: ["admin-orders", filters, page],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_order_list", {
+      const { data, error } = await (supabase as any).rpc("admin_order_list", {
         ...filters,
         _offset: page * PAGE_SIZE,
         _limit: PAGE_SIZE,
@@ -72,7 +72,7 @@ function Orders() {
   const stats = useQuery({
     queryKey: ["admin-order-stats", filters],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_order_stats", filters);
+      const { data, error } = await (supabase as any).rpc("admin_order_stats", filters);
       if (error) throw error;
       return readStats(data);
     },
@@ -80,7 +80,7 @@ function Orders() {
   const stores = useQuery({
     queryKey: ["admin-order-stores"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("stores").select("id,name").order("name");
+      const { data, error } = await (supabase as any).from("stores").select("id,name").order("name");
       if (error) throw error;
       return data ?? [];
     },

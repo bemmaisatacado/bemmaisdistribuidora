@@ -9,7 +9,7 @@ function Category() {
   const q = useQuery({
     queryKey: ["store-category", slug, categorySlug],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_storefront_catalog", {
+      const { data, error } = await (supabase as any).rpc("public_storefront_catalog", {
         _slug: slug,
         _category_slug: categorySlug,
       });

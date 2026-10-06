@@ -10,7 +10,7 @@ function Catalog() {
   const q = useQuery({
     queryKey: ["store-catalog", slug],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_storefront_catalog", { _slug: slug });
+      const { data, error } = await (supabase as any).rpc("public_storefront_catalog", { _slug: slug });
       if (error) throw error;
       return data as unknown as CatalogData | null;
     },

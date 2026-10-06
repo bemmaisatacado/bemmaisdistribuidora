@@ -11,7 +11,7 @@ function Collection() {
   const q = useQuery({
     queryKey: ["store-collection", slug, collectionSlug],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_storefront_collection", {
+      const { data, error } = await (supabase as any).rpc("public_storefront_collection", {
         _slug: slug,
         _collection_slug: collectionSlug,
       });

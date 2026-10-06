@@ -138,7 +138,7 @@ export function CategoryAttributesPanel({ category }: { category: { id: string; 
           .eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("category_attributes").insert({
+        const { error } = await (supabase as any).from("category_attributes").insert({
           category_id: category.id,
           name: value.name,
           code: value.code,
@@ -159,7 +159,7 @@ export function CategoryAttributesPanel({ category }: { category: { id: string; 
   const remove = useMutation({
     mutationFn: async (attribute: CategoryAttribute) => {
       await blockDestructiveChange(attribute);
-      const { error } = await supabase.from("category_attributes").delete().eq("id", attribute.id);
+      const { error } = await (supabase as any).from("category_attributes").delete().eq("id", attribute.id);
       if (error) throw error;
     },
     onSuccess: () =>

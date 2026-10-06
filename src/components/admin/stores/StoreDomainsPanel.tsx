@@ -49,7 +49,7 @@ export function StoreDomainsPanel({
     mutationFn: async () => {
       const value = normalizeHostname(hostname);
       if (!value) throw new Error("Informe um hostname válido, sem caminho ou protocolo.");
-      const { error } = await supabase.from("store_domains").insert({
+      const { error } = await (supabase as any).from("store_domains").insert({
         store_id: storeId,
         organization_id: organizationId,
         hostname: value,

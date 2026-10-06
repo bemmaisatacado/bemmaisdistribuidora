@@ -31,7 +31,7 @@ function Builder() {
   const publish = useMutation({
     mutationFn: async () => {
       setPublishError(null);
-      const { error } = await supabase.rpc("publish_store", { _store_id: storeId });
+      const { error } = await (supabase as any).rpc("publish_store", { _store_id: storeId });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["store-builder", storeId] }),
