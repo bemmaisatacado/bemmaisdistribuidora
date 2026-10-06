@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as OportunidadeRouteImport } from './routes/oportunidade'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -76,6 +77,11 @@ const CriarContaRoute = CriarContaRouteImport.update({
 const EntrarRoute = EntrarRouteImport.update({
   id: '/entrar',
   path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OportunidadeRoute = OportunidadeRouteImport.update({
+  id: '/oportunidade',
+  path: '/oportunidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -343,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/oportunidade': typeof OportunidadeRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/s/$slug': typeof SSlugRouteWithChildren
   '/admin/$': typeof AuthenticatedAdminSplatRoute
@@ -393,6 +400,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/oportunidade': typeof OportunidadeRoute
   '/s/$slug': typeof SSlugRouteWithChildren
   '/admin/$': typeof AuthenticatedAdminSplatRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
@@ -444,6 +452,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/oportunidade': typeof OportunidadeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/s/$slug': typeof SSlugRouteWithChildren
   '/_authenticated/admin/$': typeof AuthenticatedAdminSplatRoute
@@ -496,6 +505,7 @@ export interface FileRouteTypes {
     | '/'
     | '/criar-conta'
     | '/entrar'
+    | '/oportunidade'
     | '/admin'
     | '/s/$slug'
     | '/admin/$'
@@ -546,6 +556,7 @@ export interface FileRouteTypes {
     | '/'
     | '/criar-conta'
     | '/entrar'
+    | '/oportunidade'
     | '/s/$slug'
     | '/admin/$'
     | '/admin/auditoria'
@@ -596,6 +607,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/criar-conta'
     | '/entrar'
+    | '/oportunidade'
     | '/_authenticated/admin'
     | '/s/$slug'
     | '/_authenticated/admin/$'
@@ -648,6 +660,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CriarContaRoute: typeof CriarContaRoute
   EntrarRoute: typeof EntrarRoute
+  OportunidadeRoute: typeof OportunidadeRoute
   SSlugRoute: typeof SSlugRouteWithChildren
 }
 
@@ -679,6 +692,13 @@ declare module '@tanstack/react-router' {
       path: '/entrar'
       fullPath: '/entrar'
       preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oportunidade': {
+      id: '/oportunidade'
+      path: '/oportunidade'
+      fullPath: '/oportunidade'
+      preLoaderRoute: typeof OportunidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -1171,6 +1191,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CriarContaRoute: CriarContaRoute,
   EntrarRoute: EntrarRoute,
+  OportunidadeRoute: OportunidadeRoute,
   SSlugRoute: SSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
