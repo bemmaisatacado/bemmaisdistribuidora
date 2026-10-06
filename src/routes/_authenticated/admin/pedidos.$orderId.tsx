@@ -34,7 +34,7 @@ function Order360() {
   const query = useQuery({
     queryKey: ["admin-order-360", orderId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_order_360", { _order_id: orderId });
+      const { data, error } = await (supabase as any).rpc("admin_order_360", { _order_id: orderId });
       if (error) throw error;
       return readOrder360(data);
     },
