@@ -220,11 +220,11 @@ export function OpportunityLanding() {
                 className="absolute -inset-3 -z-10 rounded-[2rem] bg-primary/20 blur-2xl"
                 aria-hidden
               />
-              <div className="overflow-hidden rounded-[1.6rem] border border-white/15 bg-[#1b1917] shadow-2xl">
-                <div className="mx-auto w-full max-w-[25rem] bg-black lg:max-w-[24rem]">
+              <div className="mx-auto w-full max-w-[25rem] overflow-hidden rounded-[1.6rem] border border-white/15 bg-[#1b1917] shadow-2xl lg:max-w-[24rem]">
+                <div className="aspect-[9/16] w-full bg-black">
                   {hasVideo ? (
                     <video
-                      className="block max-h-[72svh] w-full object-contain"
+                      className="block size-full object-cover"
                       controls
                       playsInline
                       preload="metadata"
