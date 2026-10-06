@@ -9,6 +9,7 @@ import {
   type PersistedCart,
 } from "@/lib/store-cart";
 import { formatStorePrice } from "@/lib/storefront";
+import { checkoutErrorMessage } from "@/lib/orders/checkout";
 export const Route = createFileRoute("/s/$slug/carrinho")({ component: Cart });
 type Validation = {
   items: {
@@ -24,6 +25,10 @@ function Cart() {
   const [cart, setCart] = useState<PersistedCart>({ storeSlug: slug, items: [] });
   const [checking, setChecking] = useState(false);
   const [notice, setNotice] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [city, setCity] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [checkoutKey] = useState(() => crypto.randomUUID());
   const update = (c: PersistedCart) => {
     setCart(c);
     writeCart(c);
@@ -80,6 +85,44 @@ function Cart() {
     setCart(initial);
     void validate(initial);
   }, [slug, validate]);
+  const checkout = async () => {
+    if (!cart.items.length) return;
+    setSubmitting(true);
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) {
+      setNotice(checkoutErrorMessage("CHECKOUT_AUTH_REQUIRED"));
+      setSubmitting(false);
+      return;
+    }
+    const { data, error } = await supabase.rpc("create_storefront_order", {
+      _store_slug: slug,
+      _items: cart.items.map((item) => ({
+        listingId: item.listingId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+      })),
+      _shipping_address: { recipient, city },
+      _idempotency_key: checkoutKey,
+    });
+    setSubmitting(false);
+    if (error) {
+      setNotice(checkoutErrorMessage(error.message));
+      return;
+    }
+    const orderId =
+      typeof data === "object" &&
+      data !== null &&
+      "order_id" in data &&
+      typeof data.order_id === "string"
+        ? data.order_id
+        : null;
+    if (!orderId) {
+      setNotice(checkoutErrorMessage("IDEMPOTENCY_CONFLICT"));
+      return;
+    }
+    update({ storeSlug: slug, items: [] });
+    setNotice(`Pedido criado com sucesso: ${orderId}. O pagamento ainda não foi registrado.`);
+  };
   return (
     <main className="mx-auto min-h-screen max-w-3xl bg-white px-5 py-10">
       <Link to="/s/$slug/catalogo" params={{ slug }} className="text-sm text-slate-500">
@@ -156,6 +199,28 @@ function Cart() {
           >
             Atualizar carrinho
           </button>
+          <div className="mt-5 grid gap-3 rounded-lg border p-4">
+            <b>Endereço de entrega</b>
+            <input
+              value={recipient}
+              onChange={(event) => setRecipient(event.target.value)}
+              placeholder="Destinatário"
+              className="rounded border px-3 py-2"
+            />
+            <input
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              placeholder="Cidade"
+              className="rounded border px-3 py-2"
+            />
+            <button
+              onClick={() => void checkout()}
+              disabled={submitting}
+              className="rounded-lg bg-black px-5 py-3 font-semibold text-white disabled:opacity-50"
+            >
+              {submitting ? "Criando pedido…" : "Criar pedido"}
+            </button>
+          </div>
           <p className="mt-3 text-sm text-slate-500">
             O pagamento será disponibilizado em etapa posterior.
           </p>
