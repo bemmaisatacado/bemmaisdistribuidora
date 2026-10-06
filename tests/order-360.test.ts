@@ -40,6 +40,7 @@ const rawOrder = {
       shipping_amount: "0.00",
       total_amount: "50.00",
       fulfillment_status: "fulfilled",
+      stock_reservation_status: "reserved",
       supplier_name: "Fornecedor A",
     },
     {
@@ -54,6 +55,7 @@ const rawOrder = {
       shipping_amount: "5.00",
       total_amount: "45.00",
       fulfillment_status: "pending",
+      stock_reservation_status: "released",
       stock_owner_name: "BemMais",
     },
   ],
@@ -67,6 +69,8 @@ test("Order 360 preserva valores, snapshots e endereço histórico", () => {
   assert.equal(order.items[0]?.unitPrice, "50.00");
   assert.equal(order.address?.city, "São Paulo");
   assert.equal(order.total, "95.00");
+  assert.equal(order.items[0]?.stockReservationStatus, "reserved");
+  assert.equal(order.items[1]?.stockReservationStatus, "released");
 });
 test("fulfillment resume um pedido multi-item sem ocultar pendências", () => {
   const order = readOrder360(rawOrder);

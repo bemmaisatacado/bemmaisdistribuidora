@@ -6,6 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { orderStatusPresentation } from "@/lib/orders/foundation";
 import { fulfillmentSummary, orderParticipants, readOrder360 } from "@/lib/orders/order-360";
 
+const reservationLabel = {
+  reserved: "Reservado",
+  released: "Liberado",
+  not_controlled: "Não controlado",
+} as const;
+
 export const Route = createFileRoute("/_authenticated/admin/pedidos/$orderId")({
   component: Order360,
 });
@@ -147,6 +153,11 @@ function Order360() {
               label: "Modalidade",
               render: (item) =>
                 item.modality ? (MODALITY_LABEL[item.modality] ?? item.modality) : "—",
+            },
+            {
+              key: "stock",
+              label: "Estoque",
+              render: (item) => reservationLabel[item.stockReservationStatus],
             },
             {
               key: "fulfillment",

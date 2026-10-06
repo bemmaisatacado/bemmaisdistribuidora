@@ -12,6 +12,10 @@ export const CHECKOUT_ERROR_CODES = [
   "PRICE_UNAVAILABLE",
   "INCOMPATIBLE_ITEM",
   "INVENTORY_UNAVAILABLE",
+  "INSUFFICIENT_STOCK",
+  "STOCK_POSITION_INVALID",
+  "STOCK_RESERVATION_CONFLICT",
+  "RESERVATION_ALREADY_RELEASED",
   "IDEMPOTENCY_CONFLICT",
   "ADDRESS_INCOMPLETE",
 ] as const;
@@ -66,6 +70,10 @@ export const checkoutErrorMessage = (code: string) =>
       PRICE_UNAVAILABLE: "Não foi possível resolver o preço atual.",
       INCOMPATIBLE_ITEM: "Um item não corresponde à loja ou à oferta.",
       INVENTORY_UNAVAILABLE: "A disponibilidade atual não atende a quantidade solicitada.",
+      INSUFFICIENT_STOCK: "A disponibilidade atual não atende a quantidade solicitada.",
+      STOCK_POSITION_INVALID: "A posição de estoque deste item não está disponível.",
+      STOCK_RESERVATION_CONFLICT: "Não foi possível reservar o estoque deste item.",
+      RESERVATION_ALREADY_RELEASED: "A reserva deste item já foi liberada.",
       IDEMPOTENCY_CONFLICT: "Não foi possível confirmar esta tentativa de checkout.",
       ADDRESS_INCOMPLETE: "Informe ao menos destinatário e cidade para a entrega.",
     }) as Record<string, string>

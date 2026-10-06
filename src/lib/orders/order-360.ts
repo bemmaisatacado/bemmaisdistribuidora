@@ -1,4 +1,5 @@
 import type { OrderFulfillmentStatus, OrderPaymentStatus, OrderStatus } from "./foundation";
+import type { ReservationStatus } from "./stock-reservation";
 
 export type Order360Item = {
   id: string;
@@ -20,6 +21,7 @@ export type Order360Item = {
   fulfillmentOwnerName: string | null;
   productId: string | null;
   variantId: string | null;
+  stockReservationStatus: ReservationStatus;
 };
 export type Order360Payment = {
   id: string;
@@ -122,6 +124,11 @@ const readItems = (value: unknown): Order360Item[] =>
             fulfillmentOwnerName: string(raw.fulfillment_owner_name),
             productId: string(raw.product_id),
             variantId: string(raw.variant_id),
+            stockReservationStatus:
+              raw.stock_reservation_status === "reserved" ||
+              raw.stock_reservation_status === "released"
+                ? raw.stock_reservation_status
+                : "not_controlled",
           },
         ];
       })
