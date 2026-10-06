@@ -1,9 +1,11 @@
 export type OrderStatus = "draft" | "pending_payment" | "paid" | "cancelled";
 export type OrderPaymentStatus =
   | "pending"
+  | "processing"
   | "authorized"
   | "paid"
   | "failed"
+  | "expired"
   | "refunded"
   | "partially_refunded"
   | "chargeback"
@@ -60,8 +62,10 @@ export const orderStatusPresentation = (
     paid: { label: "Pago", tone: "success" },
     cancelled: { label: "Cancelado", tone: "danger" },
     pending: { label: "Pendente", tone: "warning" },
+    processing: { label: "Em processamento", tone: "info" },
     authorized: { label: "Autorizado", tone: "info" },
     failed: { label: "Falhou", tone: "danger" },
+    expired: { label: "Expirado", tone: "danger" },
     refunded: { label: "Estornado", tone: "info" },
     partially_refunded: { label: "Estorno parcial", tone: "info" },
     chargeback: { label: "Contestação", tone: "danger" },

@@ -32,6 +32,9 @@ export type Order360Payment = {
   externalId: string | null;
   paidAt: string | null;
   createdAt: string;
+  updatedAt: string;
+  failureCode: string | null;
+  failureMessage: string | null;
 };
 export type Order360Activity = {
   id: string;
@@ -72,9 +75,11 @@ const orderStatus = (value: unknown): value is OrderStatus =>
 const paymentStatus = (value: unknown): value is OrderPaymentStatus =>
   [
     "pending",
+    "processing",
     "authorized",
     "paid",
     "failed",
+    "expired",
     "refunded",
     "partially_refunded",
     "chargeback",
@@ -150,7 +155,11 @@ export const readOrder360 = (value: unknown): Order360 | null => {
     return null;
   const payments: Order360Payment[] = Array.isArray(value.payments)
     ? value.payments.flatMap((raw) =>
-        record(raw) && string(raw.id) && paymentStatus(raw.status) && string(raw.created_at)
+        record(raw) &&
+        string(raw.id) &&
+        paymentStatus(raw.status) &&
+        string(raw.created_at) &&
+        string(raw.updated_at)
           ? [
               {
                 id: raw.id,
@@ -161,6 +170,9 @@ export const readOrder360 = (value: unknown): Order360 | null => {
                 externalId: string(raw.provider_payment_id),
                 paidAt: string(raw.paid_at),
                 createdAt: raw.created_at,
+                updatedAt: raw.updated_at,
+                failureCode: string(raw.failure_code),
+                failureMessage: string(raw.failure_message),
               },
             ]
           : [],

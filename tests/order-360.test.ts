@@ -59,7 +59,17 @@ const rawOrder = {
       stock_owner_name: "BemMais",
     },
   ],
-  payments: [],
+  payments: [
+    {
+      id: "payment-1",
+      status: "failed",
+      method: "pix",
+      amount: "95.00",
+      failure_message: "Não foi possível confirmar o pagamento.",
+      created_at: "2026-10-03T12:01:00Z",
+      updated_at: "2026-10-03T12:02:00Z",
+    },
+  ],
   activity: [],
 };
 test("Order 360 preserva valores, snapshots e endereço histórico", () => {
@@ -86,10 +96,12 @@ test("participantes mantêm fornecedor e owner de estoque separados", () => {
   assert.equal(groups.get("Fornecedor A")?.[0]?.sku, "BM-A");
   assert.equal(groups.get("BemMais")?.[0]?.sku, "BM-B");
 });
-test("ausência de pagamento permanece um estado vazio honesto", () => {
+test("Order 360 lê tentativas de pagamento sem expor metadata sensível", () => {
   const order = readOrder360(rawOrder);
   assert.ok(order);
-  assert.equal(order.payments.length, 0);
+  assert.equal(order.payments[0]?.status, "failed");
+  assert.equal(order.payments[0]?.failureMessage, "Não foi possível confirmar o pagamento.");
+  assert.equal("providerMetadata" in (order.payments[0] ?? {}), false);
 });
 test("apresentação centraliza labels de status", () => {
   assert.equal(orderStatusPresentation("pending_payment").label, "Aguardando pagamento");

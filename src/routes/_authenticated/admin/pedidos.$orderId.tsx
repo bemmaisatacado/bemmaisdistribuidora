@@ -218,7 +218,13 @@ function Order360() {
                 {
                   key: "date",
                   label: "Data",
-                  render: (payment) => dateTime(payment.paidAt ?? payment.createdAt),
+                  render: (payment) =>
+                    dateTime(payment.paidAt ?? payment.updatedAt ?? payment.createdAt),
+                },
+                {
+                  key: "failure",
+                  label: "Retorno",
+                  render: (payment) => payment.failureMessage ?? "—",
                 },
               ]}
             />
