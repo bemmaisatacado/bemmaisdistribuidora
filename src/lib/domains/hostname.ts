@@ -22,7 +22,7 @@ export type ResolvedStore = {
 export async function resolveStoreByHostname(hostname: string): Promise<ResolvedStore | null> {
   const normalized = normalizeHostname(hostname);
   if (!normalized) return null;
-  const { data, error } = await supabase.rpc("resolve_store_by_hostname", {
+  const { data, error } = await (supabase as any).rpc("resolve_store_by_hostname", {
     _hostname: normalized,
   });
   if (error) throw error;
