@@ -162,7 +162,7 @@ export function OpportunityLanding() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#121110] font-sans text-white">
-      <header className="relative z-20 border-b border-black/10 bg-[#f6f1ea] text-[#171513]">
+      <header className="relative z-20 border-b border-black/10 bg-white text-[#171513]">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8 sm:py-4">
           <a
             href="/"
