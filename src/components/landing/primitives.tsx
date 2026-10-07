@@ -1,9 +1,8 @@
 import { useEffect, useRef, type ReactNode, type ElementType } from "react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/bemmais-logo.png.asset.json";
 
-export const LOGO_URL = logoAsset.url;
+export const LOGO_URL = "/campaign/bemmais-logo.png";
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -65,19 +64,15 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <Reveal
-      className={cn(
-        "max-w-3xl",
-        align === "center" && "mx-auto text-center",
-        className,
-      )}
-    >
+    <Reveal className={cn("max-w-3xl", align === "center" && "mx-auto text-center", className)}>
       {eyebrow && <Eyebrow className="mb-5">{eyebrow}</Eyebrow>}
       <h2 className="text-[clamp(1.9rem,4.2vw,3.25rem)] font-bold uppercase leading-[1.05]">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">{subtitle}</p>
+        <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          {subtitle}
+        </p>
       )}
     </Reveal>
   );
@@ -92,7 +87,14 @@ type ButtonProps = {
   href?: string;
 };
 
-export function Button({ children, variant = "primary", size = "md", className, to, href }: ButtonProps) {
+export function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  className,
+  to,
+  href,
+}: ButtonProps) {
   const cls = cn(
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-full font-bold uppercase tracking-wide transition-all duration-300",
     size === "md" ? "px-5 text-xs" : "px-7 py-4 text-sm",
@@ -105,8 +107,17 @@ export function Button({ children, variant = "primary", size = "md", className, 
       "border border-ink-border text-ink-foreground hover:border-ink-foreground/40",
     className,
   );
-  if (to) return <Link to={to} className={cls}>{children}</Link>;
-  return <a href={href} className={cls}>{children}</a>;
+  if (to)
+    return (
+      <Link to={to} className={cls}>
+        {children}
+      </Link>
+    );
+  return (
+    <a href={href} className={cls}>
+      {children}
+    </a>
+  );
 }
 
 export function Reveal({
