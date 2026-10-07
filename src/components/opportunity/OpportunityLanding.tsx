@@ -184,7 +184,7 @@ export function OpportunityLanding() {
       </header>
 
       <main>
-        <section className="relative isolate overflow-hidden px-5 py-12 sm:px-8 sm:py-18">
+        <section className="relative isolate overflow-hidden px-5 py-10 sm:px-8 sm:py-16 lg:py-20">
           <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_80%_10%,oklch(0.67_0.2_42_/_0.32),transparent_30%),radial-gradient(circle_at_15%_45%,oklch(0.3_0.02_40_/_0.9),transparent_45%)]" />
           <div
             className="absolute -bottom-20 -right-20 -z-10 size-76 rounded-full border border-primary/25 sm:size-112"
@@ -194,20 +194,20 @@ export function OpportunityLanding() {
             className="absolute bottom-8 right-8 -z-10 h-px w-44 rotate-[-30deg] bg-primary/40"
             aria-hidden
           />
-          <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-15">
+          <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-14">
             <div className="max-w-xl">
               <p className="mb-4 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-primary">
                 <span className="size-2 rounded-full bg-primary" aria-hidden /> Oportunidade para
                 revender
               </p>
-              <h1 className="max-w-[11ch] text-[clamp(2.25rem,10.5vw,5.9rem)] font-extrabold uppercase leading-[0.94] tracking-[-0.055em] text-balance">
+              <h1 className="max-w-[12ch] text-[clamp(2.35rem,6vw,4.5rem)] font-extrabold uppercase leading-[0.96] tracking-[-0.048em] text-balance">
                 Quer vender calçados ou já tem sua loja?
               </h1>
-              <p className="mt-6 max-w-lg text-base leading-relaxed text-white/72 sm:text-lg">
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/72 sm:mt-6 sm:text-lg">
                 Conheça a BemMais e descubra uma nova forma de comprar, revender e aumentar suas
                 oportunidades de venda.
               </p>
-              <div className="mt-7 flex items-center gap-3 text-sm font-semibold text-white/60">
+              <div className="mt-6 flex items-center gap-3 text-sm font-semibold leading-snug text-white/60 sm:mt-7">
                 <span className="flex size-7 items-center justify-center rounded-full bg-white/8 text-primary">
                   <ArrowDown className="size-4" aria-hidden />
                 </span>
@@ -276,7 +276,7 @@ export function OpportunityLanding() {
                 <p className="text-center text-xs font-extrabold uppercase tracking-[0.2em] text-primary">
                   Agora é com você
                 </p>
-                <h2 className="mx-auto mt-3 max-w-2xl text-center text-4xl font-extrabold uppercase leading-[0.94] tracking-[-0.055em] sm:text-6xl">
+                <h2 className="mx-auto mt-3 max-w-2xl text-center text-[clamp(2rem,4.8vw,3.75rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.045em] text-balance">
                   Escolha como você quer começar <span aria-hidden>👇</span>
                 </h2>
                 <p className="mx-auto mt-5 max-w-xl text-center text-base leading-relaxed text-[#5e554d] sm:text-lg">
@@ -308,13 +308,13 @@ export function OpportunityLanding() {
           </div>
         </section>
 
-        <section className="bg-[#171513] px-5 py-16 sm:px-8 sm:py-22">
+        <section className="bg-[#171513] px-5 py-14 sm:px-8 sm:py-20">
           <div className="mx-auto max-w-6xl">
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-primary">
               Por que entrar para a BemMais?
             </p>
-            <div className="mt-5 grid gap-7 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
-              <h2 className="max-w-md text-4xl font-extrabold uppercase leading-[0.95] tracking-[-0.055em] sm:text-6xl">
+            <div className="mt-5 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-10">
+              <h2 className="max-w-xl text-[clamp(2rem,4.2vw,3.75rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.045em] text-balance">
                 Mais estrutura para transformar oportunidade em venda.
               </h2>
               <p className="max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
@@ -334,7 +334,7 @@ export function OpportunityLanding() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-primary px-5 py-18 text-primary-foreground sm:px-8 sm:py-28">
+        <section className="relative overflow-hidden bg-primary px-5 py-16 text-primary-foreground sm:px-8 sm:py-22">
           <div
             className="absolute inset-y-0 right-0 w-1/2 bg-[linear-gradient(135deg,transparent_0%,oklch(0.3_0.05_40_/_0.22)_100%)]"
             aria-hidden
@@ -343,7 +343,7 @@ export function OpportunityLanding() {
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-primary-foreground/65">
               BemMais Distribuidora
             </p>
-            <h2 className="mt-5 max-w-4xl text-[clamp(2.15rem,7vw,6.5rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.055em] text-balance">
+            <h2 className="mt-5 max-w-4xl text-[clamp(2.25rem,5.2vw,4.75rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.048em] text-balance">
               Não é só sobre comprar produto.
               <br className="hidden sm:block" /> É sobre ter um ecossistema para ajudar você a
               vender mais.
@@ -352,18 +352,18 @@ export function OpportunityLanding() {
               A BemMais conecta produtos, fornecedores, oportunidades, suporte e ferramentas para
               quem quer começar ou crescer no mercado.
             </p>
-            <p className="mt-10 text-xl font-bold tracking-tight">
+            <p className="mt-8 text-lg font-bold leading-snug tracking-tight sm:text-xl">
               BemMais — O ecossistema que ajuda sua loja a vender mais.
             </p>
           </div>
         </section>
 
-        <section className="bg-[#f6f1ea] px-5 py-16 text-[#171513] sm:px-8 sm:py-22">
+        <section className="bg-[#f6f1ea] px-5 py-14 text-[#171513] sm:px-8 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-primary">
               Comunidade BemMais
             </p>
-            <h2 className="mt-4 text-4xl font-extrabold uppercase leading-[0.94] tracking-[-0.055em] sm:text-6xl">
+            <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.75rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.045em] text-balance">
               Pronto para começar?
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#5e554d] sm:text-lg">
