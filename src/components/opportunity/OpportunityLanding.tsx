@@ -162,8 +162,8 @@ export function OpportunityLanding() {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[#121110] font-sans text-white">
-      <header className="absolute inset-x-0 top-0 z-20">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
+      <header className="relative z-20 border-b border-black/10 bg-[#f6f1ea] text-[#171513]">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8 sm:py-4">
           <a
             href="/"
             aria-label="BemMais Distribuidora, página inicial"
@@ -174,17 +174,17 @@ export function OpportunityLanding() {
               alt="BemMais Distribuidora"
               width={2172}
               height={724}
-              className="h-9 w-auto object-contain sm:h-11"
+              className="h-9 w-auto object-contain sm:h-10"
             />
           </a>
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 sm:text-xs">
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#171513]/65 sm:text-xs">
             Comunidade BemMais
           </span>
         </div>
       </header>
 
       <main>
-        <section className="relative isolate overflow-hidden px-5 pb-14 pt-29 sm:px-8 sm:pb-18 sm:pt-34">
+        <section className="relative isolate overflow-hidden px-5 py-12 sm:px-8 sm:py-18">
           <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_80%_10%,oklch(0.67_0.2_42_/_0.32),transparent_30%),radial-gradient(circle_at_15%_45%,oklch(0.3_0.02_40_/_0.9),transparent_45%)]" />
           <div
             className="absolute -bottom-20 -right-20 -z-10 size-76 rounded-full border border-primary/25 sm:size-112"
@@ -200,7 +200,7 @@ export function OpportunityLanding() {
                 <span className="size-2 rounded-full bg-primary" aria-hidden /> Oportunidade para
                 revender
               </p>
-              <h1 className="text-[clamp(2.5rem,10vw,5.9rem)] font-extrabold uppercase leading-[0.92] tracking-[-0.065em] text-balance">
+              <h1 className="max-w-[11ch] text-[clamp(2.25rem,10.5vw,5.9rem)] font-extrabold uppercase leading-[0.94] tracking-[-0.055em] text-balance">
                 Quer vender calçados ou já tem sua loja?
               </h1>
               <p className="mt-6 max-w-lg text-base leading-relaxed text-white/72 sm:text-lg">
@@ -225,6 +225,8 @@ export function OpportunityLanding() {
                   {hasVideo ? (
                     <video
                       className="block size-full object-cover"
+                      autoPlay
+                      muted
                       controls
                       playsInline
                       preload="metadata"
@@ -341,9 +343,10 @@ export function OpportunityLanding() {
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-primary-foreground/65">
               BemMais Distribuidora
             </p>
-            <h2 className="mt-5 max-w-4xl text-[clamp(2.5rem,7vw,6.5rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.07em]">
+            <h2 className="mt-5 max-w-4xl text-[clamp(2.15rem,7vw,6.5rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.055em] text-balance">
               Não é só sobre comprar produto.
-              <br />É sobre ter um ecossistema para ajudar você a vender mais.
+              <br className="hidden sm:block" /> É sobre ter um ecossistema para ajudar você a
+              vender mais.
             </h2>
             <p className="mt-7 max-w-2xl text-lg leading-relaxed text-primary-foreground/80">
               A BemMais conecta produtos, fornecedores, oportunidades, suporte e ferramentas para
