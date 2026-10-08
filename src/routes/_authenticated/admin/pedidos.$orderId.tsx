@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { FulfillmentPanel } from "@/components/admin/orders/fulfillment-panel";
+import { fulfillmentReservationLabels } from "@/lib/orders/fulfillment";
+import { useOrderFulfillments } from "@/lib/orders/fulfillment-query";
 
 const orderRpc = supabase as unknown as OrderCancellationRpc;
 
@@ -55,6 +58,7 @@ function Order360() {
   const [reason, setReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const operational = useOrderFulfillments(orderRpc, orderId);
   const cancellation = useQuery({
     queryKey: ["admin-order-cancellation", orderId],
     queryFn: async () => {
@@ -240,6 +244,7 @@ function Order360() {
           <Address address={order.address} />
         </Panel>
       </div>
+      <FulfillmentPanel client={orderRpc} orderId={orderId} />
       <Panel title="Itens" description="Snapshots históricos preservados no momento da compra.">
         <DataTable
           rowKey={(item) => item.id}
@@ -289,7 +294,16 @@ function Order360() {
             {
               key: "stock",
               label: "Estoque",
-              render: (item) => reservationLabel[item.stockReservationStatus],
+              render: (item) => {
+                const position = operational.data?.groups
+                  .flatMap((group) => group.items)
+                  .find((row) => row.id === item.id);
+                if (position) return fulfillmentReservationLabels[position.reservation];
+                // A consumption includes a release entry: never mislabel it as a cancellation release while loading.
+                if (item.fulfillmentStatus === "pending" && !operational.data)
+                  return "Consulte Fulfillment";
+                return reservationLabel[item.stockReservationStatus];
+              },
             },
             {
               key: "fulfillment",
