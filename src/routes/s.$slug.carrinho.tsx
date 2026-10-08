@@ -1,4 +1,3 @@
-// @ts-nocheck -- generated database types are out of date with the live schema
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +10,18 @@ import {
 } from "@/lib/store-cart";
 import { formatStorePrice } from "@/lib/storefront";
 import { checkoutErrorMessage } from "@/lib/orders/checkout";
+import { startOrderPayment, type PaymentRpcClient } from "@/lib/payments/client";
+import type { PaymentMethod } from "@/lib/payments/foundation";
 export const Route = createFileRoute("/s/$slug/carrinho")({ component: Cart });
+const cartRpc = supabase as unknown as {
+  rpc(
+    name: string,
+    args: Record<string, unknown>,
+  ): PromiseLike<{
+    data: unknown;
+    error: { message: string } | null;
+  }>;
+};
 type Validation = {
   items: {
     listing_id: string;
@@ -30,6 +40,26 @@ function Cart() {
   const [city, setCity] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [checkoutKey] = useState(() => crypto.randomUUID());
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("pix");
+  const [paymentKey] = useState(() => crypto.randomUUID());
+  const [startingPayment, setStartingPayment] = useState(false);
+  const startPayment = async () => {
+    if (!createdOrderId || startingPayment) return;
+    setStartingPayment(true);
+    try {
+      const result = await startOrderPayment(supabase as unknown as PaymentRpcClient, {
+        orderId: createdOrderId,
+        method: paymentMethod,
+        idempotencyKey: paymentKey,
+      });
+      setNotice(result.message);
+    } catch {
+      setNotice("Não foi possível consultar o pagamento agora.");
+    } finally {
+      setStartingPayment(false);
+    }
+  };
   const update = (c: PersistedCart) => {
     setCart(c);
     writeCart(c);
@@ -38,7 +68,7 @@ function Cart() {
     async (current: PersistedCart) => {
       if (!current.items.length) return;
       setChecking(true);
-      const { data, error } = await (supabase as any).rpc("validate_storefront_cart", {
+      const { data, error } = await cartRpc.rpc("validate_storefront_cart", {
         _slug: slug,
         _items: current.items.map((i) => ({
           listingId: i.listingId,
@@ -95,7 +125,7 @@ function Cart() {
       setSubmitting(false);
       return;
     }
-    const { data, error } = await (supabase as any).rpc("create_storefront_order", {
+    const { data, error } = await cartRpc.rpc("create_storefront_order", {
       _store_slug: slug,
       _items: cart.items.map((item) => ({
         listingId: item.listingId,
@@ -122,6 +152,7 @@ function Cart() {
       return;
     }
     update({ storeSlug: slug, items: [] });
+    setCreatedOrderId(orderId);
     setNotice(`Pedido criado com sucesso: ${orderId}. O pagamento ainda não foi registrado.`);
   };
   return (
@@ -140,6 +171,36 @@ function Cart() {
           {notice}
         </p>
       ) : null}
+      {createdOrderId && (
+        <section aria-label="Pagamento do pedido" className="mt-5 rounded-lg border p-4">
+          <h2 className="font-bold">Pagamento do pedido</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Pagamento online ainda indisponível. Nenhuma cobrança foi emitida; seu pedido aguarda
+            pagamento.
+          </p>
+          <label className="mt-3 block text-sm">
+            Método desejado para consultar disponibilidade
+            <select
+              value={paymentMethod}
+              onChange={(event) => {
+                if (event.target.value === "pix" || event.target.value === "card")
+                  setPaymentMethod(event.target.value);
+              }}
+              className="ml-2 rounded border p-2"
+            >
+              <option value="pix">Pix</option>
+              <option value="card">Cartão</option>
+            </select>
+          </label>
+          <button
+            onClick={() => void startPayment()}
+            disabled={startingPayment}
+            className="mt-3 rounded-lg bg-black px-4 py-3 text-white disabled:opacity-50"
+          >
+            {startingPayment ? "Consultando…" : "Consultar disponibilidade de pagamento"}
+          </button>
+        </section>
+      )}
       {!cart.items.length ? (
         <p className="mt-5 text-slate-500">Seu carrinho está vazio.</p>
       ) : (

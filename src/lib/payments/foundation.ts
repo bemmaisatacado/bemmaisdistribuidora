@@ -1,4 +1,5 @@
 import type { OrderPaymentStatus, OrderStatus } from "../orders/foundation";
+export { sanitizePaymentMetadata } from "./metadata.ts";
 
 export type PaymentMethod = "pix" | "card";
 export type PaymentStatus = OrderPaymentStatus;
@@ -74,20 +75,10 @@ export const paymentErrorMessage = (code: string) =>
       PAYMENT_NOT_FOUND: "Pagamento não encontrado.",
       PAYMENT_IN_PROGRESS: "Já existe uma tentativa de pagamento em andamento.",
       PAYMENT_METHOD_UNSUPPORTED: "Este método de pagamento não está disponível.",
+      PAYMENT_PROVIDER_UNAVAILABLE:
+        "Pagamento online ainda indisponível. Seu pedido permanece aguardando pagamento.",
       PROVIDER_EVENT_DUPLICATE: "Este evento de pagamento já foi processado.",
       PROVIDER_EVENT_INVALID: "Não foi possível validar a atualização de pagamento.",
       UNAUTHORIZED_PAYMENT: "Você não tem permissão para pagar este pedido.",
     }) as Record<string, string>
   )[code] ?? "Não foi possível processar o pagamento agora.";
-
-const sensitiveKeys = new Set(["cvv", "pan", "card_number", "token", "secret", "signature"]);
-
-export const sanitizePaymentMetadata = (metadata: Record<string, unknown>) =>
-  Object.fromEntries(
-    Object.entries(metadata).flatMap(([key, value]) => {
-      if (sensitiveKeys.has(key.toLowerCase())) return [];
-      return typeof value === "string" || typeof value === "number" || typeof value === "boolean"
-        ? [[key, value]]
-        : [];
-    }),
-  );

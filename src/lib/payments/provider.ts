@@ -13,9 +13,11 @@ export type VerifiedProviderEvent = {
   eventType: string;
   paymentId: string;
   status: PaymentStatus;
-  providerPaymentId: string | null;
+  providerPaymentId: string;
+  amount: string;
+  currency: string;
   failureCode: string | null;
-  metadata: Record<string, string | number | boolean>;
+  metadata: Record<string, unknown>;
 };
 
 /** A real adapter must verify its webhook before returning an event to the payment core. */

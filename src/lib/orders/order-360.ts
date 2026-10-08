@@ -1,4 +1,3 @@
-// @ts-nocheck -- generated database types are out of date with the live schema
 import type { OrderFulfillmentStatus, OrderPaymentStatus, OrderStatus } from "./foundation";
 import type { ReservationStatus } from "./stock-reservation";
 
@@ -172,8 +171,23 @@ export const readOrder360 = (value: unknown): Order360 | null => {
                 paidAt: string(raw.paid_at),
                 createdAt: raw.created_at,
                 updatedAt: raw.updated_at,
-                failureCode: string(raw.failure_code),
-                failureMessage: string(raw.failure_message),
+                failureCode:
+                  raw.status === "failed"
+                    ? "PAYMENT_FAILED"
+                    : raw.status === "expired"
+                      ? "PAYMENT_EXPIRED"
+                      : raw.status === "cancelled"
+                        ? "PAYMENT_CANCELLED"
+                        : null,
+                // Never render provider free text, including historical failure payloads.
+                failureMessage:
+                  raw.status === "failed"
+                    ? "Não foi possível confirmar o pagamento."
+                    : raw.status === "expired"
+                      ? "A tentativa de pagamento expirou."
+                      : raw.status === "cancelled"
+                        ? "A tentativa de pagamento foi cancelada."
+                        : null,
               },
             ]
           : [],

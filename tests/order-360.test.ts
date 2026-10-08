@@ -107,3 +107,22 @@ test("apresentação centraliza labels de status", () => {
   assert.equal(orderStatusPresentation("pending_payment").label, "Aguardando pagamento");
   assert.equal(orderStatusPresentation("fulfilled").label, "Concluído");
 });
+
+test("Order 360 descarta códigos e mensagens livres de falha do provider", () => {
+  const order = readOrder360({
+    ...rawOrder,
+    payments: [
+      {
+        ...rawOrder.payments[0],
+        failure_code: "Authorization: private-token",
+        failure_message: "CVV 123 / PAN 4111111111111111",
+        provider_metadata: { token: "private" },
+      },
+    ],
+  });
+  assert.ok(order);
+  assert.equal(order.payments[0]?.failureCode, "PAYMENT_FAILED");
+  assert.equal(order.payments[0]?.failureMessage, "Não foi possível confirmar o pagamento.");
+  assert.equal(JSON.stringify(order.payments).includes("private"), false);
+  assert.equal(JSON.stringify(order.payments).includes("4111111111111111"), false);
+});
