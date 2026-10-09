@@ -87,5 +87,7 @@ export const checkoutErrorMessage = (code: string) =>
       IDEMPOTENCY_CONFLICT: "Não foi possível confirmar esta tentativa de checkout.",
       ADDRESS_INCOMPLETE: "Preencha o endereço completo, com CEP e UF válidos.",
       PICKUP_UNAVAILABLE: "Esta loja ainda não oferece retirada.",
+      CHECKOUT_CONCURRENT_CHANGE:
+        "Um item está sendo atualizado. Tente novamente com a mesma tentativa.",
     }) as Record<string, string>
   )[code] ?? "Não foi possível concluir o pedido agora.";

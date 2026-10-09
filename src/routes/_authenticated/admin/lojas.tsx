@@ -3,7 +3,13 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Constants, type Database } from "@/integrations/supabase/types";
+import {
+  changeStorePublication,
+  isStorePublicationStatus,
+  storePublicationStatuses,
+  type StorePublicationClient,
+  type StorePublicationStatus,
+} from "@/lib/admin/store-publication";
 import {
   PageHeader,
   Panel,
@@ -19,7 +25,7 @@ import { dateTime, pageRange, STATUS_LABEL } from "@/lib/admin/format";
 
 export const Route = createFileRoute("/_authenticated/admin/lojas")({ component: Stores });
 
-type StoreStatus = Database["public"]["Enums"]["store_status"];
+type StoreStatus = StorePublicationStatus;
 
 function Stores() {
   const qc = useQueryClient();
@@ -45,8 +51,7 @@ function Stores() {
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: StoreStatus }) => {
-      const { error } = await supabase.from("stores").update({ status }).eq("id", id);
-      if (error) throw error;
+      await changeStorePublication(supabase as unknown as StorePublicationClient, id, status);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["stores"] });
@@ -67,6 +72,11 @@ function Stores() {
           </Btn>
         }
       />
+      {setStatus.error && (
+        <p role="alert" className="mb-4 text-sm text-danger">
+          {setStatus.error.message}
+        </p>
+      )}
       <Panel>
         <div className="flex flex-wrap items-center gap-2 px-5 pb-2 pt-4">
           <SearchBox
@@ -128,11 +138,16 @@ function Stores() {
                   aria-label="Status da loja"
                   value={r.status}
                   className="h-8 w-32 text-xs"
-                  onChange={(e) =>
-                    setStatus.mutate({ id: r.id, status: e.target.value as StoreStatus })
-                  }
+                  disabled={setStatus.isPending}
+                  onChange={(e) => {
+                    if (isStorePublicationStatus(e.target.value))
+                      setStatus.mutate({ id: r.id, status: e.target.value });
+                  }}
                 >
-                  {Constants.public.Enums.store_status.map((s) => (
+                  {!isStorePublicationStatus(r.status) && (
+                    <option value={r.status}>{STATUS_LABEL[r.status] ?? r.status}</option>
+                  )}
+                  {storePublicationStatuses.map((s) => (
                     <option key={s} value={s}>
                       {STATUS_LABEL[s]}
                     </option>

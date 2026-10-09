@@ -190,7 +190,12 @@ function Cart() {
   };
   return (
     <main className="mx-auto min-h-screen max-w-3xl bg-white px-5 py-10">
-      <Link to="/s/$slug/catalogo" params={{ slug }} className="text-sm text-slate-500">
+      <Link
+        to="/s/$slug/catalogo"
+        params={{ slug }}
+        search={{ preview: undefined }}
+        className="text-sm text-slate-500"
+      >
         ← Continuar comprando
       </Link>
       <div className="mt-6 flex items-end justify-between">

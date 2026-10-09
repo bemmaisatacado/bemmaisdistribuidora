@@ -67,12 +67,15 @@ export type Order360 = {
 };
 
 const record = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
+  typeof value === "object" && value !== null && !Array.isArray(value);
 const string = (value: unknown) => (typeof value === "string" ? value : null);
+const requiredString = (value: unknown): value is string =>
+  typeof value === "string" && value.length > 0;
 const money = (value: unknown) => string(value) ?? "0.00";
 const orderStatus = (value: unknown): value is OrderStatus =>
   value === "draft" || value === "pending_payment" || value === "paid" || value === "cancelled";
 const paymentStatus = (value: unknown): value is OrderPaymentStatus =>
+  typeof value === "string" &&
   [
     "pending",
     "processing",
@@ -84,9 +87,9 @@ const paymentStatus = (value: unknown): value is OrderPaymentStatus =>
     "partially_refunded",
     "chargeback",
     "cancelled",
-  ].includes(String(value));
+  ].includes(value);
 const fulfillmentStatus = (value: unknown): value is OrderFulfillmentStatus =>
-  ["unassigned", "pending", "fulfilled", "cancelled"].includes(String(value));
+  typeof value === "string" && ["unassigned", "pending", "fulfilled", "cancelled"].includes(value);
 const stringRecord = (value: unknown): Record<string, string> =>
   record(value)
     ? Object.fromEntries(
@@ -101,10 +104,12 @@ const readItems = (value: unknown): Order360Item[] =>
     ? value.flatMap((raw) => {
         if (
           !record(raw) ||
-          !string(raw.id) ||
-          !string(raw.product_name_snapshot) ||
-          !string(raw.sku_snapshot) ||
+          !requiredString(raw.id) ||
+          !requiredString(raw.product_name_snapshot) ||
+          !requiredString(raw.sku_snapshot) ||
           typeof raw.quantity !== "number" ||
+          !Number.isSafeInteger(raw.quantity) ||
+          raw.quantity < 1 ||
           !fulfillmentStatus(raw.fulfillment_status)
         )
           return [];
@@ -143,23 +148,23 @@ export const readOrder360 = (value: unknown): Order360 | null => {
   if (!record(value) || !record(value.order)) return null;
   const order = value.order;
   if (
-    !string(order.id) ||
-    !string(order.order_number) ||
+    !requiredString(order.id) ||
+    !requiredString(order.order_number) ||
     !orderStatus(order.status) ||
     !paymentStatus(order.payment_status) ||
     !fulfillmentStatus(order.fulfillment_status) ||
-    !string(order.currency) ||
-    !string(order.created_at) ||
-    !string(order.updated_at)
+    !requiredString(order.currency) ||
+    !requiredString(order.created_at) ||
+    !requiredString(order.updated_at)
   )
     return null;
   const payments: Order360Payment[] = Array.isArray(value.payments)
     ? value.payments.flatMap((raw) =>
         record(raw) &&
-        string(raw.id) &&
+        requiredString(raw.id) &&
         paymentStatus(raw.status) &&
-        string(raw.created_at) &&
-        string(raw.updated_at)
+        requiredString(raw.created_at) &&
+        requiredString(raw.updated_at)
           ? [
               {
                 id: raw.id,
@@ -196,10 +201,10 @@ export const readOrder360 = (value: unknown): Order360 | null => {
   const activity: Order360Activity[] = Array.isArray(value.activity)
     ? value.activity.flatMap((raw) =>
         record(raw) &&
-        string(raw.id) &&
-        string(raw.action) &&
-        string(raw.entity_type) &&
-        string(raw.occurred_at)
+        requiredString(raw.id) &&
+        requiredString(raw.action) &&
+        requiredString(raw.entity_type) &&
+        requiredString(raw.occurred_at)
           ? [
               {
                 id: raw.id,
