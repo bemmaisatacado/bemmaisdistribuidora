@@ -1,0 +1,26 @@
+# Dedicated LOCAL disposable stack. Never link this workspace to a remote project.
+project_id = "bemmais-homologation"
+
+[api]
+port = 55321
+schemas = ["public", "graphql_public"]
+
+[db]
+port = 55322
+shadow_port = 55320
+major_version = 15
+
+[db.seed]
+enabled = false
+
+[studio]
+port = 55323
+
+[inbucket]
+port = 55324
+
+[auth]
+site_url = "http://127.0.0.1:55300"
+
+[analytics]
+enabled = false

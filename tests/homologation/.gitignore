@@ -1,0 +1,8 @@
+# Local CLI state, copied runtime sources and credentials must never be committed.
+supabase/.temp/
+supabase/.branches/
+supabase/functions/
+src/
+.env*
+*.local
+reports/
