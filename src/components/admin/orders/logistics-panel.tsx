@@ -182,7 +182,10 @@ export function LogisticsPanel({
                 </p>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold">Destinatário histórico</h4>
+                    <h4 className="mb-2 text-sm font-semibold">Destino autorizado</h4>
+                    <p className="mb-2 text-xs text-muted-foreground">
+                      Snapshot do pedido ou correção operacional registrada separadamente.
+                    </p>
                     <Address value={shipment.recipient} />
                   </div>
                   <div>

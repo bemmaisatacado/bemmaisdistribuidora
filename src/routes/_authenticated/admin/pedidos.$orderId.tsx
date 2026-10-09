@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FulfillmentPanel } from "@/components/admin/orders/fulfillment-panel";
 import { LogisticsPanel } from "@/components/admin/orders/logistics-panel";
+import { OrderAddressPanel } from "@/components/admin/orders/address-panel";
 import { fulfillmentReservationLabels } from "@/lib/orders/fulfillment";
 import { useOrderFulfillments } from "@/lib/orders/fulfillment-query";
 
@@ -246,6 +247,7 @@ function Order360() {
         </Panel>
       </div>
       <FulfillmentPanel client={orderRpc} orderId={orderId} />
+      <OrderAddressPanel client={orderRpc} orderId={orderId} />
       <LogisticsPanel client={orderRpc} orderId={orderId} />
       <Panel title="Itens" description="Snapshots históricos preservados no momento da compra.">
         <DataTable

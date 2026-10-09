@@ -1,4 +1,5 @@
 import type { OrderCancellationRpc } from "./cancellation";
+import { deliveryAddressComplete } from "./address.ts";
 
 export type ShipmentStatus = "draft" | "ready_for_quote";
 export const shipmentLabels: Record<ShipmentStatus, string> = {
@@ -15,6 +16,8 @@ export const shippingAddressFields = [
   "city",
   "state",
   "country",
+  "no_number",
+  "reference",
 ] as const;
 export type ShippingAddress = Partial<Record<(typeof shippingAddressFields)[number], string>>;
 export const addressLabels: Record<(typeof shippingAddressFields)[number], string> = {
@@ -27,19 +30,11 @@ export const addressLabels: Record<(typeof shippingAddressFields)[number], strin
   city: "Cidade",
   state: "UF",
   country: "País (BR)",
+  no_number: "Sem número (true/false)",
+  reference: "Referência",
 };
 export function shippingAddressComplete(address: ShippingAddress | null) {
-  return Boolean(
-    address &&
-    address.recipient?.trim() &&
-    /^[0-9]{8}$/.test(address.postal_code ?? "") &&
-    address.street?.trim() &&
-    address.number?.trim() &&
-    address.district?.trim() &&
-    address.city?.trim() &&
-    /^[A-Z]{2}$/.test(address.state ?? "") &&
-    address.country === "BR",
-  );
+  return deliveryAddressComplete(address);
 }
 export const shippingTransitionAllowed = (from: ShipmentStatus, to: string) =>
   (from === "draft" || from === "ready_for_quote") && (to === "draft" || to === "ready_for_quote");

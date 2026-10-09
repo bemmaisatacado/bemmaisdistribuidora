@@ -10,6 +10,13 @@ import {
 } from "@/lib/store-cart";
 import { formatStorePrice } from "@/lib/storefront";
 import { checkoutErrorMessage } from "@/lib/orders/checkout";
+import {
+  deliveryAddressComplete,
+  normalizeDeliveryAddress,
+  emptyDeliveryAddress,
+  type DeliveryAddress,
+} from "@/lib/orders/address";
+import { DeliveryAddressForm } from "@/components/delivery-address-form";
 import { startOrderPayment, type PaymentRpcClient } from "@/lib/payments/client";
 import type { PaymentMethod } from "@/lib/payments/foundation";
 export const Route = createFileRoute("/s/$slug/carrinho")({ component: Cart });
@@ -36,8 +43,9 @@ function Cart() {
   const [cart, setCart] = useState<PersistedCart>({ storeSlug: slug, items: [] });
   const [checking, setChecking] = useState(false);
   const [notice, setNotice] = useState("");
-  const [recipient, setRecipient] = useState("");
-  const [city, setCity] = useState("");
+  const [address, setAddress] = useState<DeliveryAddress>(emptyDeliveryAddress);
+  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const [pickupAvailable, setPickupAvailable] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [checkoutKey] = useState(() => crypto.randomUUID());
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
@@ -112,48 +120,73 @@ function Cart() {
     [slug],
   );
   useEffect(() => {
+    let active = true;
+    void cartRpc.rpc("storefront_delivery_options", { _slug: slug }).then(({ data }) => {
+      if (active)
+        setPickupAvailable(
+          typeof data === "object" && data !== null && "pickup" in data && data.pickup === true,
+        );
+    });
     const initial = readCart(slug);
     setCart(initial);
     void validate(initial);
+    return () => {
+      active = false;
+    };
   }, [slug, validate]);
   const checkout = async () => {
-    if (!cart.items.length) return;
+    if (!cart.items.length || submitting) return;
+    if (deliveryMethod === "delivery" && !deliveryAddressComplete(address)) {
+      setNotice(checkoutErrorMessage("ADDRESS_INCOMPLETE"));
+      return;
+    }
     setSubmitting(true);
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) {
-      setNotice(checkoutErrorMessage("CHECKOUT_AUTH_REQUIRED"));
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) {
+        setNotice(checkoutErrorMessage("CHECKOUT_AUTH_REQUIRED"));
+        setSubmitting(false);
+        return;
+      }
+      const { data, error } = await cartRpc.rpc("create_storefront_order", {
+        _store_slug: slug,
+        _items: cart.items.map((item) => ({
+          listingId: item.listingId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })),
+        _shipping_address:
+          deliveryMethod === "pickup"
+            ? { delivery_method: "pickup" }
+            : { ...normalizeDeliveryAddress(address), delivery_method: "delivery" },
+        _idempotency_key: checkoutKey,
+      });
       setSubmitting(false);
-      return;
+      if (error) {
+        setNotice(checkoutErrorMessage(error.message));
+        return;
+      }
+      const orderId =
+        typeof data === "object" &&
+        data !== null &&
+        "order_id" in data &&
+        typeof data.order_id === "string"
+          ? data.order_id
+          : null;
+      if (!orderId) {
+        setNotice(checkoutErrorMessage("IDEMPOTENCY_CONFLICT"));
+        return;
+      }
+      update({ storeSlug: slug, items: [] });
+      setCreatedOrderId(orderId);
+      setNotice(`Pedido criado com sucesso: ${orderId}. O pagamento ainda não foi registrado.`);
+    } catch {
+      setNotice(
+        "Falha de conexão. Seus dados foram preservados; tente novamente com a mesma tentativa.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-    const { data, error } = await cartRpc.rpc("create_storefront_order", {
-      _store_slug: slug,
-      _items: cart.items.map((item) => ({
-        listingId: item.listingId,
-        variantId: item.variantId,
-        quantity: item.quantity,
-      })),
-      _shipping_address: { recipient, city },
-      _idempotency_key: checkoutKey,
-    });
-    setSubmitting(false);
-    if (error) {
-      setNotice(checkoutErrorMessage(error.message));
-      return;
-    }
-    const orderId =
-      typeof data === "object" &&
-      data !== null &&
-      "order_id" in data &&
-      typeof data.order_id === "string"
-        ? data.order_id
-        : null;
-    if (!orderId) {
-      setNotice(checkoutErrorMessage("IDEMPOTENCY_CONFLICT"));
-      return;
-    }
-    update({ storeSlug: slug, items: [] });
-    setCreatedOrderId(orderId);
-    setNotice(`Pedido criado com sucesso: ${orderId}. O pagamento ainda não foi registrado.`);
   };
   return (
     <main className="mx-auto min-h-screen max-w-3xl bg-white px-5 py-10">
@@ -262,19 +295,24 @@ function Cart() {
             Atualizar carrinho
           </button>
           <div className="mt-5 grid gap-3 rounded-lg border p-4">
-            <b>Endereço de entrega</b>
-            <input
-              value={recipient}
-              onChange={(event) => setRecipient(event.target.value)}
-              placeholder="Destinatário"
-              className="rounded border px-3 py-2"
-            />
-            <input
-              value={city}
-              onChange={(event) => setCity(event.target.value)}
-              placeholder="Cidade"
-              className="rounded border px-3 py-2"
-            />
+            {pickupAvailable && (
+              <label>
+                Recebimento
+                <select
+                  value={deliveryMethod}
+                  onChange={(e) => setDeliveryMethod(e.target.value)}
+                  className="ml-2 rounded border p-3"
+                >
+                  <option value="delivery">Entrega</option>
+                  <option value="pickup">Retirada</option>
+                </select>
+              </label>
+            )}
+            {deliveryMethod === "delivery" ? (
+              <DeliveryAddressForm value={address} onChange={setAddress} />
+            ) : (
+              <p>Retirada selecionada. Não é necessário endereço de entrega.</p>
+            )}
             <button
               onClick={() => void checkout()}
               disabled={submitting}

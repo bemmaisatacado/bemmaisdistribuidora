@@ -3,7 +3,16 @@ import test from "node:test";
 import { checkoutErrorMessage, checkoutIntentError } from "../src/lib/orders/checkout.ts";
 
 const id = "00000000-0000-4000-8000-000000000001";
-const address = { recipient: "Cliente", city: "São Paulo" };
+const address = {
+  recipient: "Cliente",
+  city: "São Paulo",
+  postal_code: "01001000",
+  street: "Praça da Sé",
+  number: "1",
+  district: "Sé",
+  state: "SP",
+  country: "BR",
+};
 test("checkout aceita somente intenção sem preço autoritativo", () =>
   assert.equal(
     checkoutIntentError({
@@ -96,7 +105,7 @@ test("erros de domínio são seguros para o comprador", () => {
   );
   assert.equal(
     checkoutErrorMessage("ADDRESS_INCOMPLETE"),
-    "Informe ao menos destinatário e cidade para a entrega.",
+    "Preencha o endereço completo, com CEP e UF válidos.",
   );
   assert.equal(checkoutErrorMessage("internal"), "Não foi possível concluir o pedido agora.");
 });

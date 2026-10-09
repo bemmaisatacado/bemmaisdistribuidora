@@ -1,3 +1,4 @@
+import { deliveryAddressComplete } from "./address.ts";
 export const CHECKOUT_ERROR_CODES = [
   "CHECKOUT_AUTH_REQUIRED",
   "STORE_UNAVAILABLE",
@@ -18,6 +19,7 @@ export const CHECKOUT_ERROR_CODES = [
   "RESERVATION_ALREADY_RELEASED",
   "IDEMPOTENCY_CONFLICT",
   "ADDRESS_INCOMPLETE",
+  "PICKUP_UNAVAILABLE",
 ] as const;
 export type CheckoutErrorCode = (typeof CHECKOUT_ERROR_CODES)[number];
 export type CheckoutIntentItem = {
@@ -36,7 +38,15 @@ export type CheckoutIntent = {
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const checkoutIntentError = (intent: CheckoutIntent): CheckoutErrorCode | null => {
   if (!intent.storeSlug.trim() || !intent.idempotencyKey.trim()) return "INVALID_ITEM";
-  if (!intent.shippingAddress.recipient?.trim() || !intent.shippingAddress.city?.trim())
+  if (
+    intent.shippingAddress.delivery_method &&
+    !["delivery", "pickup"].includes(intent.shippingAddress.delivery_method)
+  )
+    return "ADDRESS_INCOMPLETE";
+  if (
+    intent.shippingAddress.delivery_method !== "pickup" &&
+    !deliveryAddressComplete(intent.shippingAddress)
+  )
     return "ADDRESS_INCOMPLETE";
   if (!intent.items.length) return "EMPTY_CART";
   const seen = new Set<string>();
@@ -75,6 +85,7 @@ export const checkoutErrorMessage = (code: string) =>
       STOCK_RESERVATION_CONFLICT: "Não foi possível reservar o estoque deste item.",
       RESERVATION_ALREADY_RELEASED: "A reserva deste item já foi liberada.",
       IDEMPOTENCY_CONFLICT: "Não foi possível confirmar esta tentativa de checkout.",
-      ADDRESS_INCOMPLETE: "Informe ao menos destinatário e cidade para a entrega.",
+      ADDRESS_INCOMPLETE: "Preencha o endereço completo, com CEP e UF válidos.",
+      PICKUP_UNAVAILABLE: "Esta loja ainda não oferece retirada.",
     }) as Record<string, string>
   )[code] ?? "Não foi possível concluir o pedido agora.";
